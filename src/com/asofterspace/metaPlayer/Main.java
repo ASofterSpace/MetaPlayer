@@ -10,6 +10,8 @@ import com.asofterspace.toolbox.Utils;
 
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 
 public class Main {
 
@@ -18,7 +20,6 @@ public class Main {
 	public final static String VERSION_DATE = "25. September 2019";
 
 	private static ConfigFile config;
-	private static ConfigFile songs;
 
 	private static PlayerCtrl playerCtrl;
 	private static SongCtrl songCtrl;
@@ -53,33 +54,23 @@ public class Main {
 
 		// load config
 		config = new ConfigFile("settings", true);
-		songs = new ConfigFile("songs", true);
 
 		// create a default config file, if necessary
 		if (config.getAllContents().isEmpty()) {
 			config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
-		}
-		if (songs.getAllContents().isEmpty()) {
-			songs.setAllContents(new JSON("[]"));
 		}
 
 		// load player associations
 		playerCtrl = new PlayerCtrl(config.getAllContents());
 
 		// load songs
-		songCtrl = new SongCtrl(songs.getAllContents());
+		songCtrl = new SongCtrl();
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
-		// TODO :: actually do stuff ;)
-
-		save();
+		SwingUtilities.invokeLater(new GUI(playerCtrl, songCtrl, config));
 
 		System.out.println("MetaPlayer out. Have a fun day! :)");
-	}
-
-	private static void save() {
-		songs.setAllContents(songCtrl.getData());
 	}
 
 }

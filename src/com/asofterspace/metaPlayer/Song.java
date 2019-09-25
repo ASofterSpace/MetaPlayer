@@ -34,4 +34,9 @@ public class Song {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return artist + " - " + title;
+	}
+
 }

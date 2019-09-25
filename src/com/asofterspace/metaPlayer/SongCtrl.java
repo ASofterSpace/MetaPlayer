@@ -4,6 +4,7 @@
  */
 package com.asofterspace.metaPlayer;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.Record;
 
@@ -13,11 +14,22 @@ import java.util.List;
 
 public class SongCtrl {
 
+	private ConfigFile songConfig;
+
 	private List<Song> songs;
 
 
-	public SongCtrl(JSON config) {
-		List<Record> songRecords = config.getValues();
+	public SongCtrl() {
+
+		songConfig = new ConfigFile("songs", true);
+
+		// create a default config file, if necessary
+		if (songConfig.getAllContents().isEmpty()) {
+			songConfig.setAllContents(new JSON("[]"));
+		}
+
+		JSON songRecordContainer = songConfig.getAllContents();
+		List<Record> songRecords = songRecordContainer.getValues();
 
 		songs = new ArrayList<>();
 
@@ -27,7 +39,11 @@ public class SongCtrl {
 		}
 	}
 
-	public Record getData() {
+	public List<Song> getSongs() {
+		return songs;
+	}
+
+	public Record getSongData() {
 
 		JSON result = new JSON();
 		result.makeArray();
@@ -37,5 +53,9 @@ public class SongCtrl {
 		}
 
 		return result;
+	}
+
+	public void save() {
+		songConfig.setAllContents(getSongData());
 	}
 }
