@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +74,7 @@ public class GUI extends MainWindow {
 
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
+	private ScheduledExecutorService executor;
 
 	private Song currentlyPlayedSong;
 
@@ -95,6 +99,8 @@ public class GUI extends MainWindow {
 		this.songCtrl = songCtrl;
 
 		this.configuration = config;
+
+		executor = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	@Override
@@ -151,6 +157,8 @@ public class GUI extends MainWindow {
 		});
 
 		regenerateSongList();
+
+		startPlaying();
 	}
 
 	private JMenuBar createMenu(JFrame parent) {
@@ -179,6 +187,7 @@ public class GUI extends MainWindow {
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				executor.shutdown();
 				System.exit(0);
 			}
 		});
@@ -366,6 +375,7 @@ public class GUI extends MainWindow {
 	 */
 	public void regenerateSongList() {
 
+		/*
 		// if there is no last shown tab...
 		if (currentlyPlayedSong == null) {
 			// ... show some random tab explicitly - this is fun, and the tabbed layout otherwise shows it anyway, so may as well...
@@ -373,6 +383,7 @@ public class GUI extends MainWindow {
 				setCurrentlyPlayedSong(songCtrl.getSongs().get(0));
 			}
 		}
+		*/
 
 		/*
 		Collections.sort(songCtrl.getSongs(), new Comparator<Song>() {
@@ -431,8 +442,42 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE);
 	}
 
-	private void setCurrentlyPlayedSong(Song song) {
-		currentlyPlayedSong = song;
+	private void playSong(Song song) {
+
+		String player = playerCtrl.getPlayerForSong(song);
+
+		if (player != null) {
+
+			currentlyPlayedSong = song;
+
+			try {
+				Process process = new ProcessBuilder(player, song.getPath()).start();
+
+				if (song.getLength() != null) {
+					Runnable task = new Runnable() {
+						@Override
+						public void run() {
+							process.destroy();
+						}
+					};
+					executor.schedule(task, song.getLength(), TimeUnit.MILLISECONDS);
+				}
+
+				regenerateSongList();
+
+			} catch (IOException ex) {
+				System.err.println("Could not start playing the song " + song.getPath() + " with player " + player + " due to: " + ex);
+			}
+		}
+	}
+
+	private void startPlaying() {
+
+		List<Song> songs = songCtrl.getSongs();
+
+		if (songs.size() > 0) {
+			playSong(songs.get(0));
+		}
 	}
 
 }

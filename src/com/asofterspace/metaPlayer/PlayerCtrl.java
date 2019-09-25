@@ -21,6 +21,10 @@ public class PlayerCtrl {
 		extPlayerAssocs = config.getArray(EXT_PLAYER_ASSOC_KEY);
 	}
 
+	public String getPlayerForSong(Song song) {
+		return getPlayerForFile(song.getPath());
+	}
+
 	public String getPlayerForFile(String filename) {
 
 		for (Record assoc : extPlayerAssocs) {

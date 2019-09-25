@@ -6,6 +6,8 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.io.Record;
 
+import java.io.File;
+
 
 public class Song {
 
@@ -32,6 +34,14 @@ public class Song {
 		result.set("length", new Record(length));
 		result.set("rating", new Record(rating));
 		return result;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public Integer getLength() {
+		return length;
 	}
 
 	@Override
