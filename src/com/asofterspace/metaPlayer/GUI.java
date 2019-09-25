@@ -159,6 +159,8 @@ public class GUI extends MainWindow {
 			}
 		});
 
+		songCtrl.randomize();
+
 		regenerateSongList();
 
 		startPlaying();
@@ -189,16 +191,15 @@ public class GUI extends MainWindow {
 		});
 		songs.add(stopPlaying);
 
-		/*
 		JMenuItem randomize = new JMenuItem("Randomize");
 		randomize.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO randomizeSongs();
+				songCtrl.randomize();
+				regenerateSongList();
 			}
 		});
 		songs.add(randomize);
-		*/
 
 		// songs.addSeparator();
 

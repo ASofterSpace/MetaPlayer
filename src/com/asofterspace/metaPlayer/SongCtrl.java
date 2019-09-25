@@ -9,7 +9,9 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.Record;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 
 public class SongCtrl {
@@ -17,6 +19,8 @@ public class SongCtrl {
 	private ConfigFile songConfig;
 
 	private List<Song> songs;
+
+	private Random randomizer;
 
 
 	public SongCtrl() {
@@ -37,6 +41,12 @@ public class SongCtrl {
 			Song song = new Song(record);
 			songs.add(song);
 		}
+
+		randomizer = new Random();
+	}
+
+	public void randomize() {
+		Collections.shuffle(songs, randomizer);
 	}
 
 	public List<Song> getSongs() {
