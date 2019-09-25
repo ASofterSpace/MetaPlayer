@@ -53,7 +53,7 @@ public class SongCtrl {
 	public void sort() {
 		Collections.sort(songs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				return a.toString().compareTo(b.toString());
+				return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
 			}
 		});
 	}
