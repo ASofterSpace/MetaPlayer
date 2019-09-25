@@ -43,6 +43,21 @@ public class SongCtrl {
 		return songs;
 	}
 
+	public Song getNextSong(Song currentlyPlayedSong) {
+
+		for (int i = 0; i < songs.size() - 1; i++) {
+			if (songs.get(i).equals(currentlyPlayedSong)) {
+				return songs.get(i+1);
+			}
+		}
+
+		if (songs.size() > 0) {
+			return songs.get(0);
+		}
+
+		return null;
+	}
+
 	public Record getSongData() {
 
 		JSON result = new JSON();

@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.HashSet;
 import java.util.List;
@@ -74,7 +74,9 @@ public class GUI extends MainWindow {
 
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
-	private ScheduledExecutorService executor;
+	private ScheduledThreadPoolExecutor executor;
+	private Runnable lastDestructionTask;
+	private ScheduledFuture<?> lastDestructor;
 
 	private Song currentlyPlayedSong;
 
@@ -100,7 +102,8 @@ public class GUI extends MainWindow {
 
 		this.configuration = config;
 
-		executor = Executors.newSingleThreadScheduledExecutor();
+		executor = new ScheduledThreadPoolExecutor(1);
+		executor.setRemoveOnCancelPolicy(true);
 	}
 
 	@Override
@@ -165,25 +168,50 @@ public class GUI extends MainWindow {
 
 		JMenuBar menu = new JMenuBar();
 
-		JMenu file = new JMenu("File");
-		menu.add(file);
+		JMenu songs = new JMenu("Songs");
+		menu.add(songs);
 
-		/*
-		JMenuItem newFile = new JMenuItem("New File");
-		newFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		newFile.addActionListener(new ActionListener() {
+		JMenuItem startPlaying = new JMenuItem("Start Playing");
+		startPlaying.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				newFile();
+				playNextSong();
 			}
 		});
-		file.add(newFile);
+		songs.add(startPlaying);
+
+		JMenuItem stopPlaying = new JMenuItem("Stop Playing");
+		stopPlaying.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				stopPlaying();
+			}
+		});
+		songs.add(stopPlaying);
+
+		/*
+		JMenuItem randomize = new JMenuItem("Randomize");
+		randomize.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO randomizeSongs();
+			}
+		});
+		songs.add(randomize);
 		*/
 
-		// file.addSeparator();
+		// songs.addSeparator();
 
-		close = new JMenuItem("Exit");
-		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
+		JMenuItem next = new JMenuItem("Next");
+		next.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playNextSong();
+			}
+		});
+		menu.add(next);
+
+		close = new JMenuItem("Close");
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -191,7 +219,7 @@ public class GUI extends MainWindow {
 				System.exit(0);
 			}
 		});
-		file.add(close);
+		menu.add(close);
 
 		JMenu huh = new JMenu("?");
 
@@ -442,33 +470,74 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE);
 	}
 
+	private void stopPlaying() {
+
+		// stop the ongoing destruction of the current player
+		if (lastDestructor != null) {
+			lastDestructor.cancel(false);
+			lastDestructor = null;
+		}
+		// actually destroy the current player right now
+		if (lastDestructionTask != null) {
+			lastDestructionTask.run();
+			lastDestructionTask = null;
+		}
+
+		currentlyPlayedSong = null;
+
+		regenerateSongList();
+	}
+
 	private void playSong(Song song) {
+
+		if (song == null) {
+			return;
+		}
 
 		String player = playerCtrl.getPlayerForSong(song);
 
-		if (player != null) {
-
-			currentlyPlayedSong = song;
-
-			try {
-				Process process = new ProcessBuilder(player, song.getPath()).start();
-
-				if (song.getLength() != null) {
-					Runnable task = new Runnable() {
-						@Override
-						public void run() {
-							process.destroy();
-						}
-					};
-					executor.schedule(task, song.getLength(), TimeUnit.MILLISECONDS);
-				}
-
-				regenerateSongList();
-
-			} catch (IOException ex) {
-				System.err.println("Could not start playing the song " + song.getPath() + " with player " + player + " due to: " + ex);
-			}
+		if (player == null) {
+			return;
 		}
+
+		currentlyPlayedSong = song;
+
+		try {
+			// stop the ongoing destruction of the current player
+			if (lastDestructor != null) {
+				lastDestructor.cancel(false);
+			}
+			// actually destroy the current player right now
+			if (lastDestructionTask != null) {
+				lastDestructionTask.run();
+			}
+
+			Process process = new ProcessBuilder(player, song.getPath()).start();
+
+			if (song.getLength() != null) {
+				lastDestructionTask = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							process.destroy();
+						} catch (Throwable t) {
+							// catching throwables is bad? well... oopsie!
+						}
+					}
+				};
+				lastDestructor = executor.schedule(lastDestructionTask, song.getLength(), TimeUnit.MILLISECONDS);
+			}
+
+			regenerateSongList();
+
+		} catch (IOException ex) {
+			System.err.println("Could not start playing the song " + song.getPath() + " with player " + player + " due to: " + ex);
+		}
+	}
+
+	private void playNextSong() {
+
+		playSong(songCtrl.getNextSong(currentlyPlayedSong));
 	}
 
 	private void startPlaying() {
