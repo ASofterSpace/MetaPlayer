@@ -18,6 +18,8 @@ public class Song {
 	private Integer rating;
 
 
+	public Song() {}
+
 	public Song(Record record) {
 		this.artist = record.getString("artist");
 		this.title = record.getString("title");
@@ -36,17 +38,88 @@ public class Song {
 		return result;
 	}
 
+	public String getArtist() {
+		return artist;
+	}
+
+	public void setArtist(String artist) {
+		this.artist = artist;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getPath() {
 		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public Integer getLength() {
 		return length;
 	}
 
+	public void setLength(Integer length) {
+		this.length = length;
+	}
+
+	public void setLength(String length) {
+		try {
+			this.length = Integer.parseInt(length);
+		} catch (NumberFormatException e) {}
+	}
+
+	public Integer getRating() {
+		return rating;
+	}
+
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
+
+	public void setRating(String rating) {
+		try {
+			this.rating = Integer.parseInt(rating);
+		} catch (NumberFormatException e) {}
+	}
+
 	@Override
 	public String toString() {
 		return artist + " - " + title;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof Song) {
+			Song otherSong = (Song) other;
+			if (otherSong.path == null) {
+				if (path == null) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			return otherSong.path.equals(path);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		if (path == null) {
+			return 0;
+		}
+		return path.hashCode();
 	}
 
 }

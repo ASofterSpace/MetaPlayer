@@ -10,6 +10,7 @@ import com.asofterspace.toolbox.io.Record;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -49,8 +50,80 @@ public class SongCtrl {
 		Collections.shuffle(songs, randomizer);
 	}
 
+	public void sort() {
+		Collections.sort(songs, new Comparator<Song>() {
+			public int compare(Song a, Song b) {
+				return a.toString().compareTo(b.toString());
+			}
+		});
+	}
+
+	/**
+	 * Ensure that every song is only present once;
+	 * if a song is present several times, take the longest length
+	 * and the highest score :)
+	 */
+	public void cullMultiples() {
+
+		boolean continueCulling = true;
+		int index = 0;
+
+		while (continueCulling) {
+
+			continueCulling = false;
+
+			while (index < songs.size()) {
+				if (culledSong(songs.get(index), index)) {
+					continueCulling = true;
+					break;
+				}
+				index++;
+			}
+		}
+	}
+
+	/**
+	 * Tries to cull a song and returns true if it actually managed to do so
+	 */
+	private boolean culledSong(Song curSong, int index) {
+
+		for (int j = index + 1; j < songs.size(); j++) {
+			Song otherSong = songs.get(j);
+			if (curSong.equals(otherSong)) {
+				songs.remove(j);
+				if (otherSong.getLength() != null) {
+					if (curSong.getLength() == null) {
+						curSong.setLength(otherSong.getLength());
+					}
+					if (curSong.getLength() < otherSong.getLength()) {
+						curSong.setLength(otherSong.getLength());
+					}
+				}
+				if (otherSong.getRating() != null) {
+					if (curSong.getRating() == null) {
+						curSong.setRating(otherSong.getRating());
+					}
+					if (curSong.getRating() < otherSong.getRating()) {
+						curSong.setRating(otherSong.getRating());
+					}
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public List<Song> getSongs() {
 		return songs;
+	}
+
+	public int getSongAmount() {
+		return songs.size();
+	}
+
+	public void add(Song song) {
+		songs.add(song);
 	}
 
 	public Song getNextSong(Song currentlyPlayedSong) {

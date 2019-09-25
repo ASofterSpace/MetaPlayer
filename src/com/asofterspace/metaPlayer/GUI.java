@@ -8,6 +8,7 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
+import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.Callback;
 import com.asofterspace.toolbox.Utils;
 
@@ -86,6 +87,7 @@ public class GUI extends MainWindow {
 	private JTextField searchField;
 
 	private JMenuItem close;
+	private JMenuItem songItem;
 
 	private ConfigFile configuration;
 	private JList<String> songListComponent;
@@ -191,6 +193,8 @@ public class GUI extends MainWindow {
 		});
 		songs.add(stopPlaying);
 
+		songs.addSeparator();
+
 		JMenuItem randomize = new JMenuItem("Randomize");
 		randomize.addActionListener(new ActionListener() {
 			@Override
@@ -201,7 +205,82 @@ public class GUI extends MainWindow {
 		});
 		songs.add(randomize);
 
-		// songs.addSeparator();
+		JMenuItem sort = new JMenuItem("Sort");
+		sort.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.sort();
+				regenerateSongList();
+			}
+		});
+		songs.add(sort);
+
+		songs.addSeparator();
+
+		JMenuItem importSongs = new JMenuItem("Import");
+		importSongs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO :: do not hardcode this ;)
+				String folder = "C:\\home\\prog\\delphi\\andere\\metaplayer\\playlists\\";
+				String mppPath = folder + "music.mpp";
+				String intPath = folder + "music_int.mpp";
+				SimpleFile mppFile = new SimpleFile(mppPath);
+				SimpleFile intFile = new SimpleFile(intPath);
+				List<String> mppContents = mppFile.getContents();
+				List<String> intContents = intFile.getContents();
+				for (int i = 0; i < mppContents.size(); i++) {
+					Song song = new Song();
+					song.setPath(intContents.get(i*2));
+					String songName = mppContents.get(i);
+					String[] songNames = songName.split(" - ");
+					song.setArtist(songNames[0]);
+					if (songNames.length > 2) {
+						song.setTitle(songNames[1] + " - " + songNames[2]);
+					} else {
+						if (songNames.length > 1) {
+							if (songNames[1].endsWith(".mp4")) {
+								song.setTitle(songNames[1].substring(songNames[1].length() - 4));
+							} else {
+								song.setTitle(songNames[1]);
+							}
+						}
+					}
+					String lengthAndRating = intContents.get((i*2)+1);
+					String[] lengthAndRatings = lengthAndRating.split("\\*");
+					song.setLength(lengthAndRatings[0]);
+					if (lengthAndRatings.length > 1) {
+						song.setRating(lengthAndRatings[1]);
+					}
+					songCtrl.add(song);
+				}
+				songCtrl.save();
+				regenerateSongList();
+			}
+		});
+		songs.add(importSongs);
+
+		JMenuItem cullMultiples = new JMenuItem("Cull Multiples");
+		cullMultiples.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.cullMultiples();
+				songCtrl.save();
+				regenerateSongList();
+			}
+		});
+		songs.add(cullMultiples);
+
+		songs.addSeparator();
+
+		JMenuItem save = new JMenuItem("Save");
+		save.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.save();
+			}
+		});
+		songs.add(save);
 
 		JMenuItem next = new JMenuItem("Next");
 		next.addActionListener(new ActionListener() {
@@ -249,6 +328,15 @@ public class GUI extends MainWindow {
 		});
 		huh.add(about);
 		menu.add(huh);
+
+		songItem = new JMenuItem("");
+		songItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO :: copy the path of the currently played song to the clipboard
+			}
+		});
+		menu.add(songItem);
 
 		parent.setJMenuBar(menu);
 
@@ -448,6 +536,8 @@ public class GUI extends MainWindow {
 		*/
 
 		highlightTabInLeftListOrTree(currentlyPlayedSong);
+
+		refreshTitleBar();
 	}
 
 	public void highlightTabInLeftListOrTree(Song song) {
@@ -468,7 +558,7 @@ public class GUI extends MainWindow {
 	}
 
 	private void refreshTitleBar() {
-		mainFrame.setTitle(Main.PROGRAM_TITLE);
+		mainFrame.setTitle(Main.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
 	}
 
 	private void stopPlaying() {
@@ -485,6 +575,7 @@ public class GUI extends MainWindow {
 		}
 
 		currentlyPlayedSong = null;
+		songItem.setText("");
 
 		regenerateSongList();
 	}
@@ -502,6 +593,7 @@ public class GUI extends MainWindow {
 		}
 
 		currentlyPlayedSong = song;
+		songItem.setText(song.getPath());
 
 		try {
 			// stop the ongoing destruction of the current player
