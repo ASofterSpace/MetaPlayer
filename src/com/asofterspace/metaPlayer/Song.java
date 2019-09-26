@@ -92,6 +92,9 @@ public class Song {
 
 	@Override
 	public String toString() {
+		if (artist == null) {
+			return title;
+		}
 		return artist + " - " + title;
 	}
 

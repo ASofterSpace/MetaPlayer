@@ -34,6 +34,7 @@ public class SongCtrl {
 		}
 
 		JSON songRecordContainer = songConfig.getAllContents();
+
 		List<Record> songRecords = songRecordContainer.getValues();
 
 		songs = new ArrayList<>();

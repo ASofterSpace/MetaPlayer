@@ -69,8 +69,6 @@ public class Main {
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
 		SwingUtilities.invokeLater(new GUI(playerCtrl, songCtrl, config));
-
-		System.out.println("MetaPlayer out. Have a fun day! :)");
 	}
 
 }

@@ -30,6 +30,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -227,6 +228,8 @@ public class GUI extends MainWindow {
 				String intPath = folder + "music_int.mpp";
 				SimpleFile mppFile = new SimpleFile(mppPath);
 				SimpleFile intFile = new SimpleFile(intPath);
+				mppFile.useCharset(StandardCharsets.ISO_8859_1);
+				intFile.useCharset(StandardCharsets.ISO_8859_1);
 				List<String> mppContents = mppFile.getContents();
 				List<String> intContents = intFile.getContents();
 				for (int i = 0; i < mppContents.size(); i++) {
@@ -234,18 +237,23 @@ public class GUI extends MainWindow {
 					song.setPath(intContents.get(i*2));
 					String songName = mppContents.get(i);
 					String[] songNames = songName.split(" - ");
-					song.setArtist(songNames[0]);
-					if (songNames.length > 2) {
-						song.setTitle(songNames[1] + " - " + songNames[2]);
+					String title = null;
+					if (songNames.length > 1) {
+						song.setArtist(songNames[0]);
+						if (songNames.length > 2) {
+							title = songNames[1] + " - " + songNames[2];
+						} else {
+							title = songNames[1];
+						}
 					} else {
-						if (songNames.length > 1) {
-							if (songNames[1].endsWith(".mp4")) {
-								song.setTitle(songNames[1].substring(songNames[1].length() - 4));
-							} else {
-								song.setTitle(songNames[1]);
-							}
+						title = songNames[0];
+					}
+					if (title != null) {
+						if (title.endsWith(".mp4")) {
+							title = title.substring(0, title.length() - 4);
 						}
 					}
+					song.setTitle(title);
 					String lengthAndRating = intContents.get((i*2)+1);
 					String[] lengthAndRatings = lengthAndRating.split("\\*");
 					song.setLength(lengthAndRatings[0]);
