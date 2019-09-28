@@ -77,7 +77,7 @@ public class GUI extends MainWindow {
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
 	private ScheduledThreadPoolExecutor executor;
-	private Runnable lastDestructionTask;
+	private SongEndTask lastDestructionTask;
 	private ScheduledFuture<?> lastDestructor;
 
 	private Song currentlyPlayedSong;
@@ -569,7 +569,7 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
 	}
 
-	private void stopPlaying() {
+	private void stopPlayingInternal() {
 
 		// stop the ongoing destruction of the current player
 		if (lastDestructor != null) {
@@ -578,9 +578,14 @@ public class GUI extends MainWindow {
 		}
 		// actually destroy the current player right now
 		if (lastDestructionTask != null) {
-			lastDestructionTask.run();
+			lastDestructionTask.stopPlayer();
 			lastDestructionTask = null;
 		}
+	}
+
+	private void stopPlaying() {
+
+		stopPlayingInternal();
 
 		currentlyPlayedSong = null;
 		songItem.setText("");
@@ -604,28 +609,13 @@ public class GUI extends MainWindow {
 		songItem.setText(song.getPath());
 
 		try {
-			// stop the ongoing destruction of the current player
-			if (lastDestructor != null) {
-				lastDestructor.cancel(false);
-			}
-			// actually destroy the current player right now
-			if (lastDestructionTask != null) {
-				lastDestructionTask.run();
-			}
+			// we call the internal version, as we do not want to immediately regenerate the song list
+			stopPlayingInternal();
 
 			Process process = new ProcessBuilder(player, song.getPath()).start();
 
 			if (song.getLength() != null) {
-				lastDestructionTask = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							process.destroy();
-						} catch (Throwable t) {
-							// catching throwables is bad? well... oopsie!
-						}
-					}
-				};
+				lastDestructionTask = new SongEndTask(this, process);
 				lastDestructor = executor.schedule(lastDestructionTask, song.getLength(), TimeUnit.MILLISECONDS);
 			}
 
@@ -636,7 +626,7 @@ public class GUI extends MainWindow {
 		}
 	}
 
-	private void playNextSong() {
+	public void playNextSong() {
 
 		playSong(songCtrl.getNextSong(currentlyPlayedSong));
 	}
