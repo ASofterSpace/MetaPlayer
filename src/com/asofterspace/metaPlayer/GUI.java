@@ -8,6 +8,7 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
+import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.Callback;
 import com.asofterspace.toolbox.Utils;
@@ -41,12 +42,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -87,7 +90,6 @@ public class GUI extends MainWindow {
 	private JPanel searchPanel;
 	private JTextField searchField;
 
-	private JMenuItem close;
 	private JMenuItem songItem;
 
 	private ConfigFile configuration;
@@ -290,7 +292,27 @@ public class GUI extends MainWindow {
 		});
 		songs.add(save);
 
-		JMenuItem next = new JMenuItem("Next");
+		menu.add(new MenuItemForMainMenu("|"));
+
+		AbstractButton prev = new MenuItemForMainMenu("Previous");
+		prev.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playPreviousSong();
+			}
+		});
+		menu.add(prev);
+
+		AbstractButton pause = new MenuItemForMainMenu("Pause");
+		pause.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pauseCurSong();
+			}
+		});
+		menu.add(pause);
+
+		AbstractButton next = new MenuItemForMainMenu("Next");
 		next.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -299,7 +321,29 @@ public class GUI extends MainWindow {
 		});
 		menu.add(next);
 
-		close = new JMenuItem("Close");
+		menu.add(new MenuItemForMainMenu("|"));
+
+		AbstractButton songIsOver = new MenuItemForMainMenu("Song is Over");
+		songIsOver.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				curSongIsOver();
+			}
+		});
+		menu.add(songIsOver);
+
+		AbstractButton resetLength = new MenuItemForMainMenu("Reset Length");
+		resetLength.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resetCurSongLength();
+			}
+		});
+		menu.add(resetLength);
+
+		menu.add(new MenuItemForMainMenu("|"));
+
+		AbstractButton close = new MenuItemForMainMenu("Close");
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -336,6 +380,8 @@ public class GUI extends MainWindow {
 		});
 		huh.add(about);
 		menu.add(huh);
+
+		menu.add(new MenuItemForMainMenu("|"));
 
 		songItem = new JMenuItem("");
 		songItem.addActionListener(new ActionListener() {
@@ -631,6 +677,11 @@ public class GUI extends MainWindow {
 		playSong(songCtrl.getNextSong(currentlyPlayedSong));
 	}
 
+	private void playPreviousSong() {
+
+		playSong(songCtrl.getPreviousSong(currentlyPlayedSong));
+	}
+
 	private void startPlaying() {
 
 		List<Song> songs = songCtrl.getSongs();
@@ -638,6 +689,18 @@ public class GUI extends MainWindow {
 		if (songs.size() > 0) {
 			playSong(songs.get(0));
 		}
+	}
+
+	private void resetCurSongLength() {
+		// TODO
+	}
+
+	private void pauseCurSong() {
+		// TODO
+	}
+
+	private void curSongIsOver() {
+		// TODO
 	}
 
 }

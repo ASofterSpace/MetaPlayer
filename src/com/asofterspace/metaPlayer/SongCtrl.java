@@ -127,6 +127,21 @@ public class SongCtrl {
 		songs.add(song);
 	}
 
+	public Song getPreviousSong(Song currentlyPlayedSong) {
+
+		for (int i = 0; i < songs.size() - 1; i++) {
+			if (songs.get(i).equals(currentlyPlayedSong)) {
+				return songs.get(i-1);
+			}
+		}
+
+		if (songs.size() > 0) {
+			return songs.get(songs.size() - 1);
+		}
+
+		return null;
+	}
+
 	public Song getNextSong(Song currentlyPlayedSong) {
 
 		for (int i = 0; i < songs.size() - 1; i++) {
