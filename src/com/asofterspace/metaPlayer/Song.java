@@ -7,6 +7,7 @@ package com.asofterspace.metaPlayer;
 import com.asofterspace.toolbox.io.Record;
 
 import java.io.File;
+import java.io.IOException;
 
 
 public class Song {
@@ -18,7 +19,62 @@ public class Song {
 	private Integer rating;
 
 
-	public Song() {}
+	public Song(File file) {
+		this(fileToPath(file));
+	}
+
+	private static String fileToPath(File file) {
+		try {
+			return file.getCanonicalPath();
+		} catch (IOException ex) {
+			return file.getAbsolutePath();
+		}
+	}
+
+	public Song(String path) {
+		this(path, null);
+	}
+
+	public Song(String path, String artistAndTitle) {
+
+		this.setPath(path);
+
+		if ((artistAndTitle == null) || !artistAndTitle.contains(" - ")) {
+			String altSongName = path;
+			if (altSongName.contains("\\")) {
+				altSongName = altSongName.substring(altSongName.lastIndexOf("\\") + 1);
+			}
+			if (altSongName.contains("/")) {
+				altSongName = altSongName.substring(altSongName.lastIndexOf("/") + 1);
+			}
+			if ((artistAndTitle == null) || altSongName.contains(" - ")) {
+				artistAndTitle = altSongName;
+			}
+		}
+		String[] songNames = artistAndTitle.split(" - ");
+		title = null;
+		if (songNames.length > 1) {
+			artist = songNames[0];
+			if (songNames.length > 2) {
+				title = songNames[1] + " - " + songNames[2];
+			} else {
+				title = songNames[1];
+			}
+		} else {
+			title = songNames[0];
+		}
+		if (title != null) {
+			if (title.endsWith(".mp4") ||
+				title.endsWith(".mp3") ||
+				title.endsWith(".mkv") ||
+				title.endsWith(".avi") ||
+				title.endsWith(".flv") ||
+				title.endsWith(".wmv") ||
+				title.endsWith(".wma")) {
+				title = title.substring(0, title.length() - 4);
+			}
+		}
+	}
 
 	public Song(Record record) {
 		this.artist = record.getString("artist");
@@ -115,6 +171,37 @@ public class Song {
 			return otherSong.path.equals(path);
 		}
 		return false;
+	}
+
+	public boolean is(String otherArtist, String otherTitle) {
+
+		if (artist == null) {
+			if (otherArtist != null) {
+				return false;
+			}
+		} else {
+			if (otherArtist == null) {
+				return false;
+			}
+			if (!artist.equals(otherArtist)) {
+				return false;
+			}
+		}
+
+		if (title == null) {
+			if (otherTitle != null) {
+				return false;
+			}
+		} else {
+			if (otherTitle == null) {
+				return false;
+			}
+			if (!title.equals(otherTitle)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override

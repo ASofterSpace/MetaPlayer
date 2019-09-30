@@ -92,6 +92,20 @@ public class SongCtrl {
 			Song otherSong = songs.get(j);
 			if (curSong.equals(otherSong)) {
 				songs.remove(j);
+				// if this song's artist or title are missing, take the artist/title pair of the other song
+				if (otherSong.getArtist() != null) {
+					if (curSong.getArtist() == null) {
+						curSong.setArtist(otherSong.getArtist());
+						curSong.setTitle(otherSong.getTitle());
+					}
+				}
+				if (otherSong.getTitle() != null) {
+					if (curSong.getTitle() == null) {
+						curSong.setArtist(otherSong.getArtist());
+						curSong.setTitle(otherSong.getTitle());
+					}
+				}
+				// take the longer length...
 				if (otherSong.getLength() != null) {
 					if (curSong.getLength() == null) {
 						curSong.setLength(otherSong.getLength());
@@ -100,6 +114,7 @@ public class SongCtrl {
 						curSong.setLength(otherSong.getLength());
 					}
 				}
+				// ... and the higher rating
 				if (otherSong.getRating() != null) {
 					if (curSong.getRating() == null) {
 						curSong.setRating(otherSong.getRating());
@@ -109,6 +124,9 @@ public class SongCtrl {
 					}
 				}
 				return true;
+			}
+			if (curSong.is(otherSong.getArtist(), otherSong.getTitle())) {
+				otherSong.setTitle(otherSong.getTitle() + " (2)");
 			}
 		}
 
@@ -125,6 +143,17 @@ public class SongCtrl {
 
 	public void add(Song song) {
 		songs.add(song);
+	}
+
+	public void addUnlessAlreadyPresent(Song song) {
+
+		for (Song curSong : songs) {
+			if (song.equals(curSong)) {
+				return;
+			}
+		}
+
+		add(song);
 	}
 
 	public Song getPreviousSong(Song currentlyPlayedSong) {

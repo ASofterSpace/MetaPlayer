@@ -76,6 +76,8 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_HEIGHT = "mainFrameHeight";
 	private final static String CONFIG_KEY_LEFT = "mainFrameLeft";
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
+	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
+	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
@@ -220,55 +222,23 @@ public class GUI extends MainWindow {
 
 		songs.addSeparator();
 
-		JMenuItem importSongs = new JMenuItem("Import");
+		JMenuItem importSongs = new JMenuItem("Import Songs");
 		importSongs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO :: do not hardcode this ;)
-				String folder = "C:\\home\\prog\\delphi\\andere\\metaplayer\\playlists\\";
-				String mppPath = folder + "music.mpp";
-				String intPath = folder + "music_int.mpp";
-				SimpleFile mppFile = new SimpleFile(mppPath);
-				SimpleFile intFile = new SimpleFile(intPath);
-				mppFile.useCharset(StandardCharsets.ISO_8859_1);
-				intFile.useCharset(StandardCharsets.ISO_8859_1);
-				List<String> mppContents = mppFile.getContents();
-				List<String> intContents = intFile.getContents();
-				for (int i = 0; i < mppContents.size(); i++) {
-					Song song = new Song();
-					song.setPath(intContents.get(i*2));
-					String songName = mppContents.get(i);
-					String[] songNames = songName.split(" - ");
-					String title = null;
-					if (songNames.length > 1) {
-						song.setArtist(songNames[0]);
-						if (songNames.length > 2) {
-							title = songNames[1] + " - " + songNames[2];
-						} else {
-							title = songNames[1];
-						}
-					} else {
-						title = songNames[0];
-					}
-					if (title != null) {
-						if (title.endsWith(".mp4")) {
-							title = title.substring(0, title.length() - 4);
-						}
-					}
-					song.setTitle(title);
-					String lengthAndRating = intContents.get((i*2)+1);
-					String[] lengthAndRatings = lengthAndRating.split("\\*");
-					song.setLength(lengthAndRatings[0]);
-					if (lengthAndRatings.length > 1) {
-						song.setRating(lengthAndRatings[1]);
-					}
-					songCtrl.add(song);
-				}
-				songCtrl.save();
-				regenerateSongList();
+				importSongs();
 			}
 		});
 		songs.add(importSongs);
+
+		JMenuItem importLegacyPlaylist = new JMenuItem("Import Songs from Legacy Playlist");
+		importLegacyPlaylist.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				importLegacyPlaylist();
+			}
+		});
+		songs.add(importLegacyPlaylist);
 
 		JMenuItem cullMultiples = new JMenuItem("Cull Multiples");
 		cullMultiples.addActionListener(new ActionListener() {
@@ -688,6 +658,133 @@ public class GUI extends MainWindow {
 
 		if (songs.size() > 0) {
 			playSong(songs.get(0));
+		}
+	}
+
+	private void importSongs() {
+
+		JFileChooser filePicker;
+
+		// use the last-used directory
+		String lastDirectory = configuration.getValue(CONFIG_KEY_LAST_SONG_DIRECTORY);
+
+		if ((lastDirectory != null) && !"".equals(lastDirectory)) {
+			filePicker = new JFileChooser(new java.io.File(lastDirectory));
+		} else {
+			filePicker = new JFileChooser();
+		}
+
+		filePicker.setDialogTitle("Open Songs or Directories to Import");
+		filePicker.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		filePicker.setMultiSelectionEnabled(true);
+
+		int result = filePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getAbsolutePath());
+
+				for (java.io.File curFile : filePicker.getSelectedFiles()) {
+					importSongsRecursively(curFile);
+				}
+
+				songCtrl.save();
+				regenerateSongList();
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing for now
+				break;
+		}
+	}
+
+	private void importSongsRecursively(java.io.File parent) {
+
+		if (parent.isDirectory()) {
+			java.io.File[] curFiles = parent.listFiles();
+
+			for (java.io.File curFile : curFiles) {
+				importSongsRecursively(curFile);
+			}
+		} else {
+			songCtrl.addUnlessAlreadyPresent(new Song(parent));
+		}
+	}
+
+	private void importLegacyPlaylist() {
+
+		JFileChooser filePicker;
+
+		// use the last-used directory
+		String lastDirectory = configuration.getValue(CONFIG_KEY_LAST_LEGACY_DIRECTORY);
+
+		if ((lastDirectory != null) && !"".equals(lastDirectory)) {
+			filePicker = new JFileChooser(new java.io.File(lastDirectory));
+		} else {
+			filePicker = new JFileChooser();
+		}
+
+		filePicker.setDialogTitle("Open a Legacy Playlist to Import");
+		filePicker.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		filePicker.setMultiSelectionEnabled(false);
+
+		int result = filePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				configuration.set(CONFIG_KEY_LAST_LEGACY_DIRECTORY, filePicker.getCurrentDirectory().getAbsolutePath());
+
+				java.io.File curFile = filePicker.getSelectedFile();
+
+				String mppPath;
+				String intPath;
+				String selectedPath = curFile.getAbsolutePath();
+
+				// we assume that either music.mpp or music_int.mpp were selected
+				if (selectedPath.contains("music.mpp")) {
+					mppPath = selectedPath;
+					intPath = selectedPath.replace("music.mpp", "music_int.mpp");
+				} else {
+					if (selectedPath.contains("music_int.mpp")) {
+						mppPath = selectedPath.replace("music_int.mpp", "music.mpp");
+						intPath = selectedPath;
+					} else {
+						System.err.println("You selected neither a file called music.mpp, nor one called music_int.mpp!");
+						return;
+					}
+				}
+				SimpleFile mppFile = new SimpleFile(mppPath);
+				SimpleFile intFile = new SimpleFile(intPath);
+				mppFile.useCharset(StandardCharsets.ISO_8859_1);
+				intFile.useCharset(StandardCharsets.ISO_8859_1);
+				List<String> mppContents = mppFile.getContents();
+				List<String> intContents = intFile.getContents();
+				for (int i = 0; i < mppContents.size(); i++) {
+					Song song = new Song(intContents.get(i*2), mppContents.get(i));
+					String lengthAndRating = intContents.get((i*2)+1);
+					String[] lengthAndRatings = lengthAndRating.split("\\*");
+					song.setLength(lengthAndRatings[0]);
+					if (lengthAndRatings.length > 1) {
+						song.setRating(lengthAndRatings[1]);
+					}
+					songCtrl.add(song);
+				}
+
+				songCtrl.save();
+				regenerateSongList();
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing for now
+				break;
 		}
 	}
 
