@@ -5,9 +5,6 @@
 package com.asofterspace.metaPlayer;
 
 
-// TODO :: actually link this back into the GUI,
-// and count down a timer there every second that
-// shows how long the song is still playing
 public class TimingCtrl {
 
 	// we only have one song end task at the same time!
@@ -19,6 +16,8 @@ public class TimingCtrl {
 
 	private boolean timerRunning;
 
+	private GUI gui;
+
 
 	public TimingCtrl() {
 
@@ -29,11 +28,15 @@ public class TimingCtrl {
 			public void run() {
 
 				while (timerRunning) {
-					try{
+					try {
 						SongEndTask task = currentEndTask;
 
 						if (task != null) {
-							if (executeSongEndAt < System.currentTimeMillis()) {
+							long remainingTime = executeSongEndAt - System.currentTimeMillis();
+							if (gui != null) {
+								gui.setRemainingTime(remainingTime);
+							}
+							if (remainingTime < 0) {
 								task.songIsOver();
 								currentEndTask = null;
 							}
@@ -47,6 +50,7 @@ public class TimingCtrl {
 				}
 			}
 		};
+		timerThread.start();
 	}
 
 	public void close() {
@@ -83,6 +87,10 @@ public class TimingCtrl {
 			currentEndTask = pausedEndTask;
 			pausedEndTask = null;
 		}
+	}
+
+	public void setGui(GUI gui) {
+		this.gui = gui;
 	}
 
 }

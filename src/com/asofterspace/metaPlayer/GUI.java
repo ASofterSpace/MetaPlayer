@@ -89,6 +89,7 @@ public class GUI extends MainWindow {
 
 	private JMenuItem songItem;
 	private AbstractButton pauseItem;
+	private AbstractButton timeRemainingItem;
 
 	private ConfigFile configuration;
 	private JList<String> songListComponent;
@@ -100,6 +101,7 @@ public class GUI extends MainWindow {
 	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
 
 		this.timingCtrl = timingCtrl;
+		timingCtrl.setGui(this);
 
 		this.playerCtrl = playerCtrl;
 
@@ -272,12 +274,12 @@ public class GUI extends MainWindow {
 		pauseItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (pauseItem.getName().equals("Pause")) {
+				if (pauseItem.getText().equals("Pause")) {
 					pauseCurSong();
-					pauseItem.setName("Continue");
+					pauseItem.setText("Continue");
 				} else {
 					continueCurSong();
-					pauseItem.setName("Pause");
+					pauseItem.setText("Pause");
 				}
 			}
 		});
@@ -362,6 +364,9 @@ public class GUI extends MainWindow {
 			}
 		});
 		menu.add(songItem);
+
+		timeRemainingItem = new MenuItemForMainMenu("");
+		menu.add(timeRemainingItem);
 
 		parent.setJMenuBar(menu);
 
@@ -616,7 +621,7 @@ public class GUI extends MainWindow {
 
 			Process process = new ProcessBuilder(player, song.getPath()).start();
 
-			pauseItem.setName("Pause");
+			pauseItem.setText("Pause");
 
 			if (song.getLength() != null) {
 				SongEndTask songEndTask = new SongEndTask(this, process);
@@ -790,6 +795,23 @@ public class GUI extends MainWindow {
 
 	private void curSongIsOver() {
 		// TODO
+	}
+
+	public void setRemainingTime(long remainingTime) {
+
+		if (timeRemainingItem == null) {
+			return;
+		}
+
+		if (remainingTime < 0) {
+			remainingTime = 0;
+		}
+
+		remainingTime = remainingTime / 1000;
+
+		timeRemainingItem.setText(
+			((int) Math.floor(remainingTime / 60)) + ":" + (remainingTime % 60)
+		);
 	}
 
 }
