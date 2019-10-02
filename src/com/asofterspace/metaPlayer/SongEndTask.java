@@ -4,8 +4,10 @@
  */
 package com.asofterspace.metaPlayer;
 
+import java.util.Date;
 
-public class SongEndTask implements Runnable {
+
+public class SongEndTask {
 
 	private GUI gui;
 
@@ -17,8 +19,7 @@ public class SongEndTask implements Runnable {
 		this.process = process;
 	}
 
-	@Override
-	public void run() {
+	public void songIsOver() {
 
 		stopPlayer();
 

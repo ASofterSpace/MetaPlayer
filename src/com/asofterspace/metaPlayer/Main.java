@@ -21,6 +21,7 @@ public class Main {
 
 	private static ConfigFile config;
 
+	private static TimingCtrl timingCtrl;
 	private static PlayerCtrl playerCtrl;
 	private static SongCtrl songCtrl;
 
@@ -60,6 +61,9 @@ public class Main {
 			config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
 		}
 
+		// create timer
+		timingCtrl = new TimingCtrl();
+
 		// load player associations
 		playerCtrl = new PlayerCtrl(config.getAllContents());
 
@@ -68,7 +72,7 @@ public class Main {
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
-		SwingUtilities.invokeLater(new GUI(playerCtrl, songCtrl, config));
+		SwingUtilities.invokeLater(new GUI(timingCtrl, playerCtrl, songCtrl, config));
 	}
 
 }

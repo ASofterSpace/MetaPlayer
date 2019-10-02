@@ -35,9 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,11 +76,9 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 
+	private TimingCtrl timingCtrl;
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
-	private ScheduledThreadPoolExecutor executor;
-	private SongEndTask lastDestructionTask;
-	private ScheduledFuture<?> lastDestructor;
 
 	private Song currentlyPlayedSong;
 
@@ -93,6 +88,7 @@ public class GUI extends MainWindow {
 	private JTextField searchField;
 
 	private JMenuItem songItem;
+	private AbstractButton pauseItem;
 
 	private ConfigFile configuration;
 	private JList<String> songListComponent;
@@ -101,16 +97,15 @@ public class GUI extends MainWindow {
 	private JScrollPane songListScroller;
 
 
-	public GUI(PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
+	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
+
+		this.timingCtrl = timingCtrl;
 
 		this.playerCtrl = playerCtrl;
 
 		this.songCtrl = songCtrl;
 
 		this.configuration = config;
-
-		executor = new ScheduledThreadPoolExecutor(1);
-		executor.setRemoveOnCancelPolicy(true);
 	}
 
 	@Override
@@ -273,14 +268,20 @@ public class GUI extends MainWindow {
 		});
 		menu.add(prev);
 
-		AbstractButton pause = new MenuItemForMainMenu("Pause");
-		pause.addActionListener(new ActionListener() {
+		pauseItem = new MenuItemForMainMenu("Pause");
+		pauseItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pauseCurSong();
+				if (pauseItem.getName().equals("Pause")) {
+					pauseCurSong();
+					pauseItem.setName("Continue");
+				} else {
+					continueCurSong();
+					pauseItem.setName("Pause");
+				}
 			}
 		});
-		menu.add(pause);
+		menu.add(pauseItem);
 
 		AbstractButton next = new MenuItemForMainMenu("Next");
 		next.addActionListener(new ActionListener() {
@@ -317,7 +318,7 @@ public class GUI extends MainWindow {
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				executor.shutdown();
+				timingCtrl.close();
 				System.exit(0);
 			}
 		});
@@ -585,23 +586,9 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
 	}
 
-	private void stopPlayingInternal() {
-
-		// stop the ongoing destruction of the current player
-		if (lastDestructor != null) {
-			lastDestructor.cancel(false);
-			lastDestructor = null;
-		}
-		// actually destroy the current player right now
-		if (lastDestructionTask != null) {
-			lastDestructionTask.stopPlayer();
-			lastDestructionTask = null;
-		}
-	}
-
 	private void stopPlaying() {
 
-		stopPlayingInternal();
+		timingCtrl.stopPlaying();
 
 		currentlyPlayedSong = null;
 		songItem.setText("");
@@ -625,14 +612,15 @@ public class GUI extends MainWindow {
 		songItem.setText(song.getPath());
 
 		try {
-			// we call the internal version, as we do not want to immediately regenerate the song list
-			stopPlayingInternal();
+			timingCtrl.stopPlaying();
 
 			Process process = new ProcessBuilder(player, song.getPath()).start();
 
+			pauseItem.setName("Pause");
+
 			if (song.getLength() != null) {
-				lastDestructionTask = new SongEndTask(this, process);
-				lastDestructor = executor.schedule(lastDestructionTask, song.getLength(), TimeUnit.MILLISECONDS);
+				SongEndTask songEndTask = new SongEndTask(this, process);
+				timingCtrl.schedule(songEndTask, song.getLength());
 			}
 
 			regenerateSongList();
@@ -793,7 +781,11 @@ public class GUI extends MainWindow {
 	}
 
 	private void pauseCurSong() {
-		// TODO
+		timingCtrl.pauseSong();
+	}
+
+	private void continueCurSong() {
+		timingCtrl.continueSong();
 	}
 
 	private void curSongIsOver() {
