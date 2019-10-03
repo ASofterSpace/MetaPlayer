@@ -67,6 +67,7 @@ public class Song {
 			if (title.endsWith(".mp4") ||
 				title.endsWith(".mp3") ||
 				title.endsWith(".mkv") ||
+				title.endsWith(".mpg") ||
 				title.endsWith(".avi") ||
 				title.endsWith(".flv") ||
 				title.endsWith(".wmv") ||
