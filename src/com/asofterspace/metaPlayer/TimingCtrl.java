@@ -14,54 +14,38 @@ public class TimingCtrl {
 	private SongEndTask pausedEndTask;
 	private Long pausedTimeLeft;
 
+	private Long lastSongStart;
+
 	private boolean timerRunning;
 
 	private GUI gui;
 
 
 	public TimingCtrl() {
-
-		timerRunning = true;
-
-		Thread timerThread = new Thread() {
-
-			public void run() {
-
-				while (timerRunning) {
-					try {
-						SongEndTask task = currentEndTask;
-
-						if (task != null) {
-							long remainingTime = executeSongEndAt - System.currentTimeMillis();
-							if (gui != null) {
-								gui.setRemainingTime(remainingTime);
-							}
-							if (remainingTime < 0) {
-								task.songIsOver();
-								currentEndTask = null;
-							}
-						}
-
-						Thread.sleep(1000);
-
-					} catch (InterruptedException e) {
-						// just keep sleeping...
-					}
-				}
-			}
-		};
-		timerThread.start();
+		timerRunning = false;
 	}
 
 	public void close() {
 		timerRunning = false;
 	}
 
-	public void schedule(SongEndTask songEndTask, int songLengthInMilliseconds) {
+	public void startPlaying() {
 
-		this.executeSongEndAt = System.currentTimeMillis() + songLengthInMilliseconds;
+		this.lastSongStart = System.currentTimeMillis();
+	}
+
+	public void startPlaying(SongEndTask songEndTask, int songLengthInMilliseconds) {
+
+		startPlaying();
+
+		this.executeSongEndAt = lastSongStart + songLengthInMilliseconds;
 
 		this.currentEndTask = songEndTask;
+	}
+
+	public Long getElapsedTimeSinceLastSongStart() {
+
+		return System.currentTimeMillis() - this.lastSongStart;
 	}
 
 	public void stopPlaying() {
@@ -89,8 +73,47 @@ public class TimingCtrl {
 		}
 	}
 
+	public void resetSongLength() {
+		currentEndTask = null;
+	}
+
 	public void setGui(GUI gui) {
 		this.gui = gui;
+		startTimerThread();
+	}
+
+	private void startTimerThread() {
+
+		timerRunning = true;
+
+		Thread timerThread = new Thread() {
+
+			public void run() {
+
+				while (timerRunning) {
+					try {
+						SongEndTask task = currentEndTask;
+
+						if (task == null) {
+							gui.setRemainingTime(null);
+						} else {
+							long remainingTime = executeSongEndAt - System.currentTimeMillis();
+							gui.setRemainingTime(remainingTime);
+							if (remainingTime < 0) {
+								currentEndTask = null;
+								task.songIsOver();
+							}
+						}
+
+						Thread.sleep(1000);
+
+					} catch (InterruptedException e) {
+						// just keep sleeping...
+					}
+				}
+			}
+		};
+		timerThread.start();
 	}
 
 }

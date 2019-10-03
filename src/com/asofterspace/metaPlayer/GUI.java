@@ -59,6 +59,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -80,7 +81,8 @@ public class GUI extends MainWindow {
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
 
-	private Song currentlyPlayedSong;
+	private Song currentlyPlayedSong = null;
+	private Song currentlySelectedSong = null;
 
 	private JPanel mainPanelRight;
 
@@ -194,6 +196,26 @@ public class GUI extends MainWindow {
 			}
 		});
 		songs.add(stopPlaying);
+
+		songs.addSeparator();
+
+		JMenuItem jumpToPlaying = new JMenuItem("Jump to Playing Song");
+		jumpToPlaying.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				jumpToSong(currentlyPlayedSong);
+			}
+		});
+		songs.add(jumpToPlaying);
+
+		JMenuItem jumpToSelected = new JMenuItem("Jump to Selected Song");
+		jumpToSelected.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				jumpToSong(currentlySelectedSong);
+			}
+		});
+		songs.add(jumpToSelected);
 
 		songs.addSeparator();
 
@@ -394,7 +416,6 @@ public class GUI extends MainWindow {
 		String[] songList = new String[0];
 		songListComponent = new JList<String>(songList);
 
-		/*
 		songListComponent.addMouseListener(new MouseListener() {
 
 			@Override
@@ -421,11 +442,12 @@ public class GUI extends MainWindow {
 			}
 
 			private void showPopupAndSelectedTab(MouseEvent e) {
+				/*
 				if (e.isPopupTrigger()) {
 					songListComponent.setSelectedIndex(songListComponent.locationToIndex(e.getPoint()));
 					songListPopup.show(songListComponent, e.getX(), e.getY());
 				}
-
+				*/
 				showSelectedTab();
 			}
 		});
@@ -450,7 +472,6 @@ public class GUI extends MainWindow {
 				}
 			}
 		});
-		*/
 
 		songListScroller = new JScrollPane(songListComponent);
 		songListScroller.setPreferredSize(new Dimension(8, 8));
@@ -563,13 +584,14 @@ public class GUI extends MainWindow {
 		/*
 		// show the last shown tab
 		showTab(currentlyPlayedSong);
-		*/
 
 		highlightTabInLeftListOrTree(currentlyPlayedSong);
+		*/
 
 		refreshTitleBar();
 	}
 
+	/*
 	public void highlightTabInLeftListOrTree(Song song) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -586,6 +608,7 @@ public class GUI extends MainWindow {
 			}
 		});
 	}
+	*/
 
 	private void refreshTitleBar() {
 		mainFrame.setTitle(Main.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
@@ -623,9 +646,11 @@ public class GUI extends MainWindow {
 
 			pauseItem.setText("Pause");
 
-			if (song.getLength() != null) {
+			if (song.getLength() == null) {
+				timingCtrl.startPlaying();
+			} else {
 				SongEndTask songEndTask = new SongEndTask(this, process);
-				timingCtrl.schedule(songEndTask, song.getLength());
+				timingCtrl.startPlaying(songEndTask, song.getLength());
 			}
 
 			regenerateSongList();
@@ -763,7 +788,7 @@ public class GUI extends MainWindow {
 					Song song = new Song(intContents.get(i*2), mppContents.get(i));
 					String lengthAndRating = intContents.get((i*2)+1);
 					String[] lengthAndRatings = lengthAndRating.split("\\*");
-					song.setLength(lengthAndRatings[0]);
+					song.setStrLength(lengthAndRatings[0]);
 					if (lengthAndRatings.length > 1) {
 						song.setRating(lengthAndRatings[1]);
 					}
@@ -782,7 +807,11 @@ public class GUI extends MainWindow {
 	}
 
 	private void resetCurSongLength() {
-		// TODO
+		if (currentlyPlayedSong != null) {
+			currentlyPlayedSong.setLength(null);
+			songCtrl.save();
+		}
+		timingCtrl.resetSongLength();
 	}
 
 	private void pauseCurSong() {
@@ -794,24 +823,60 @@ public class GUI extends MainWindow {
 	}
 
 	private void curSongIsOver() {
-		// TODO
+		if (currentlyPlayedSong != null) {
+			Long newLength = timingCtrl.getElapsedTimeSinceLastSongStart();
+			if (newLength == null) {
+				currentlyPlayedSong.setLength(null);
+			} else {
+				currentlyPlayedSong.setLength(newLength.intValue());
+			}
+			songCtrl.save();
+		}
+		playNextSong();
 	}
 
-	public void setRemainingTime(long remainingTime) {
+	public void setRemainingTime(Long remainingTime) {
 
 		if (timeRemainingItem == null) {
 			return;
 		}
 
+		if (remainingTime == null) {
+			timeRemainingItem.setText("");
+			return;
+		}
+
 		if (remainingTime < 0) {
-			remainingTime = 0;
+			remainingTime = 0l;
 		}
 
 		remainingTime = remainingTime / 1000;
 
-		timeRemainingItem.setText(
-			((int) Math.floor(remainingTime / 60)) + ":" + (remainingTime % 60)
-		);
+		String minutes = "" + ((int) Math.floor(remainingTime / 60));
+		String seconds = "" + (remainingTime % 60);
+		if (seconds.length() < 2) {
+			seconds = "0" + seconds;
+		}
+
+		timeRemainingItem.setText(minutes + ":" + seconds);
+	}
+
+	private void showSelectedTab() {
+
+		Integer selectedItem = songListComponent.getSelectedIndex();
+
+		currentlySelectedSong = songCtrl.getSong(selectedItem);
+	}
+
+	private void jumpToSong(Song song) {
+		// find the song in the songCtrl
+		int songPos = songCtrl.getSongPosition(song);
+		int songAmount = songCtrl.getSongAmount();
+
+		// let the songListComponent jump to it
+		JScrollBar bar = songListScroller.getVerticalScrollBar();
+		bar.setValue((bar.getMaximum() * songPos) / songAmount);
+		songListScroller.repaint();
 	}
 
 }

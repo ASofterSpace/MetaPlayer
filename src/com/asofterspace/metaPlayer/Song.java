@@ -126,7 +126,7 @@ public class Song {
 		this.length = length;
 	}
 
-	public void setLength(String length) {
+	public void setStrLength(String length) {
 		try {
 			this.length = Integer.parseInt(length);
 		} catch (NumberFormatException e) {}

@@ -137,6 +137,28 @@ public class SongCtrl {
 		return songs;
 	}
 
+	public Song getSong(Integer index) {
+		if ((index != null) && (index >= 0) && (index < songs.size())) {
+			return songs.get(index);
+		}
+		return null;
+	}
+
+	public int getSongPosition(Song song) {
+
+		if (song == null) {
+			return 0;
+		}
+
+		for (int i = 0; i < songs.size(); i++) {
+			if (song.equals(songs.get(i))) {
+				return i;
+			}
+		}
+
+		return 0;
+	}
+
 	public int getSongAmount() {
 		return songs.size();
 	}
