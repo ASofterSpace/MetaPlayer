@@ -637,7 +637,7 @@ public class GUI extends MainWindow {
 		}
 
 		currentlyPlayedSong = song;
-		songItem.setText(song.getPath());
+		songItem.setText(song.toString());
 
 		try {
 			timingCtrl.stopPlaying();
@@ -646,12 +646,8 @@ public class GUI extends MainWindow {
 
 			pauseItem.setText("Pause");
 
-			if (song.getLength() == null) {
-				timingCtrl.startPlaying();
-			} else {
-				SongEndTask songEndTask = new SongEndTask(this, process);
-				timingCtrl.startPlaying(songEndTask, song.getLength());
-			}
+			SongEndTask songEndTask = new SongEndTask(this, process);
+			timingCtrl.startPlaying(songEndTask, song.getLength());
 
 			regenerateSongList();
 

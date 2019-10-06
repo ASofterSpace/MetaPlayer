@@ -29,16 +29,15 @@ public class TimingCtrl {
 		timerRunning = false;
 	}
 
-	public void startPlaying() {
+	public void startPlaying(SongEndTask songEndTask, Integer songLengthInMilliseconds) {
 
 		this.lastSongStart = System.currentTimeMillis();
-	}
 
-	public void startPlaying(SongEndTask songEndTask, int songLengthInMilliseconds) {
-
-		startPlaying();
-
-		this.executeSongEndAt = lastSongStart + songLengthInMilliseconds;
+		if (songLengthInMilliseconds == null) {
+			this.executeSongEndAt = null;
+		} else {
+			this.executeSongEndAt = lastSongStart + songLengthInMilliseconds;
+		}
 
 		this.currentEndTask = songEndTask;
 	}
@@ -61,20 +60,28 @@ public class TimingCtrl {
 		if (currentEndTask != null) {
 			pausedEndTask = currentEndTask;
 			currentEndTask = null;
-			pausedTimeLeft = executeSongEndAt - System.currentTimeMillis();
+			if (executeSongEndAt == null) {
+				pausedTimeLeft = null;
+			} else {
+				pausedTimeLeft = executeSongEndAt - System.currentTimeMillis();
+			}
 		}
 	}
 
 	public void continueSong() {
 		if (pausedEndTask != null) {
-			executeSongEndAt = System.currentTimeMillis() + pausedTimeLeft;
+			if (pausedTimeLeft == null) {
+				executeSongEndAt = null;
+			} else {
+				executeSongEndAt = System.currentTimeMillis() + pausedTimeLeft;
+			}
 			currentEndTask = pausedEndTask;
 			pausedEndTask = null;
 		}
 	}
 
 	public void resetSongLength() {
-		currentEndTask = null;
+		executeSongEndAt = null;
 	}
 
 	public void setGui(GUI gui) {
@@ -92,14 +99,13 @@ public class TimingCtrl {
 
 				while (timerRunning) {
 					try {
-						SongEndTask task = currentEndTask;
-
-						if (task == null) {
+						if (executeSongEndAt == null) {
 							gui.setRemainingTime(null);
 						} else {
 							long remainingTime = executeSongEndAt - System.currentTimeMillis();
 							gui.setRemainingTime(remainingTime);
 							if (remainingTime < 0) {
+								SongEndTask task = currentEndTask;
 								currentEndTask = null;
 								task.songIsOver();
 							}
