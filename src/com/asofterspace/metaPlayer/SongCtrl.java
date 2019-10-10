@@ -67,6 +67,18 @@ public class SongCtrl {
 	 */
 	public void cullMultiples() {
 
+		// remove previous (2) multiplicity markers
+		for (Song song : songs) {
+			if (song.getTitle() != null) {
+				while (song.getTitle().endsWith(" (2)")) {
+					song.setTitle(song.getTitle().substring(0, song.getTitle().length() - 4));
+				}
+			}
+		}
+
+		// actually do the culling - that is, remove multiple entries songs that are the same file
+		// and add (2) behind song titles that have the same artist + title combination otherwise
+		// but are *different* files
 		boolean continueCulling = true;
 		int index = 0;
 
