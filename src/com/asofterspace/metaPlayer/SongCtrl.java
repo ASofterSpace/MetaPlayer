@@ -6,6 +6,7 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.Record;
 
 import java.util.ArrayList;
@@ -24,13 +25,13 @@ public class SongCtrl {
 	private Random randomizer;
 
 
-	public SongCtrl() {
+	public SongCtrl() throws JsonParseException {
 
 		songConfig = new ConfigFile("songs", true);
 
 		// create a default config file, if necessary
 		if (songConfig.getAllContents().isEmpty()) {
-			songConfig.setAllContents(new JSON("[]"));
+			songConfig.setAllContents(Record.emptyArray());
 		}
 
 		JSON songRecordContainer = songConfig.getAllContents();

@@ -6,6 +6,7 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.List;
@@ -53,12 +54,18 @@ public class Main {
 			}
 		}
 
-		// load config
-		config = new ConfigFile("settings", true);
+		try {
+			// load config
+			config = new ConfigFile("settings", true);
 
-		// create a default config file, if necessary
-		if (config.getAllContents().isEmpty()) {
-			config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
+			// create a default config file, if necessary
+			if (config.getAllContents().isEmpty()) {
+				config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
+			}
+		} catch (JsonParseException e) {
+			System.err.println("Loading the settings failed:");
+			System.err.println(e);
+			System.exit(1);
 		}
 
 		// create timer
@@ -67,8 +74,14 @@ public class Main {
 		// load player associations
 		playerCtrl = new PlayerCtrl(config.getAllContents());
 
-		// load songs
-		songCtrl = new SongCtrl();
+		try {
+			// load songs
+			songCtrl = new SongCtrl();
+		} catch (JsonParseException e) {
+			System.err.println("Loading the songs failed:");
+			System.err.println(e);
+			System.exit(1);
+		}
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
