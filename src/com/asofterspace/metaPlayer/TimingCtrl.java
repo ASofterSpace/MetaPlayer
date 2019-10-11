@@ -104,7 +104,7 @@ public class TimingCtrl {
 						} else {
 							long remainingTime = executeSongEndAt - System.currentTimeMillis();
 							gui.setRemainingTime(remainingTime);
-							if (remainingTime < 0) {
+							if ((remainingTime < 0) && (currentEndTask != null)) {
 								SongEndTask task = currentEndTask;
 								currentEndTask = null;
 								task.songIsOver();
