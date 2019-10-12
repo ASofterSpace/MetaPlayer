@@ -169,7 +169,7 @@ public class Song {
 					return false;
 				}
 			}
-			return otherSong.path.equals(path);
+			return otherSong.path.toLowerCase().equals(path.toLowerCase());
 		}
 		return false;
 	}
@@ -184,7 +184,7 @@ public class Song {
 			if (otherArtist == null) {
 				return false;
 			}
-			if (!artist.equals(otherArtist)) {
+			if (!artist.toLowerCase().equals(otherArtist.toLowerCase())) {
 				return false;
 			}
 		}
@@ -197,7 +197,7 @@ public class Song {
 			if (otherTitle == null) {
 				return false;
 			}
-			if (!title.equals(otherTitle)) {
+			if (!title.toLowerCase().equals(otherTitle.toLowerCase())) {
 				return false;
 			}
 		}
