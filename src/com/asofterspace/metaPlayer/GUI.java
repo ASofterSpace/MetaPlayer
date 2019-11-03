@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
+import com.asofterspace.toolbox.io.Record;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.ProcessUtils;
 import com.asofterspace.toolbox.Utils;
@@ -300,6 +301,35 @@ public class GUI extends MainWindow {
 				}
 			});
 			artists.add(artistItem);
+		}
+
+		JMenu playlists = new JMenu("Select Playlist");
+		menu.add(playlists);
+
+		JMenuItem allSongs = new JMenuItem("All Songs");
+		allSongs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.selectAllSongs();
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		playlists.add(allSongs);
+
+		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
+
+		for (Record playlistRecord : playlistRecords) {
+			JMenuItem playlistItem = new JMenuItem(playlistRecord.getString("name"));
+			playlistItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					songCtrl.selectPlaylist(playlistRecord);
+					songCtrl.randomize();
+					regenerateSongList();
+				}
+			});
+			playlists.add(playlistItem);
 		}
 
 		menu.add(new MenuItemForMainMenu("|"));

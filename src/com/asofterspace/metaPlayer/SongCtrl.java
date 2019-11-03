@@ -75,6 +75,36 @@ public class SongCtrl {
 		}
 	}
 
+	public void selectPlaylist(Record playlist) {
+
+		currentSongs = new ArrayList<>();
+
+		List<String> songList = playlist.getArrayAsStringList("songs");
+
+		for (String curSongStr : songList) {
+			String curSongLoStr = curSongStr.toLowerCase();
+			for (Song song : allSongs) {
+				if (song.toString().toLowerCase().equals(curSongLoStr)) {
+					if (!currentSongs.contains(song)) {
+						currentSongs.add(song);
+					}
+				}
+			}
+		}
+
+		List<String> artistList = playlist.getArrayAsStringList("artists");
+
+		for (String curArtistStr : artistList) {
+			for (Song song : allSongs) {
+				if (song.hasArtist(curArtistStr)) {
+					if (!currentSongs.contains(song)) {
+						currentSongs.add(song);
+					}
+				}
+			}
+		}
+	}
+
 	public void randomize() {
 		Collections.shuffle(currentSongs, randomizer);
 	}
@@ -95,7 +125,7 @@ public class SongCtrl {
 	public void cullMultiples() {
 
 		// remove previous (2) multiplicity markers
-		for (Song song : currentSongs) {
+		for (Song song : allSongs) {
 			if (song.getTitle() != null) {
 				while (song.getTitle().endsWith(" (2)")) {
 					song.setTitle(song.getTitle().substring(0, song.getTitle().length() - 4));
@@ -113,8 +143,8 @@ public class SongCtrl {
 
 			continueCulling = false;
 
-			while (index < currentSongs.size()) {
-				if (culledSong(currentSongs.get(index), index)) {
+			while (index < allSongs.size()) {
+				if (culledSong(allSongs.get(index), index)) {
 					continueCulling = true;
 					break;
 				}
@@ -128,10 +158,14 @@ public class SongCtrl {
 	 */
 	private boolean culledSong(Song curSong, int index) {
 
-		for (int j = index + 1; j < currentSongs.size(); j++) {
-			Song otherSong = currentSongs.get(j);
+		for (int j = index + 1; j < allSongs.size(); j++) {
+			Song otherSong = allSongs.get(j);
 			if (curSong.equals(otherSong)) {
-				currentSongs.remove(j);
+				allSongs.remove(j);
+				int currentSongsJ = currentSongs.indexOf(otherSong);
+				if (currentSongsJ >= 0) {
+					currentSongs.remove(currentSongsJ);
+				}
 				// if this song's artist or title are missing, take the artist/title pair of the other song
 				if (otherSong.getArtist() != null) {
 					if (curSong.getArtist() == null) {
@@ -204,12 +238,12 @@ public class SongCtrl {
 	}
 
 	public void add(Song song) {
-		currentSongs.add(song);
+		allSongs.add(song);
 	}
 
 	public void addUnlessAlreadyPresent(Song song) {
 
-		for (Song curSong : currentSongs) {
+		for (Song curSong : allSongs) {
 			if (song.equals(curSong)) {
 				return;
 			}
