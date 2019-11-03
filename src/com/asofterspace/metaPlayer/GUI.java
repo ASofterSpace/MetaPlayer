@@ -60,6 +60,8 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
+	public final static String CONFIG_KEY_MAIN_ARTISTS = "mainArtists";
+	public final static String CONFIG_KEY_PLAYLISTS = "playlists";
 
 	private TimingCtrl timingCtrl;
 	private PlayerCtrl playerCtrl;
@@ -279,7 +281,13 @@ public class GUI extends MainWindow {
 		});
 		artists.add(allArtists);
 
-		List<String> artistNames = songCtrl.getTopArtists(32);
+		// actually, the artists that we have a lot of songs of are not necessarily the ones that
+		// we want to see in the list, so load this from configuration by default:
+		List<String> artistNames = configuration.getList(CONFIG_KEY_MAIN_ARTISTS);
+		// and only get the top artists if there is no such configuration:
+		if ((artistNames == null) || (artistNames.size() == 0)) {
+			artistNames = songCtrl.getTopArtists(32);
+		}
 
 		for (String artistName : artistNames) {
 			JMenuItem artistItem = new JMenuItem(artistName);

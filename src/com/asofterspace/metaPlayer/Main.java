@@ -58,7 +58,11 @@ public class Main {
 
 			// create a default config file, if necessary
 			if (config.getAllContents().isEmpty()) {
-				config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
+				config.setAllContents(new JSON(
+					"{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[]," +
+					"\"" + GUI.CONFIG_KEY_PLAYLISTS + "\":[]," +
+					"\"" + GUI.CONFIG_KEY_MAIN_ARTISTS + "\":[]}"
+				));
 			}
 		} catch (JsonParseException e) {
 			System.err.println("Loading the settings failed:");
