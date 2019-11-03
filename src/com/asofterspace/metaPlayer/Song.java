@@ -99,6 +99,49 @@ public class Song {
 		return artist;
 	}
 
+	public boolean hasArtist(String potentialArtist) {
+
+		if ((artist == null) || (potentialArtist == null)) {
+			return false;
+		}
+
+		String loArtist = artist.toLowerCase();
+		String loPotentialArtist = potentialArtist.toLowerCase();
+
+		// matches Foo - Bar for argument "foo"
+		if (loArtist.equals(loPotentialArtist)) {
+			return true;
+		}
+
+		// matches Foo Bar - Bar for argument "foo",
+		// but does not match FooBar - Barbara
+		if (loArtist.startsWith(loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Foo, Bar - Bar for argument "foo",
+		if (loArtist.startsWith(loPotentialArtist + ",")) {
+			return true;
+		}
+
+		// matches Bar, Foo - Bar for argument "foo"
+		if (loArtist.contains(", " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar, Foo, Barbara - Bar for argument "foo"
+		if (loArtist.contains(", " + loPotentialArtist + ",")) {
+			return true;
+		}
+
+		// matches Bar and Foo - Bar for argument "foo"
+		if (loArtist.contains(" and " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public void setArtist(String artist) {
 		this.artist = artist;
 	}

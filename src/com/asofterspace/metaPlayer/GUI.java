@@ -265,6 +265,35 @@ public class GUI extends MainWindow {
 		});
 		songs.add(save);
 
+		JMenu artists = new JMenu("Select Artist");
+		menu.add(artists);
+
+		JMenuItem allArtists = new JMenuItem("All Artists");
+		allArtists.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.selectAllSongs();
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		artists.add(allArtists);
+
+		List<String> artistNames = songCtrl.getTopArtists(32);
+
+		for (String artistName : artistNames) {
+			JMenuItem artistItem = new JMenuItem(artistName);
+			artistItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					songCtrl.selectSongsOfArtist(artistName);
+					songCtrl.randomize();
+					regenerateSongList();
+				}
+			});
+			artists.add(artistItem);
+		}
+
 		menu.add(new MenuItemForMainMenu("|"));
 
 		AbstractButton prev = new MenuItemForMainMenu("Previous");
@@ -405,6 +434,12 @@ public class GUI extends MainWindow {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				showSelectedTab();
+
+				// on double-click...
+				if (e.getClickCount() == 2) {
+					// ... actually play the song!
+					playSong(currentlySelectedSong);
+				}
 			}
 
 			@Override

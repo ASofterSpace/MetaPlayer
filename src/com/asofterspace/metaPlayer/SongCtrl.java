@@ -20,7 +20,12 @@ public class SongCtrl {
 
 	private ConfigFile songConfig;
 
-	private List<Song> songs;
+	// all the songs that this SongCtrl has loaded
+	private List<Song> allSongs;
+
+	// the songs that are currently being played, e.g. the current playlist,
+	// or all songs, or all songs of a certain artist, etc.
+	private List<Song> currentSongs;
 
 	private Random randomizer;
 
@@ -38,22 +43,44 @@ public class SongCtrl {
 
 		List<Record> songRecords = songRecordContainer.getValues();
 
-		songs = new ArrayList<>();
+		allSongs = new ArrayList<>();
 
 		for (Record record : songRecords) {
 			Song song = new Song(record);
-			songs.add(song);
+			allSongs.add(song);
 		}
 
 		randomizer = new Random();
+
+		selectAllSongs();
+	}
+
+	public void selectAllSongs() {
+
+		currentSongs = new ArrayList<>();
+
+		for (Song song : allSongs) {
+			currentSongs.add(song);
+		}
+	}
+
+	public void selectSongsOfArtist(String artist) {
+
+		currentSongs = new ArrayList<>();
+
+		for (Song song : allSongs) {
+			if (song.hasArtist(artist)) {
+				currentSongs.add(song);
+			}
+		}
 	}
 
 	public void randomize() {
-		Collections.shuffle(songs, randomizer);
+		Collections.shuffle(currentSongs, randomizer);
 	}
 
 	public void sort() {
-		Collections.sort(songs, new Comparator<Song>() {
+		Collections.sort(currentSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
 				return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
 			}
@@ -68,7 +95,7 @@ public class SongCtrl {
 	public void cullMultiples() {
 
 		// remove previous (2) multiplicity markers
-		for (Song song : songs) {
+		for (Song song : currentSongs) {
 			if (song.getTitle() != null) {
 				while (song.getTitle().endsWith(" (2)")) {
 					song.setTitle(song.getTitle().substring(0, song.getTitle().length() - 4));
@@ -76,7 +103,7 @@ public class SongCtrl {
 			}
 		}
 
-		// actually do the culling - that is, remove multiple entries songs that are the same file
+		// actually do the culling - that is, remove multiple entries currentSongs that are the same file
 		// and add (2) behind song titles that have the same artist + title combination otherwise
 		// but are *different* files
 		boolean continueCulling = true;
@@ -86,8 +113,8 @@ public class SongCtrl {
 
 			continueCulling = false;
 
-			while (index < songs.size()) {
-				if (culledSong(songs.get(index), index)) {
+			while (index < currentSongs.size()) {
+				if (culledSong(currentSongs.get(index), index)) {
 					continueCulling = true;
 					break;
 				}
@@ -101,10 +128,10 @@ public class SongCtrl {
 	 */
 	private boolean culledSong(Song curSong, int index) {
 
-		for (int j = index + 1; j < songs.size(); j++) {
-			Song otherSong = songs.get(j);
+		for (int j = index + 1; j < currentSongs.size(); j++) {
+			Song otherSong = currentSongs.get(j);
 			if (curSong.equals(otherSong)) {
-				songs.remove(j);
+				currentSongs.remove(j);
 				// if this song's artist or title are missing, take the artist/title pair of the other song
 				if (otherSong.getArtist() != null) {
 					if (curSong.getArtist() == null) {
@@ -147,12 +174,12 @@ public class SongCtrl {
 	}
 
 	public List<Song> getSongs() {
-		return songs;
+		return currentSongs;
 	}
 
 	public Song getSong(Integer index) {
-		if ((index != null) && (index >= 0) && (index < songs.size())) {
-			return songs.get(index);
+		if ((index != null) && (index >= 0) && (index < currentSongs.size())) {
+			return currentSongs.get(index);
 		}
 		return null;
 	}
@@ -163,8 +190,8 @@ public class SongCtrl {
 			return 0;
 		}
 
-		for (int i = 0; i < songs.size(); i++) {
-			if (song.equals(songs.get(i))) {
+		for (int i = 0; i < currentSongs.size(); i++) {
+			if (song.equals(currentSongs.get(i))) {
 				return i;
 			}
 		}
@@ -173,16 +200,16 @@ public class SongCtrl {
 	}
 
 	public int getSongAmount() {
-		return songs.size();
+		return currentSongs.size();
 	}
 
 	public void add(Song song) {
-		songs.add(song);
+		currentSongs.add(song);
 	}
 
 	public void addUnlessAlreadyPresent(Song song) {
 
-		for (Song curSong : songs) {
+		for (Song curSong : currentSongs) {
 			if (song.equals(curSong)) {
 				return;
 			}
@@ -193,14 +220,14 @@ public class SongCtrl {
 
 	public Song getPreviousSong(Song currentlyPlayedSong) {
 
-		for (int i = 0; i < songs.size() - 1; i++) {
-			if (songs.get(i).equals(currentlyPlayedSong)) {
-				return songs.get(i-1);
+		for (int i = 0; i < currentSongs.size() - 1; i++) {
+			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
+				return currentSongs.get(i-1);
 			}
 		}
 
-		if (songs.size() > 0) {
-			return songs.get(songs.size() - 1);
+		if (currentSongs.size() > 0) {
+			return currentSongs.get(currentSongs.size() - 1);
 		}
 
 		return null;
@@ -208,25 +235,68 @@ public class SongCtrl {
 
 	public Song getNextSong(Song currentlyPlayedSong) {
 
-		for (int i = 0; i < songs.size() - 1; i++) {
-			if (songs.get(i).equals(currentlyPlayedSong)) {
-				return songs.get(i+1);
+		for (int i = 0; i < currentSongs.size() - 1; i++) {
+			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
+				return currentSongs.get(i+1);
 			}
 		}
 
-		if (songs.size() > 0) {
-			return songs.get(0);
+		if (currentSongs.size() > 0) {
+			return currentSongs.get(0);
 		}
 
 		return null;
 	}
 
+	/**
+	 * Gets a list of artists that have performed the most songs, without knowing in advance
+	 * how many songs that would be - but no more than a certain maximum amount
+	 */
+	public List<String> getTopArtists(int maxAmount) {
+
+		List<Artist> allArtists = new ArrayList<>();
+
+		for (Song song : allSongs) {
+			String curArtistStr = song.getArtist();
+			Artist curArtist = new Artist(curArtistStr);
+			int contained = allArtists.indexOf(curArtist);
+			if (contained >= 0) {
+				allArtists.get(contained).addSong();
+			} else {
+				allArtists.add(curArtist);
+			}
+		}
+
+		Collections.sort(allArtists, new Comparator<Artist>() {
+			public int compare(Artist a, Artist b) {
+				return b.getSongAmount() - a.getSongAmount();
+			}
+		});
+
+		List<String> result = new ArrayList<>();
+
+		for (int i = 0; i < allArtists.size(); i++) {
+			result.add(allArtists.get(i).getName());
+			if (i >= maxAmount) {
+				break;
+			}
+		}
+
+		return result;
+	}
+
 	public Record getSongData() {
+
+		Collections.sort(allSongs, new Comparator<Song>() {
+			public int compare(Song a, Song b) {
+				return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
+			}
+		});
 
 		JSON result = new JSON();
 		result.makeArray();
 
-		for (Song song : songs) {
+		for (Song song : allSongs) {
 			result.append(song.toRecord());
 		}
 
