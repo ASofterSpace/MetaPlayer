@@ -6,7 +6,6 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
-import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.Record;
@@ -20,14 +19,13 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -55,10 +53,6 @@ import javax.swing.SwingUtilities;
 
 public class GUI extends MainWindow {
 
-	private final static String CONFIG_KEY_WIDTH = "mainFrameWidth";
-	private final static String CONFIG_KEY_HEIGHT = "mainFrameHeight";
-	private final static String CONFIG_KEY_LEFT = "mainFrameLeft";
-	private final static String CONFIG_KEY_TOP = "mainFrameTop";
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 	public final static String CONFIG_KEY_MAIN_ARTISTS = "mainArtists";
@@ -79,6 +73,7 @@ public class GUI extends MainWindow {
 	private JMenuItem songItem;
 	private AbstractButton pauseItem;
 	private AbstractButton timeRemainingItem;
+	private AbstractButton minimizeMaximize;
 
 	private ConfigFile configuration;
 	private JList<String> songListComponent;
@@ -115,11 +110,6 @@ public class GUI extends MainWindow {
 		// position...)
 		// super.show();
 
-		final Integer lastWidth = configuration.getInteger(CONFIG_KEY_WIDTH, -1);
-		final Integer lastHeight = configuration.getInteger(CONFIG_KEY_HEIGHT, -1);
-		final Integer lastLeft = configuration.getInteger(CONFIG_KEY_LEFT, -1);
-		final Integer lastTop = configuration.getInteger(CONFIG_KEY_TOP, -1);
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				// Stage everything to be shown
@@ -128,27 +118,7 @@ public class GUI extends MainWindow {
 				// Actually display the whole jazz
 				mainFrame.setVisible(true);
 
-				if ((lastWidth < 1) || (lastHeight < 1)) {
-					GuiUtils.maximizeWindow(mainFrame);
-				} else {
-					mainFrame.setSize(lastWidth, lastHeight);
-
-					mainFrame.setPreferredSize(new Dimension(lastWidth, lastHeight));
-
-					mainFrame.setLocation(new Point(lastLeft, lastTop));
-				}
-
-				mainFrame.addComponentListener(new ComponentAdapter() {
-					public void componentResized(ComponentEvent componentEvent) {
-						configuration.set(CONFIG_KEY_WIDTH, mainFrame.getWidth());
-						configuration.set(CONFIG_KEY_HEIGHT, mainFrame.getHeight());
-					}
-
-					public void componentMoved(ComponentEvent componentEvent) {
-						configuration.set(CONFIG_KEY_LEFT, mainFrame.getLocation().x);
-						configuration.set(CONFIG_KEY_TOP, mainFrame.getLocation().y);
-					}
-				});
+				minimize();
 			}
 		});
 
@@ -389,6 +359,21 @@ public class GUI extends MainWindow {
 
 		menu.add(new MenuItemForMainMenu("|"));
 
+		minimizeMaximize = new MenuItemForMainMenu("Maximize");
+		minimizeMaximize.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (minimizeMaximize.getText().equals("Maximize")) {
+					minimizeMaximize.setText("Minimize");
+					maximize();
+				} else {
+					minimizeMaximize.setText("Maximize");
+					minimize();
+				}
+			}
+		});
+		menu.add(minimizeMaximize);
+
 		AbstractButton close = new MenuItemForMainMenu("Close");
 		close.addActionListener(new ActionListener() {
 			@Override
@@ -591,7 +576,33 @@ public class GUI extends MainWindow {
 		searchField.requestFocus();
 	}
 
+	private void minimize() {
 
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+		int width = (int) screenSize.getWidth() + 20;
+		int height = (int) screenSize.getHeight() - 73;
+
+		mainFrame.setSize(width, height);
+
+		mainFrame.setPreferredSize(new Dimension(width, height));
+
+		mainFrame.setLocation(new Point(-8, (int) screenSize.getHeight() - 53));
+	}
+
+	private void maximize() {
+
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+		int width = (int) screenSize.getWidth() - 166;
+		int height = (int) screenSize.getHeight() - 73;
+
+		mainFrame.setSize(width, height);
+
+		mainFrame.setPreferredSize(new Dimension(width, height));
+
+		mainFrame.setLocation(new Point(83, 26));
+	}
 
 	/**
 	 * Regenerate the file list on the left hand side based on the songCtrl.getSongs() list,
