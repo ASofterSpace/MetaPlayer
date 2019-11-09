@@ -158,6 +158,10 @@ public class Song {
 		return path;
 	}
 
+	public String getClipboardText() {
+		return toString() + " (" + getPath() + ")";
+	}
+
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -211,6 +215,9 @@ public class Song {
 				} else {
 					return false;
 				}
+			}
+			if (path == null) {
+				return false;
 			}
 			return otherSong.path.toLowerCase().equals(path.toLowerCase());
 		}

@@ -6,15 +6,20 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.BarListener;
+import com.asofterspace.toolbox.gui.BarMenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.Record;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.ProcessUtils;
+import com.asofterspace.toolbox.utils.TextEncoding;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -27,7 +32,6 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -74,6 +78,7 @@ public class GUI extends MainWindow {
 	private AbstractButton pauseItem;
 	private AbstractButton timeRemainingItem;
 	private AbstractButton minimizeMaximize;
+	private BarMenuItemForMainMenu ratingItem;
 
 	private ConfigFile configuration;
 	private JList<String> songListComponent;
@@ -414,11 +419,28 @@ public class GUI extends MainWindow {
 
 		menu.add(new MenuItemForMainMenu("|"));
 
+		ratingItem = new BarMenuItemForMainMenu();
+		ratingItem.setMaximum(100);
+		ratingItem.addBarListener(new BarListener() {
+			@Override
+			public void onBarMove(int position) {
+				if (currentlyPlayedSong != null) {
+					currentlyPlayedSong.setRating(position);
+					songCtrl.save();
+				}
+			}
+		});
+		menu.add(ratingItem);
+
 		songItem = new JMenuItem("");
 		songItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO :: copy the path of the currently played song to the clipboard
+				if (currentlyPlayedSong != null) {
+					StringSelection selection = new StringSelection(currentlyPlayedSong.getClipboardText());
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					clipboard.setContents(selection, selection);
+				}
 			}
 		});
 		menu.add(songItem);
@@ -706,6 +728,7 @@ public class GUI extends MainWindow {
 
 		currentlyPlayedSong = song;
 		songItem.setText(song.toString());
+		ratingItem.setBarPosition(song.getRating());
 
 		timingCtrl.stopPlaying();
 
@@ -844,8 +867,8 @@ public class GUI extends MainWindow {
 				}
 				SimpleFile mppFile = new SimpleFile(mppPath);
 				SimpleFile intFile = new SimpleFile(intPath);
-				mppFile.useCharset(StandardCharsets.ISO_8859_1);
-				intFile.useCharset(StandardCharsets.ISO_8859_1);
+				mppFile.setEncoding(TextEncoding.ISO_LATIN_1);
+				intFile.setEncoding(TextEncoding.ISO_LATIN_1);
 				List<String> mppContents = mppFile.getContents();
 				List<String> intContents = intFile.getContents();
 				for (int i = 0; i < mppContents.size(); i++) {
