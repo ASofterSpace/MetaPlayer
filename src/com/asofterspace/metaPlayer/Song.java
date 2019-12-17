@@ -17,6 +17,7 @@ public class Song {
 	private String path;
 	private Integer length;
 	private Integer rating;
+	private boolean fileExists;
 
 
 	public Song(File file) {
@@ -83,6 +84,7 @@ public class Song {
 		this.path = record.getString("path");
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
+		this.fileExists = (new File(path)).exists();
 	}
 
 	public Record toRecord() {
@@ -92,6 +94,7 @@ public class Song {
 		result.set("path", new Record(path));
 		result.set("length", new Record(length));
 		result.set("rating", new Record(rating));
+		result.set("fileExists", new Record(fileExists));
 		return result;
 	}
 
