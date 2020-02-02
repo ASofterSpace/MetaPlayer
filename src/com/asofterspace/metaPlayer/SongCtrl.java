@@ -7,7 +7,7 @@ package com.asofterspace.metaPlayer;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
-import com.asofterspace.toolbox.io.Record;
+import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
 import java.util.Collections;

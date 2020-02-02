@@ -5,7 +5,7 @@
 package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.io.JSON;
-import com.asofterspace.toolbox.io.Record;
+import com.asofterspace.toolbox.utils.Record;
 
 import java.util.List;
 

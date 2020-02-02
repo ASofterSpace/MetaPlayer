@@ -10,9 +10,9 @@ import com.asofterspace.toolbox.gui.BarListener;
 import com.asofterspace.toolbox.gui.BarMenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
-import com.asofterspace.toolbox.io.Record;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.ProcessUtils;
+import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.TextEncoding;
 import com.asofterspace.toolbox.Utils;
 
