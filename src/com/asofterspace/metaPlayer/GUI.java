@@ -191,15 +191,35 @@ public class GUI extends MainWindow {
 		});
 		songs.add(randomize);
 
-		JMenuItem sort = new JMenuItem("Sort");
-		sort.addActionListener(new ActionListener() {
+		JMenuItem sortArtist = new JMenuItem("Sort by Artist");
+		sortArtist.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				songCtrl.sort();
+				songCtrl.sort(SortCriterion.ARTIST);
 				regenerateSongList();
 			}
 		});
-		songs.add(sort);
+		songs.add(sortArtist);
+
+		JMenuItem sortTitle = new JMenuItem("Sort by Song Title");
+		sortTitle.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.sort(SortCriterion.TITLE);
+				regenerateSongList();
+			}
+		});
+		songs.add(sortTitle);
+
+		JMenuItem sortRating = new JMenuItem("Sort by Rating");
+		sortRating.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.sort(SortCriterion.RATING);
+				regenerateSongList();
+			}
+		});
+		songs.add(sortRating);
 
 		songs.addSeparator();
 

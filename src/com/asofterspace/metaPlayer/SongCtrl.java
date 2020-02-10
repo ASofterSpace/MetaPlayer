@@ -109,10 +109,25 @@ public class SongCtrl {
 		Collections.shuffle(currentSongs, randomizer);
 	}
 
-	public void sort() {
+	public void sort(final SortCriterion criterion) {
 		Collections.sort(currentSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
+				String aStr;
+				String bStr;
+				switch (criterion) {
+					case ARTIST:
+						aStr = a.getArtist() + " - " + a.getTitle() + ")";
+						bStr = b.getArtist() + " - " + b.getTitle() + ")";
+						return aStr.toLowerCase().compareTo(bStr.toLowerCase());
+					case TITLE:
+						aStr = a.getTitle() + " (" + a.getArtist() + ")";
+						bStr = b.getTitle() + " (" + b.getArtist() + ")";
+						return aStr.toLowerCase().compareTo(bStr.toLowerCase());
+					case RATING:
+						return b.getRating() - a.getRating();
+					default:
+						return 0;
+				}
 			}
 		});
 	}
@@ -167,21 +182,21 @@ public class SongCtrl {
 					currentSongs.remove(currentSongsJ);
 				}
 				// if this song's artist or title are missing, take the artist/title pair of the other song
-				if (otherSong.getArtist() != null) {
-					if (curSong.getArtist() == null) {
+				if (otherSong.hasArtist()) {
+					if (!curSong.hasArtist()) {
 						curSong.setArtist(otherSong.getArtist());
 						curSong.setTitle(otherSong.getTitle());
 					}
 				}
-				if (otherSong.getTitle() != null) {
-					if (curSong.getTitle() == null) {
+				if (otherSong.hasTitle()) {
+					if (!curSong.hasTitle()) {
 						curSong.setArtist(otherSong.getArtist());
 						curSong.setTitle(otherSong.getTitle());
 					}
 				}
 				// take the longer length...
-				if (otherSong.getLength() != null) {
-					if (curSong.getLength() == null) {
+				if (otherSong.hasLength()) {
+					if (!curSong.hasLength()) {
 						curSong.setLength(otherSong.getLength());
 					}
 					if (curSong.getLength() < otherSong.getLength()) {
@@ -189,8 +204,8 @@ public class SongCtrl {
 					}
 				}
 				// ... and the higher rating
-				if (otherSong.getRating() != null) {
-					if (curSong.getRating() == null) {
+				if (otherSong.hasRating()) {
+					if (!curSong.hasRating()) {
 						curSong.setRating(otherSong.getRating());
 					}
 					if (curSong.getRating() < otherSong.getRating()) {

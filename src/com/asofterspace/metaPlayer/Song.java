@@ -99,7 +99,14 @@ public class Song {
 	}
 
 	public String getArtist() {
+		if (artist == null) {
+			return "";
+		}
 		return artist;
+	}
+
+	public boolean hasArtist() {
+		return artist != null;
 	}
 
 	public boolean hasArtist(String potentialArtist) {
@@ -150,7 +157,14 @@ public class Song {
 	}
 
 	public String getTitle() {
+		if (title == null) {
+			return "";
+		}
 		return title;
+	}
+
+	public boolean hasTitle() {
+		return title != null;
 	}
 
 	public void setTitle(String title) {
@@ -169,8 +183,15 @@ public class Song {
 		this.path = path;
 	}
 
-	public Integer getLength() {
+	public int getLength() {
+		if (length == null) {
+			return 0;
+		}
 		return length;
+	}
+
+	public boolean hasLength() {
+		return length != null;
 	}
 
 	public void setLength(Integer length) {
@@ -183,8 +204,15 @@ public class Song {
 		} catch (NumberFormatException e) {}
 	}
 
-	public Integer getRating() {
+	public int getRating() {
+		if (rating == null) {
+			return 0;
+		}
 		return rating;
+	}
+
+	public boolean hasRating() {
+		return rating != null;
 	}
 
 	public void setRating(Integer rating) {
@@ -199,10 +227,10 @@ public class Song {
 
 	@Override
 	public String toString() {
-		if (artist == null) {
-			return title;
+		if (hasArtist()) {
+			return getArtist() + " - " + getTitle();
 		}
-		return artist + " - " + title;
+		return getTitle();
 	}
 
 	@Override
@@ -229,30 +257,12 @@ public class Song {
 
 	public boolean is(String otherArtist, String otherTitle) {
 
-		if (artist == null) {
-			if (otherArtist != null) {
-				return false;
-			}
-		} else {
-			if (otherArtist == null) {
-				return false;
-			}
-			if (!artist.toLowerCase().equals(otherArtist.toLowerCase())) {
-				return false;
-			}
+		if (!getArtist().toLowerCase().equals(otherArtist.toLowerCase())) {
+			return false;
 		}
 
-		if (title == null) {
-			if (otherTitle != null) {
-				return false;
-			}
-		} else {
-			if (otherTitle == null) {
-				return false;
-			}
-			if (!title.toLowerCase().equals(otherTitle.toLowerCase())) {
-				return false;
-			}
+		if (!getTitle().toLowerCase().equals(otherTitle.toLowerCase())) {
+			return false;
 		}
 
 		return true;

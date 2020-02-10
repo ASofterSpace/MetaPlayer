@@ -33,7 +33,7 @@ public class TimingCtrl {
 
 		this.lastSongStart = System.currentTimeMillis();
 
-		if (songLengthInMilliseconds == null) {
+		if ((songLengthInMilliseconds == null) || (songLengthInMilliseconds < 1)) {
 			this.executeSongEndAt = null;
 		} else {
 			this.executeSongEndAt = lastSongStart + songLengthInMilliseconds;
