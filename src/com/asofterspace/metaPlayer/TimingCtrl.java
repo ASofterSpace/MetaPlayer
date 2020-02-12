@@ -99,15 +99,20 @@ public class TimingCtrl {
 
 				while (timerRunning) {
 					try {
-						if (executeSongEndAt == null) {
-							gui.setRemainingTime(null);
-						} else {
-							long remainingTime = executeSongEndAt - System.currentTimeMillis();
-							gui.setRemainingTime(remainingTime);
-							if ((remainingTime < 0) && (currentEndTask != null)) {
-								SongEndTask task = currentEndTask;
-								currentEndTask = null;
-								task.songIsOver();
+						// while we are not paused...
+						if (pausedEndTask == null) {
+							// ... either set to unknown time remaining...
+							if (executeSongEndAt == null) {
+								gui.setRemainingTime(null);
+							} else {
+								// ... or to a clearly known time!
+								long remainingTime = executeSongEndAt - System.currentTimeMillis();
+								gui.setRemainingTime(remainingTime);
+								if ((remainingTime < 0) && (currentEndTask != null)) {
+									SongEndTask task = currentEndTask;
+									currentEndTask = null;
+									task.songIsOver();
+								}
 							}
 						}
 
