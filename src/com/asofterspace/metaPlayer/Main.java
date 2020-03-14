@@ -27,11 +27,10 @@ public class Main {
 
 	/**
 	 * TODO:
-	 * create importer for legacy metaplayer playlists
-	 * add playlist selection - playlists are either all music, or just a specific selection of existing songs
+	 * add search for any artist (maybe submenu with F... > Fo... > FooBarista)
 	 * add more detailed ratings (nice video, energetic music, etc.) and metadata (e.g. language)
-	 * create importer to add new songs
 	 * create search tool that searches through music folders and checks if any songs are missing from the songs.cnf
+	 * add software tests (e.g. for the Song > hasArtist function)
 	 */
 	public static void main(String[] args) {
 

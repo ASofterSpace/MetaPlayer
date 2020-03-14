@@ -115,7 +115,7 @@ public class Song {
 			return false;
 		}
 
-		String loArtist = artist.toLowerCase();
+		String loArtist = artist.toLowerCase() + " ";
 		String loPotentialArtist = potentialArtist.toLowerCase();
 
 		// matches Foo - Bar for argument "foo"
