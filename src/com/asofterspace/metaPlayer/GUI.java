@@ -221,6 +221,16 @@ public class GUI extends MainWindow {
 		});
 		songs.add(sortRating);
 
+		JMenuItem invertOrder = new JMenuItem("Invert Current Order");
+		invertOrder.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.invertOrder();
+				regenerateSongList();
+			}
+		});
+		songs.add(invertOrder);
+
 		songs.addSeparator();
 
 		JMenuItem importSongs = new JMenuItem("Import Songs");

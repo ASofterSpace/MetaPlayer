@@ -132,6 +132,10 @@ public class SongCtrl {
 		});
 	}
 
+	public void invertOrder() {
+		Collections.reverse(currentSongs);
+	}
+
 	/**
 	 * Ensure that every song is only present once;
 	 * if a song is present several times, take the longest length
