@@ -212,7 +212,7 @@ public class Song {
 	}
 
 	public boolean hasRating() {
-		return rating != null;
+		return (rating != null) && (rating > 0);
 	}
 
 	public void setRating(Integer rating) {
