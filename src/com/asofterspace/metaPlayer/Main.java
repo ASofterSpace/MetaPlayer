@@ -86,7 +86,9 @@ public class Main {
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
-		SwingUtilities.invokeLater(new GUI(timingCtrl, playerCtrl, songCtrl, config));
+		GUI gui = new GUI(timingCtrl, playerCtrl, songCtrl, config);
+		songCtrl.setGUI(gui);
+		SwingUtilities.invokeLater(gui);
 	}
 
 }

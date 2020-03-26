@@ -29,6 +29,8 @@ public class SongCtrl {
 
 	private Random randomizer;
 
+	private GUI gui;
+
 
 	public SongCtrl() throws JsonParseException {
 
@@ -53,6 +55,10 @@ public class SongCtrl {
 		randomizer = new Random();
 
 		selectAllSongs();
+	}
+
+	public void setGUI(GUI gui) {
+		this.gui = gui;
 	}
 
 	public void selectAllSongs() {
@@ -273,32 +279,74 @@ public class SongCtrl {
 
 	public Song getPreviousSong(Song currentlyPlayedSong) {
 
+		// iterate over all songs...
 		for (int i = 0; i < currentSongs.size() - 1; i++) {
+			// ... and once we found the current song...
 			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
-				return currentSongs.get(i-1);
+				int j = i-1;
+				boolean escape = false;
+				// ... keep on iterating until we find a song that is not being skipped...
+				while (gui.skippingSong(currentSongs.get(j))) {
+					j--;
+					if (j < 0) {
+						escape = true;
+						break;
+					}
+				}
+				if (escape) {
+					break;
+				}
+				// ... and then play it!
+				return currentSongs.get(j);
 			}
 		}
 
-		if (currentSongs.size() > 0) {
-			return currentSongs.get(currentSongs.size() - 1);
+		// on the other hand, if we found no song to play after the current song, retry from the end
+		int j = currentSongs.size() - 1;
+		while (gui.skippingSong(currentSongs.get(j))) {
+			j--;
+			if (j < 0) {
+				// finally give up, if we again found no playable song in the second iteration
+				return null;
+			}
 		}
-
-		return null;
+		return currentSongs.get(j);
 	}
 
 	public Song getNextSong(Song currentlyPlayedSong) {
 
+		// iterate over all songs...
 		for (int i = 0; i < currentSongs.size() - 1; i++) {
+			// ... and once we found the current song...
 			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
-				return currentSongs.get(i+1);
+				int j = i+1;
+				boolean escape = false;
+				// ... keep on iterating until we find a song that is not being skipped...
+				while (gui.skippingSong(currentSongs.get(j))) {
+					j++;
+					if (j >= currentSongs.size()) {
+						escape = true;
+						break;
+					}
+				}
+				if (escape) {
+					break;
+				}
+				// ... and then play it!
+				return currentSongs.get(j);
 			}
 		}
 
-		if (currentSongs.size() > 0) {
-			return currentSongs.get(0);
+		// on the other hand, if we found no song to play after the current song, retry from the beginning
+		int j = 0;
+		while (gui.skippingSong(currentSongs.get(j))) {
+			j++;
+			if (j >= currentSongs.size()) {
+				// finally give up, if we again found no playable song in the second iteration
+				return null;
+			}
 		}
-
-		return null;
+		return currentSongs.get(j);
 	}
 
 	/**

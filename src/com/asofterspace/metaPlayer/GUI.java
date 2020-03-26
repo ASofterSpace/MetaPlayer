@@ -40,6 +40,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -85,6 +86,18 @@ public class GUI extends MainWindow {
 	private JPopupMenu songListPopup;
 	private String[] strSongs;
 	private JScrollPane songListScroller;
+
+	private JCheckBoxMenuItem skipWithDuration;
+	private JCheckBoxMenuItem skipWithoutDuration;
+	private JCheckBoxMenuItem skipWithRating;
+	private JCheckBoxMenuItem skipBelow95;
+	private JCheckBoxMenuItem skipBelow90;
+	private JCheckBoxMenuItem skipBelow80;
+	private JCheckBoxMenuItem skipBelow70;
+	private JCheckBoxMenuItem skipBelow60;
+	private JCheckBoxMenuItem skipBelow50;
+	private JCheckBoxMenuItem skipBelow45;
+	private JCheckBoxMenuItem skipWithoutRating;
 
 
 	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
@@ -273,7 +286,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(save);
 
-		JMenu artists = new JMenu("Select Artist");
+		JMenu artists = new JMenu("Artists");
 		menu.add(artists);
 
 		JMenuItem allArtists = new JMenuItem("All Artists");
@@ -308,7 +321,7 @@ public class GUI extends MainWindow {
 			artists.add(artistItem);
 		}
 
-		JMenu playlists = new JMenu("Select Playlist");
+		JMenu playlists = new JMenu("Playlists");
 		menu.add(playlists);
 
 		JMenuItem allSongs = new JMenuItem("All Songs");
@@ -336,6 +349,95 @@ public class GUI extends MainWindow {
 			});
 			playlists.add(playlistItem);
 		}
+
+		JMenu skip = new JMenu("Skip");
+		menu.add(skip);
+
+		ActionListener skipClickListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveSkipState();
+			}
+		};
+
+		skipWithDuration = new JCheckBoxMenuItem("Skip Songs With Duration");
+		skipWithDuration.setSelected(configuration.getBoolean("skipSongsWithDuration", false));
+		skipWithDuration.addActionListener(skipClickListener);
+		skip.add(skipWithDuration);
+
+		skipWithoutDuration = new JCheckBoxMenuItem("Skip Songs Without Duration");
+		skipWithoutDuration.setSelected(configuration.getBoolean("skipSongsWithoutDuration", false));
+		skipWithoutDuration.addActionListener(skipClickListener);
+		skip.add(skipWithoutDuration);
+
+		skip.addSeparator();
+
+		skipWithRating = new JCheckBoxMenuItem("Skip Songs With Rating");
+		skipWithRating.setSelected(configuration.getBoolean("skipSongsWithRating", false));
+		skipWithRating.addActionListener(skipClickListener);
+		skip.add(skipWithRating);
+
+		skipBelow95 = new JCheckBoxMenuItem("Skip Songs With Rating Below 95%");
+		skipBelow95.setSelected(configuration.getBoolean("skipSongsBelow95", false));
+		skipBelow95.addActionListener(skipClickListener);
+		skip.add(skipBelow95);
+
+		skipBelow90 = new JCheckBoxMenuItem("Skip Songs With Rating Below 90%");
+		skipBelow90.setSelected(configuration.getBoolean("skipSongsBelow90", false));
+		skipBelow90.addActionListener(skipClickListener);
+		skip.add(skipBelow90);
+
+		skipBelow80 = new JCheckBoxMenuItem("Skip Songs With Rating Below 80%");
+		skipBelow80.setSelected(configuration.getBoolean("skipSongsBelow80", false));
+		skipBelow80.addActionListener(skipClickListener);
+		skip.add(skipBelow80);
+
+		skipBelow70 = new JCheckBoxMenuItem("Skip Songs With Rating Below 70%");
+		skipBelow70.setSelected(configuration.getBoolean("skipSongsBelow70", false));
+		skipBelow70.addActionListener(skipClickListener);
+		skip.add(skipBelow70);
+
+		skipBelow60 = new JCheckBoxMenuItem("Skip Songs With Rating Below 60%");
+		skipBelow60.setSelected(configuration.getBoolean("skipSongsBelow60", false));
+		skipBelow60.addActionListener(skipClickListener);
+		skip.add(skipBelow60);
+
+		skipBelow50 = new JCheckBoxMenuItem("Skip Songs With Rating Below 50%");
+		skipBelow50.setSelected(configuration.getBoolean("skipSongsBelow50", false));
+		skipBelow50.addActionListener(skipClickListener);
+		skip.add(skipBelow50);
+
+		skipBelow45 = new JCheckBoxMenuItem("Skip Songs With Rating Below 45%");
+		skipBelow45.setSelected(configuration.getBoolean("skipSongsBelow45", false));
+		skipBelow45.addActionListener(skipClickListener);
+		skip.add(skipBelow45);
+
+		skipWithoutRating = new JCheckBoxMenuItem("Skip Songs Without Rating");
+		skipWithoutRating.setSelected(configuration.getBoolean("skipSongsWithoutRating", false));
+		skipWithoutRating.addActionListener(skipClickListener);
+		skip.add(skipWithoutRating);
+
+		skip.addSeparator();
+
+		JMenuItem skipNone = new JMenuItem("Skip None / Play All From Current Playlist");
+		skipNone.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				skipWithDuration.setSelected(false);
+				skipWithoutDuration.setSelected(false);
+				skipWithRating.setSelected(false);
+				skipBelow95.setSelected(false);
+				skipBelow90.setSelected(false);
+				skipBelow80.setSelected(false);
+				skipBelow70.setSelected(false);
+				skipBelow60.setSelected(false);
+				skipBelow50.setSelected(false);
+				skipBelow45.setSelected(false);
+				skipWithoutRating.setSelected(false);
+				saveSkipState();
+			}
+		});
+		skip.add(skipNone);
 
 		menu.add(new MenuItemForMainMenu("|"));
 
@@ -481,6 +583,20 @@ public class GUI extends MainWindow {
 		parent.setJMenuBar(menu);
 
 		return menu;
+	}
+
+	private void saveSkipState() {
+		configuration.set("skipSongsWithDuration", skipWithDuration.isSelected());
+		configuration.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
+		configuration.set("skipSongsWithRating", skipWithRating.isSelected());
+		configuration.set("skipSongsBelow95", skipBelow95.isSelected());
+		configuration.set("skipSongsBelow90", skipBelow90.isSelected());
+		configuration.set("skipSongsBelow80", skipBelow80.isSelected());
+		configuration.set("skipSongsBelow70", skipBelow70.isSelected());
+		configuration.set("skipSongsBelow60", skipBelow60.isSelected());
+		configuration.set("skipSongsBelow50", skipBelow50.isSelected());
+		configuration.set("skipSongsBelow45", skipBelow45.isSelected());
+		configuration.set("skipSongsWithoutRating", skipWithoutRating.isSelected());
 	}
 
 	private JPanel createMainPanel(JFrame parent) {
@@ -994,6 +1110,54 @@ public class GUI extends MainWindow {
 		JScrollBar bar = songListScroller.getVerticalScrollBar();
 		bar.setValue((bar.getMaximum() * songPos) / songAmount);
 		songListScroller.repaint();
+	}
+
+	/**
+	 * Are we skipping this song?
+	 */
+	public boolean skippingSong(Song song) {
+
+		if (skipWithDuration.isSelected() && song.hasLength()) {
+			return true;
+		}
+
+		if (skipWithoutDuration.isSelected() && !song.hasLength()) {
+			return true;
+		}
+
+		if (skipWithRating.isSelected() && song.hasRating()) {
+			return true;
+		}
+
+		if (song.hasRating()) {
+			if (skipBelow95.isSelected() && (song.getRating() < 95)) {
+				return true;
+			}
+			if (skipBelow90.isSelected() && (song.getRating() < 90)) {
+				return true;
+			}
+			if (skipBelow80.isSelected() && (song.getRating() < 80)) {
+				return true;
+			}
+			if (skipBelow70.isSelected() && (song.getRating() < 70)) {
+				return true;
+			}
+			if (skipBelow60.isSelected() && (song.getRating() < 60)) {
+				return true;
+			}
+			if (skipBelow50.isSelected() && (song.getRating() < 50)) {
+				return true;
+			}
+			if (skipBelow45.isSelected() && (song.getRating() < 45)) {
+				return true;
+			}
+		}
+
+		if (skipWithoutRating.isSelected() && !song.hasRating()) {
+			return true;
+		}
+
+		return false;
 	}
 
 }
