@@ -876,6 +876,11 @@ public class GUI extends MainWindow {
 		songItem.setText(song.toString());
 		ratingItem.setBarPosition(song.getRating());
 
+		// explicitly continue a paused song (if there is any), such that it can be stopped
+		// in the next line
+		timingCtrl.continueSong();
+
+		// stop playing the current song as we do not want to play two at the same time
 		timingCtrl.stopPlaying();
 
 		try {
