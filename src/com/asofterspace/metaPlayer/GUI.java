@@ -308,7 +308,7 @@ public class GUI extends MainWindow {
 			artistNames = songCtrl.getTopArtists(32);
 		}
 
-		for (String artistName : artistNames) {
+		for (final String artistName : artistNames) {
 			JMenuItem artistItem = new JMenuItem(artistName);
 			artistItem.addActionListener(new ActionListener() {
 				@Override
@@ -337,7 +337,7 @@ public class GUI extends MainWindow {
 
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
-		for (Record playlistRecord : playlistRecords) {
+		for (final Record playlistRecord : playlistRecords) {
 			JMenuItem playlistItem = new JMenuItem(playlistRecord.getString("name"));
 			playlistItem.addActionListener(new ActionListener() {
 				@Override
