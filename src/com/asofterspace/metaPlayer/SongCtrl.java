@@ -280,7 +280,7 @@ public class SongCtrl {
 	public Song getPreviousSong(Song currentlyPlayedSong) {
 
 		// iterate over all songs...
-		for (int i = 0; i < currentSongs.size() - 1; i++) {
+		for (int i = 1; i < currentSongs.size(); i++) {
 			// ... and once we found the current song...
 			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
 				int j = i-1;

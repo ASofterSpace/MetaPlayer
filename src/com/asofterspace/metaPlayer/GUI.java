@@ -144,7 +144,8 @@ public class GUI extends MainWindow {
 
 		regenerateSongList();
 
-		startPlaying();
+		// play the first song
+		playNextSong();
 	}
 
 	private JMenuBar createMenu(JFrame parent) {
@@ -906,15 +907,6 @@ public class GUI extends MainWindow {
 	private void playPreviousSong() {
 
 		playSong(songCtrl.getPreviousSong(currentlyPlayedSong));
-	}
-
-	private void startPlaying() {
-
-		List<Song> songs = songCtrl.getSongs();
-
-		if (songs.size() > 0) {
-			playSong(songs.get(0));
-		}
 	}
 
 	private void importSongs() {
