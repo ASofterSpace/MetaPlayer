@@ -28,7 +28,7 @@ public class PlayerCtrl {
 	public String getPlayerForFile(String filename) {
 
 		for (Record assoc : extPlayerAssocs) {
-			if (filename.endsWith(assoc.getString("ext"))) {
+			if (filename.toLowerCase().endsWith(assoc.getString("ext").toLowerCase())) {
 				return assoc.getString("play");
 			}
 		}
