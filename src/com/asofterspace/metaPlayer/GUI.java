@@ -13,6 +13,7 @@ import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.ProcessUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.utils.TextEncoding;
 import com.asofterspace.toolbox.Utils;
 
@@ -32,8 +33,6 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -283,6 +282,7 @@ public class GUI extends MainWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				songCtrl.save();
+				configuration.create();
 			}
 		});
 		songs.add(save);
@@ -339,6 +339,16 @@ public class GUI extends MainWindow {
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
 		for (final Record playlistRecord : playlistRecords) {
+
+			// sort and remove duplicates
+			List<String> songList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_SONGS_KEY);
+			songList = StrUtils.sortAndRemoveDuplicates(songList);
+			playlistRecord.set(SongCtrl.PLAYLIST_SONGS_KEY, songList);
+
+			List<String> artistList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_ARTISTS_KEY);
+			artistList = StrUtils.sortAndRemoveDuplicates(artistList);
+			playlistRecord.set(SongCtrl.PLAYLIST_ARTISTS_KEY, artistList);
+
 			JMenuItem playlistItem = new JMenuItem(playlistRecord.getString("name"));
 			playlistItem.addActionListener(new ActionListener() {
 				@Override

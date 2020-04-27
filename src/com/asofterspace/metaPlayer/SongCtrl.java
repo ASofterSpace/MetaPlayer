@@ -18,6 +18,9 @@ import java.util.Random;
 
 public class SongCtrl {
 
+	public final static String PLAYLIST_SONGS_KEY = "songs";
+	public final static String PLAYLIST_ARTISTS_KEY = "artists";
+
 	private ConfigFile songConfig;
 
 	// all the songs that this SongCtrl has loaded
@@ -85,7 +88,7 @@ public class SongCtrl {
 
 		currentSongs = new ArrayList<>();
 
-		List<String> songList = playlist.getArrayAsStringList("songs");
+		List<String> songList = playlist.getArrayAsStringList(PLAYLIST_SONGS_KEY);
 
 		for (String curSongStr : songList) {
 			String curSongLoStr = curSongStr.toLowerCase();
@@ -98,7 +101,7 @@ public class SongCtrl {
 			}
 		}
 
-		List<String> artistList = playlist.getArrayAsStringList("artists");
+		List<String> artistList = playlist.getArrayAsStringList(PLAYLIST_ARTISTS_KEY);
 
 		for (String curArtistStr : artistList) {
 			for (Song song : allSongs) {
