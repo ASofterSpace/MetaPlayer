@@ -20,6 +20,8 @@ public class SongCtrl {
 
 	public final static String PLAYLIST_SONGS_KEY = "songs";
 	public final static String PLAYLIST_ARTISTS_KEY = "artists";
+	public final static String PLAYLIST_EXTENDS_KEY = "extends";
+	public final static String PLAYLIST_NAME_KEY = "name";
 
 	private ConfigFile songConfig;
 
@@ -84,9 +86,14 @@ public class SongCtrl {
 		}
 	}
 
-	public void selectPlaylist(Record playlist) {
+	public void selectPlaylist(Record playlistToSelect, List<Record> allPlaylists) {
 
-		currentSongs = new ArrayList<>();
+		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists);
+	}
+
+	private List<Song> getSongsForPlaylist(Record playlist, List<Record> allPlaylists) {
+
+		List<Song> result = new ArrayList<>();
 
 		List<String> songList = playlist.getArrayAsStringList(PLAYLIST_SONGS_KEY);
 
@@ -94,8 +101,8 @@ public class SongCtrl {
 			String curSongLoStr = curSongStr.toLowerCase();
 			for (Song song : allSongs) {
 				if (song.toString().toLowerCase().equals(curSongLoStr)) {
-					if (!currentSongs.contains(song)) {
-						currentSongs.add(song);
+					if (!result.contains(song)) {
+						result.add(song);
 					}
 				}
 			}
@@ -106,12 +113,26 @@ public class SongCtrl {
 		for (String curArtistStr : artistList) {
 			for (Song song : allSongs) {
 				if (song.hasArtist(curArtistStr)) {
-					if (!currentSongs.contains(song)) {
-						currentSongs.add(song);
+					if (!result.contains(song)) {
+						result.add(song);
 					}
 				}
 			}
 		}
+
+		for (String extendedPlaylist : playlist.getArrayAsStringList(PLAYLIST_EXTENDS_KEY)) {
+			for (Record curPlaylist : allPlaylists) {
+				if (curPlaylist.getString(PLAYLIST_NAME_KEY).equals(extendedPlaylist)) {
+					for (Song song : getSongsForPlaylist(curPlaylist, allPlaylists)) {
+						if (!result.contains(song)) {
+							result.add(song);
+						}
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public void randomize() {

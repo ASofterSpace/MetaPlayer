@@ -349,11 +349,11 @@ public class GUI extends MainWindow {
 			artistList = StrUtils.sortAndRemoveDuplicates(artistList);
 			playlistRecord.set(SongCtrl.PLAYLIST_ARTISTS_KEY, artistList);
 
-			JMenuItem playlistItem = new JMenuItem(playlistRecord.getString("name"));
+			JMenuItem playlistItem = new JMenuItem(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
 			playlistItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					songCtrl.selectPlaylist(playlistRecord);
+					songCtrl.selectPlaylist(playlistRecord, playlistRecords);
 					songCtrl.randomize();
 					regenerateSongList();
 				}
