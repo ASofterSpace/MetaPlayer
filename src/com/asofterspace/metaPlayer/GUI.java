@@ -551,8 +551,8 @@ public class GUI extends MainWindow {
 		about.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String aboutMessage = "This is the " + Main.PROGRAM_TITLE + ".\n" +
-					"Version: " + Main.VERSION_NUMBER + " (" + Main.VERSION_DATE + ")\n" +
+				String aboutMessage = "This is the " + MetaPlayer.PROGRAM_TITLE + ".\n" +
+					"Version: " + MetaPlayer.VERSION_NUMBER + " (" + MetaPlayer.VERSION_DATE + ")\n" +
 					"Brought to you by: A Softer Space";
 				JOptionPane.showMessageDialog(mainFrame, aboutMessage, "About", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -858,7 +858,7 @@ public class GUI extends MainWindow {
 	*/
 
 	private void refreshTitleBar() {
-		mainFrame.setTitle(Main.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
+		mainFrame.setTitle(MetaPlayer.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
 	}
 
 	private void stopPlaying() {

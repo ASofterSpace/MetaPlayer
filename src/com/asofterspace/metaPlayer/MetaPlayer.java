@@ -12,7 +12,7 @@ import com.asofterspace.toolbox.Utils;
 import javax.swing.SwingUtilities;
 
 
-public class Main {
+public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
 	public final static String VERSION_NUMBER = "0.0.0.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
