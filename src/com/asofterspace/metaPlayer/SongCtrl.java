@@ -81,7 +81,28 @@ public class SongCtrl {
 
 		for (Song song : allSongs) {
 			if (song.hasArtist(artist)) {
-				currentSongs.add(song);
+				if (!currentSongs.contains(song)) {
+					currentSongs.add(song);
+				}
+			}
+		}
+	}
+
+	public void selectSongsOfArtists(List<String> artists) {
+
+		currentSongs = new ArrayList<>();
+
+		if (artists == null) {
+			return;
+		}
+
+		for (Song song : allSongs) {
+			for (String artist : artists) {
+				if (song.hasArtist(artist)) {
+					if (!currentSongs.contains(song)) {
+						currentSongs.add(song);
+					}
+				}
 			}
 		}
 	}

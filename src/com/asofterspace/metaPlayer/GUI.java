@@ -301,6 +301,23 @@ public class GUI extends MainWindow {
 		});
 		artists.add(allArtists);
 
+		JMenuItem artistsOfCurlyPlayedSong = new JMenuItem("Artists of Currently Played Song");
+		artistsOfCurlyPlayedSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentlyPlayedSong == null) {
+					songCtrl.selectSongsOfArtists(null);
+				} else {
+					songCtrl.selectSongsOfArtists(currentlyPlayedSong.getArtists());
+				}
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		artists.add(artistsOfCurlyPlayedSong);
+
+		artists.addSeparator();
+
 		// actually, the artists that we have a lot of songs of are not necessarily the ones that
 		// we want to see in the list, so load this from configuration by default:
 		List<String> artistNames = configuration.getList(CONFIG_KEY_MAIN_ARTISTS);
@@ -335,6 +352,8 @@ public class GUI extends MainWindow {
 			}
 		});
 		playlists.add(allSongs);
+
+		playlists.addSeparator();
 
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 

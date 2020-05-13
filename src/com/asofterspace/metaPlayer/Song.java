@@ -8,6 +8,8 @@ import com.asofterspace.toolbox.utils.Record;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Song {
@@ -105,6 +107,28 @@ public class Song {
 		return artist;
 	}
 
+	public List<String> getArtists() {
+
+		List<String> result = new ArrayList<>();
+
+		if (artist == null) {
+			return result;
+		}
+
+		String artistsStr = artist.replaceAll(" and ", ", ");
+		artistsStr = artistsStr.replaceAll(" feat ", ", ");
+		artistsStr = artistsStr.replaceAll(" feat. ", ", ");
+		artistsStr = artistsStr.replaceAll(" featuring ", ", ");
+
+		String[] artists = artistsStr.split(",");
+
+		for (String cur : artists) {
+			result.add(cur.trim());
+		}
+
+		return result;
+	}
+
 	public boolean hasArtist() {
 		return artist != null;
 	}
@@ -146,6 +170,21 @@ public class Song {
 
 		// matches Bar and Foo - Bar for argument "foo"
 		if (loArtist.contains(" and " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar feat Foo - Bar for argument "foo"
+		if (loArtist.contains(" feat " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar feat Foo - Bar for argument "foo"
+		if (loArtist.contains(" feat. " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar feat Foo - Bar for argument "foo"
+		if (loArtist.contains(" featuring " + loPotentialArtist + " ")) {
 			return true;
 		}
 
