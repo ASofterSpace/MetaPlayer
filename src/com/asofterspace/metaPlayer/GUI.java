@@ -10,7 +10,11 @@ import com.asofterspace.toolbox.gui.BarListener;
 import com.asofterspace.toolbox.gui.BarMenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
+import com.asofterspace.toolbox.gui.OpenFileDialog;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.utils.CallbackWithStatus;
 import com.asofterspace.toolbox.utils.ProcessUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
@@ -940,55 +944,62 @@ public class GUI extends MainWindow {
 
 	private void importSongs() {
 
-		JFileChooser filePicker;
+		OpenFileDialog filePicker = new OpenFileDialog();
 
 		// use the last-used directory
 		String lastDirectory = configuration.getValue(CONFIG_KEY_LAST_SONG_DIRECTORY);
 
 		if ((lastDirectory != null) && !"".equals(lastDirectory)) {
-			filePicker = new JFileChooser(new java.io.File(lastDirectory));
-		} else {
-			filePicker = new JFileChooser();
+			filePicker.setCurrentDirectory(new Directory(lastDirectory));
 		}
 
 		filePicker.setDialogTitle("Open Songs or Directories to Import");
 		filePicker.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		filePicker.setMultiSelectionEnabled(true);
 
-		int result = filePicker.showOpenDialog(mainFrame);
+		filePicker.showOpenDialog(new CallbackWithStatus() {
 
-		switch (result) {
+			public void call(int status) {
 
-			case JFileChooser.APPROVE_OPTION:
+				switch (status) {
 
-				// load the files
-				configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getAbsolutePath());
+					case OpenFileDialog.APPROVE_OPTION:
 
-				for (java.io.File curFile : filePicker.getSelectedFiles()) {
-					importSongsRecursively(curFile);
+						// load the files
+						configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getAbsoluteDirname());
+
+						for (File curFile : filePicker.getSelectedFiles()) {
+							importSong(curFile);
+						}
+						for (Directory curFolder : filePicker.getSelectedDirectories()) {
+							importSongsRecursively(curFolder);
+						}
+
+						songCtrl.save();
+						regenerateSongList();
+
+						break;
+
+					case OpenFileDialog.CANCEL_OPTION:
+						// cancel was pressed... do nothing for now
+						break;
 				}
-
-				songCtrl.save();
-				regenerateSongList();
-
-				break;
-
-			case JFileChooser.CANCEL_OPTION:
-				// cancel was pressed... do nothing for now
-				break;
-		}
+			}
+		});
 	}
 
-	private void importSongsRecursively(java.io.File parent) {
+	private void importSong(File file) {
+		songCtrl.addUnlessAlreadyPresent(new Song(file));
+	}
 
-		if (parent.isDirectory()) {
-			java.io.File[] curFiles = parent.listFiles();
+	private void importSongsRecursively(Directory parent) {
 
-			for (java.io.File curFile : curFiles) {
-				importSongsRecursively(curFile);
-			}
-		} else {
-			songCtrl.addUnlessAlreadyPresent(new Song(parent));
+		boolean recursive = true;
+
+		List<File> curFiles = parent.getAllFiles(recursive);
+
+		for (File curFile : curFiles) {
+			importSong(curFile);
 		}
 	}
 

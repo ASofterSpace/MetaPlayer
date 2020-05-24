@@ -4,10 +4,9 @@
  */
 package com.asofterspace.metaPlayer;
 
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.Record;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +26,7 @@ public class Song {
 	}
 
 	private static String fileToPath(File file) {
-		try {
-			return file.getCanonicalPath();
-		} catch (IOException ex) {
-			return file.getAbsolutePath();
-		}
+		return file.getCanonicalFilename();
 	}
 
 	public Song(String path) {
