@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
@@ -39,7 +40,6 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -79,9 +79,9 @@ public class GUI extends MainWindow {
 	private JTextField searchField;
 
 	private JMenuItem songItem;
-	private AbstractButton pauseItem;
-	private AbstractButton timeRemainingItem;
-	private AbstractButton minimizeMaximize;
+	private MenuItemForMainMenu pauseItem;
+	private MenuItemForMainMenu timeRemainingItem;
+	private MenuItemForMainMenu minimizeMaximize;
 	private BarMenuItemForMainMenu ratingItem;
 
 	private ConfigFile configuration;
@@ -475,19 +475,19 @@ public class GUI extends MainWindow {
 
 		menu.add(new MenuItemForMainMenu("|"));
 
-		AbstractButton prev = new MenuItemForMainMenu("Previous");
-		prev.addActionListener(new ActionListener() {
+		MenuItemForMainMenu prev = new MenuItemForMainMenu("Previous");
+		prev.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				playPreviousSong();
 			}
 		});
 		menu.add(prev);
 
 		pauseItem = new MenuItemForMainMenu("Pause");
-		pauseItem.addActionListener(new ActionListener() {
+		pauseItem.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				if (pauseItem.getText().equals("Pause")) {
 					pauseCurSong();
 					pauseItem.setText("Continue");
@@ -499,10 +499,10 @@ public class GUI extends MainWindow {
 		});
 		menu.add(pauseItem);
 
-		AbstractButton next = new MenuItemForMainMenu("Next");
-		next.addActionListener(new ActionListener() {
+		MenuItemForMainMenu next = new MenuItemForMainMenu("Next");
+		next.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				playNextSong();
 			}
 		});
@@ -510,19 +510,19 @@ public class GUI extends MainWindow {
 
 		menu.add(new MenuItemForMainMenu("|"));
 
-		AbstractButton songIsOver = new MenuItemForMainMenu("Song is Over");
-		songIsOver.addActionListener(new ActionListener() {
+		MenuItemForMainMenu songIsOver = new MenuItemForMainMenu("Song is Over");
+		songIsOver.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				curSongIsOver();
 			}
 		});
 		menu.add(songIsOver);
 
-		AbstractButton resetLength = new MenuItemForMainMenu("Reset Length");
-		resetLength.addActionListener(new ActionListener() {
+		MenuItemForMainMenu resetLength = new MenuItemForMainMenu("Reset Length");
+		resetLength.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				resetCurSongLength();
 			}
 		});
@@ -531,9 +531,9 @@ public class GUI extends MainWindow {
 		menu.add(new MenuItemForMainMenu("|"));
 
 		minimizeMaximize = new MenuItemForMainMenu("Maximize");
-		minimizeMaximize.addActionListener(new ActionListener() {
+		minimizeMaximize.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				if (minimizeMaximize.getText().equals("Maximize")) {
 					minimizeMaximize.setText("Minimize");
 					maximize();
@@ -545,10 +545,10 @@ public class GUI extends MainWindow {
 		});
 		menu.add(minimizeMaximize);
 
-		AbstractButton close = new MenuItemForMainMenu("Close");
-		close.addActionListener(new ActionListener() {
+		MenuItemForMainMenu close = new MenuItemForMainMenu("Close");
+		close.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				timingCtrl.close();
 				System.exit(0);
 			}
@@ -789,7 +789,7 @@ public class GUI extends MainWindow {
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(-8, (int) screenSize.getHeight() - 53));
+		mainFrame.setLocation(new Point(-8, (int) screenSize.getHeight() - 50));
 	}
 
 	private void maximize() {
@@ -1128,7 +1128,7 @@ public class GUI extends MainWindow {
 			seconds = "0" + seconds;
 		}
 
-		timeRemainingItem.setText(minutes + ":" + seconds);
+		timeRemainingItem.setText(minutes + ":" + seconds + "  ");
 	}
 
 	private void showSelectedTab() {
