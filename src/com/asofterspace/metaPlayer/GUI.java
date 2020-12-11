@@ -488,7 +488,7 @@ public class GUI extends MainWindow {
 		pauseItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (pauseItem.getText().equals("Pause")) {
+				if (pauseItem.getTextContent().equals("Pause")) {
 					pauseCurSong();
 					pauseItem.setText("Continue");
 				} else {
@@ -534,7 +534,7 @@ public class GUI extends MainWindow {
 		minimizeMaximize.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (minimizeMaximize.getText().equals("Maximize")) {
+				if (minimizeMaximize.getTextContent().equals("Maximize")) {
 					minimizeMaximize.setText("Minimize");
 					maximize();
 				} else {
