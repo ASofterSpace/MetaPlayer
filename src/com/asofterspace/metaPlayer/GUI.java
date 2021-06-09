@@ -999,7 +999,12 @@ public class GUI extends MainWindow {
 		List<File> curFiles = parent.getAllFiles(recursive);
 
 		for (File curFile : curFiles) {
-			importSong(curFile);
+			if (!(curFile.getFilename().endsWith(".jpg") ||
+				  curFile.getFilename().endsWith(".png") ||
+				  curFile.getFilename().endsWith(".bmp") ||
+				  curFile.getFilename().endsWith(".txt"))) {
+				importSong(curFile);
+			}
 		}
 	}
 

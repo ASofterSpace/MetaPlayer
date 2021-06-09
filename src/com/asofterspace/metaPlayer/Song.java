@@ -69,7 +69,8 @@ public class Song {
 				title.endsWith(".avi") ||
 				title.endsWith(".flv") ||
 				title.endsWith(".wmv") ||
-				title.endsWith(".wma")) {
+				title.endsWith(".wma") ||
+				title.endsWith(".webm")) {
 				title = title.substring(0, title.length() - 4);
 			}
 		}

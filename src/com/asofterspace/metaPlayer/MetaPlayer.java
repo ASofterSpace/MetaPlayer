@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 8. December 2020";
+	public final static String VERSION_NUMBER = "0.0.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 21. February 2021";
 
 	private static ConfigFile config;
 
