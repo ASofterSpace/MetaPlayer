@@ -534,7 +534,7 @@ public class GUI extends MainWindow {
 		minimizeMaximize.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (minimizeMaximize.getTextContent().equals("Maximize")) {
+				if (minimizeMaximize.getTextContent().trim().equals("Maximize")) {
 					minimizeMaximize.setText("Minimize");
 					maximize();
 				} else {
