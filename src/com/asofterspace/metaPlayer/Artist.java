@@ -7,6 +7,7 @@ package com.asofterspace.metaPlayer;
 public class Artist {
 
 	private String name;
+	private String lowName;
 	private int songs;
 
 
@@ -27,6 +28,15 @@ public class Artist {
 		return name;
 	}
 
+	public String getLowName() {
+		if (lowName == null) {
+			if (name != null) {
+				lowName = name.toLowerCase();
+			}
+		}
+		return lowName;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {
@@ -37,7 +47,7 @@ public class Artist {
 			if (name == null) {
 				return otherArtist.name == null;
 			}
-			return name.equals(otherArtist.name);
+			return getLowName().equals(otherArtist.getLowName());
 		}
 		return false;
 	}

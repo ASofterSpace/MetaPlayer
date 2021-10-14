@@ -399,17 +399,48 @@ public class SongCtrl {
 	 * how many songs that would be - but no more than a certain maximum amount
 	 */
 	public List<String> getTopArtists(int maxAmount) {
+		return getTopArtists(maxAmount, null);
+	}
+
+	public List<String> getTopArtists(int maxAmount, String bucketName) {
 
 		List<Artist> allArtists = new ArrayList<>();
+		char bucketChar = '*';
+		if (bucketName != null) {
+			bucketChar = bucketName.toUpperCase().charAt(0);
+		}
 
 		for (Song song : allSongs) {
-			String curArtistStr = song.getArtist();
-			Artist curArtist = new Artist(curArtistStr);
-			int contained = allArtists.indexOf(curArtist);
-			if (contained >= 0) {
-				allArtists.get(contained).addSong();
-			} else {
-				allArtists.add(curArtist);
+
+			List<String> curArtists = song.getArtists();
+
+			for (String curArtistStr : curArtists) {
+
+				if ((curArtistStr == null) || (curArtistStr.length() == 0)) {
+					continue;
+				}
+
+				if (bucketName != null) {
+					char firstChar = curArtistStr.toUpperCase().charAt(0);
+					if (bucketName.length() == 1) {
+						if (firstChar != bucketChar) {
+							continue;
+						}
+					} else {
+						// "other" bucket
+						if ((firstChar >= 'A') && (firstChar <= 'Z')) {
+							continue;
+						}
+					}
+				}
+
+				Artist curArtist = new Artist(curArtistStr);
+				int contained = allArtists.indexOf(curArtist);
+				if (contained >= 0) {
+					allArtists.get(contained).addSong();
+				} else {
+					allArtists.add(curArtist);
+				}
 			}
 		}
 

@@ -66,6 +66,8 @@ public class GUI extends MainWindow {
 	public final static String CONFIG_KEY_MAIN_ARTISTS = "mainArtists";
 	public final static String CONFIG_KEY_PLAYLISTS = "playlists";
 
+	private final static Integer MAX_ARTISTS_PER_BUCKET = 32;
+
 	private TimingCtrl timingCtrl;
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
@@ -320,6 +322,14 @@ public class GUI extends MainWindow {
 		});
 		artists.add(artistsOfCurlyPlayedSong);
 
+		JMenu artistsByName = new JMenu("Artists by Name...");
+		artists.add(artistsByName);
+
+		for (char c = 'A'; c <= 'Z'; c++) {
+			addArtistsByNameSubMenu(artistsByName, ""+c);
+		}
+		addArtistsByNameSubMenu(artistsByName, "Other");
+
 		artists.addSeparator();
 
 		// actually, the artists that we have a lot of songs of are not necessarily the ones that
@@ -327,7 +337,7 @@ public class GUI extends MainWindow {
 		List<String> artistNames = configuration.getList(CONFIG_KEY_MAIN_ARTISTS);
 		// and only get the top artists if there is no such configuration:
 		if ((artistNames == null) || (artistNames.size() == 0)) {
-			artistNames = songCtrl.getTopArtists(32);
+			artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET);
 		}
 
 		for (final String artistName : artistNames) {
@@ -1200,6 +1210,28 @@ public class GUI extends MainWindow {
 		}
 
 		return false;
+	}
+
+	private void addArtistsByNameSubMenu(JMenu artistsByName, String bucketName) {
+
+		JMenu bucketMenu = new JMenu(bucketName + "...");
+		artistsByName.add(bucketMenu);
+
+		// add the top 32 artists for each bucket
+		List<String> artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET, bucketName);
+
+		for (final String artistName : artistNames) {
+			JMenuItem artistItem = new JMenuItem(artistName);
+			artistItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					songCtrl.selectSongsOfArtist(artistName);
+					songCtrl.randomize();
+					regenerateSongList();
+				}
+			});
+			bucketMenu.add(artistItem);
+		}
 	}
 
 }

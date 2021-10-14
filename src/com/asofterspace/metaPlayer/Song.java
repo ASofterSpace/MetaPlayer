@@ -112,9 +112,11 @@ public class Song {
 		}
 
 		String artistsStr = artist.replaceAll(" and ", ", ");
+		artistsStr = artistsStr.replaceAll(" ft. ", ", ");
 		artistsStr = artistsStr.replaceAll(" feat ", ", ");
 		artistsStr = artistsStr.replaceAll(" feat. ", ", ");
 		artistsStr = artistsStr.replaceAll(" featuring ", ", ");
+		artistsStr = artistsStr.replaceAll(" & ", ", ");
 
 		String[] artists = artistsStr.split(",");
 
@@ -170,6 +172,11 @@ public class Song {
 		}
 
 		// matches Bar feat Foo - Bar for argument "foo"
+		if (loArtist.contains(" ft. " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar feat Foo - Bar for argument "foo"
 		if (loArtist.contains(" feat " + loPotentialArtist + " ")) {
 			return true;
 		}
@@ -181,6 +188,11 @@ public class Song {
 
 		// matches Bar feat Foo - Bar for argument "foo"
 		if (loArtist.contains(" featuring " + loPotentialArtist + " ")) {
+			return true;
+		}
+
+		// matches Bar & Foo - Bar for argument "foo"
+		if (loArtist.contains(" & " + loPotentialArtist + " ")) {
 			return true;
 		}
 
