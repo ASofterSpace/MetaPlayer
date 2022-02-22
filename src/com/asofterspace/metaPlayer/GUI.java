@@ -322,6 +322,21 @@ public class GUI extends MainWindow {
 		});
 		artists.add(artistsOfCurlyPlayedSong);
 
+		JMenuItem songsWithSameName = new JMenuItem("Songs with the Same Name (by Any Artist)");
+		songsWithSameName.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentlyPlayedSong == null) {
+					songCtrl.selectSongsByName(null);
+				} else {
+					songCtrl.selectSongsByName(currentlyPlayedSong.getTitle());
+				}
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		artists.add(songsWithSameName);
+
 		JMenu artistsByName = new JMenu("Artists by Name...");
 		artists.add(artistsByName);
 

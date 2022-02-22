@@ -107,6 +107,40 @@ public class SongCtrl {
 		}
 	}
 
+	public void selectSongsByName(String title) {
+
+		currentSongs = new ArrayList<>();
+
+		if (title == null) {
+			return;
+		}
+
+		if (title.contains(" (")) {
+			title = title.substring(0, title.indexOf(" ("));
+		}
+
+		title = title.toLowerCase().trim();
+
+		for (Song song : allSongs) {
+			String songTitle = song.getTitle();
+			if (songTitle == null) {
+				continue;
+			}
+
+			if (songTitle.contains(" (")) {
+				songTitle = songTitle.substring(0, songTitle.indexOf(" ("));
+			}
+
+			songTitle = songTitle.toLowerCase().trim();
+
+			if (title.equals(songTitle)) {
+				if (!currentSongs.contains(song)) {
+					currentSongs.add(song);
+				}
+			}
+		}
+	}
+
 	public void selectPlaylist(Record playlistToSelect, List<Record> allPlaylists) {
 
 		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists);
