@@ -22,6 +22,7 @@ public class SongCtrl {
 	public final static String PLAYLIST_ARTISTS_KEY = "artists";
 	public final static String PLAYLIST_EXTENDS_KEY = "extends";
 	public final static String PLAYLIST_NAME_KEY = "name";
+	public final static String PLAYLIST_SUBLISTS_KEY = "sublists";
 
 	private ConfigFile songConfig;
 
