@@ -19,6 +19,7 @@ public class Song {
 	private Integer length;
 	private Integer rating;
 	private boolean fileExists;
+	private String clipboardText = null;
 
 
 	public Song(File file) {
@@ -222,8 +223,29 @@ public class Song {
 		return path;
 	}
 
-	public String getClipboardText() {
-		return toString() + " (" + getPath() + ")";
+	public String getClipboardText(SongCtrl songCtrl, List<Record> allPlaylists) {
+		if (clipboardText != null) {
+			return clipboardText;
+		}
+
+		StringBuilder result = new StringBuilder();
+		result.append(toString() + " (" + getPath() + ")");
+		result.append("\n");
+		result.append("\n");
+		result.append("Included in:");
+
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
+		if (playlistsWithThisSong.size() < 1) {
+			result.append("\n(not included in any playlists)");
+		}
+		for (Record playlistRecord : playlistsWithThisSong) {
+			result.append("\n");
+			result.append(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
+		}
+
+		clipboardText = result.toString();
+
+		return clipboardText;
 	}
 
 	public void setPath(String path) {

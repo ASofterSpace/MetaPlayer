@@ -38,6 +38,7 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -91,6 +92,7 @@ public class GUI extends MainWindow {
 	private JPopupMenu songListPopup;
 	private String[] strSongs;
 	private JScrollPane songListScroller;
+	private List<Record> allPlaylistRecords = new ArrayList<>();
 
 	private JCheckBoxMenuItem skipWithDuration;
 	private JCheckBoxMenuItem skipWithoutDuration;
@@ -386,6 +388,7 @@ public class GUI extends MainWindow {
 
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
+		allPlaylistRecords = new ArrayList<>();
 		addPlaylistsBasedOnRecords(playlistRecords, playlists);
 
 		JMenu skip = new JMenu("Skip");
@@ -607,7 +610,8 @@ public class GUI extends MainWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (currentlyPlayedSong != null) {
-					StringSelection selection = new StringSelection(currentlyPlayedSong.getClipboardText());
+					StringSelection selection = new StringSelection(
+						currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
 					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 					clipboard.setContents(selection, selection);
 				}
@@ -648,11 +652,13 @@ public class GUI extends MainWindow {
 				artistList = StrUtils.sortAndRemoveDuplicates(artistList);
 				playlistRecord.set(SongCtrl.PLAYLIST_ARTISTS_KEY, artistList);
 
+				allPlaylistRecords.add(playlistRecord);
+
 				JMenuItem playlistItem = new JMenuItem(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
 				playlistItem.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						songCtrl.selectPlaylist(playlistRecord, playlistRecords);
+						songCtrl.selectPlaylist(playlistRecord, allPlaylistRecords);
 						songCtrl.randomize();
 						regenerateSongList();
 					}
@@ -951,6 +957,7 @@ public class GUI extends MainWindow {
 
 		currentlyPlayedSong = song;
 		songItem.setText(song.toString());
+
 		ratingItem.setBarPosition(song.getRating());
 
 		// explicitly continue a paused song (if there is any), such that it can be stopped

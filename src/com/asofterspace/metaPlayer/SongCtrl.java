@@ -144,10 +144,25 @@ public class SongCtrl {
 
 	public void selectPlaylist(Record playlistToSelect, List<Record> allPlaylists) {
 
-		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists);
+		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists, allSongs);
 	}
 
-	private List<Song> getSongsForPlaylist(Record playlist, List<Record> allPlaylists) {
+	public List<Record> getPlaylistsContainingSong(Song song, List<Record> allPlaylists) {
+		// we are only interested in whether this one song is in there or not
+		List<Song> allConsideredSongs = new ArrayList<>();
+		allConsideredSongs.add(song);
+
+		List<Record> result = new ArrayList<>();
+		for (Record playlistRecord : allPlaylists) {
+			List<Song> songs = getSongsForPlaylist(playlistRecord, allPlaylists, allConsideredSongs);
+			if (songs.contains(song)) {
+				result.add(playlistRecord);
+			}
+		}
+		return result;
+	}
+
+	private List<Song> getSongsForPlaylist(Record playlist, List<Record> allPlaylists, List<Song> allConsideredSongs) {
 
 		List<Song> result = new ArrayList<>();
 
@@ -155,7 +170,7 @@ public class SongCtrl {
 
 		for (String curSongStr : songList) {
 			String curSongLoStr = curSongStr.toLowerCase();
-			for (Song song : allSongs) {
+			for (Song song : allConsideredSongs) {
 				if (song.toString().toLowerCase().equals(curSongLoStr)) {
 					if (!result.contains(song)) {
 						result.add(song);
@@ -167,7 +182,7 @@ public class SongCtrl {
 		List<String> artistList = playlist.getArrayAsStringList(PLAYLIST_ARTISTS_KEY);
 
 		for (String curArtistStr : artistList) {
-			for (Song song : allSongs) {
+			for (Song song : allConsideredSongs) {
 				if (song.hasArtist(curArtistStr)) {
 					if (!result.contains(song)) {
 						result.add(song);
@@ -179,7 +194,7 @@ public class SongCtrl {
 		for (String extendedPlaylist : playlist.getArrayAsStringList(PLAYLIST_EXTENDS_KEY)) {
 			for (Record curPlaylist : allPlaylists) {
 				if (curPlaylist.getString(PLAYLIST_NAME_KEY).equals(extendedPlaylist)) {
-					for (Song song : getSongsForPlaylist(curPlaylist, allPlaylists)) {
+					for (Song song : getSongsForPlaylist(curPlaylist, allPlaylists, allConsideredSongs)) {
 						if (!result.contains(song)) {
 							result.add(song);
 						}
