@@ -76,6 +76,27 @@ public class SongCtrl {
 		}
 	}
 
+	public void selectSongsOfPlaylistsWithCurSong(Song currentlyPlayedSong, List<Record> allPlaylists) {
+
+		currentSongs = new ArrayList<>();
+		currentSongs.add(currentlyPlayedSong);
+
+		List<Record> playlistsContainingSong = getPlaylistsContainingSong(
+			currentlyPlayedSong, allPlaylists);
+
+		List<Song> songs = new ArrayList<>();
+
+		for (Record playlist : playlistsContainingSong) {
+			songs.addAll(getSongsForPlaylist(playlist, allPlaylists, allSongs));
+		}
+
+		for (Song song : songs) {
+			if (!currentSongs.contains(song)) {
+				currentSongs.add(song);
+			}
+		}
+	}
+
 	public void selectSongsOfArtist(String artist) {
 
 		currentSongs = new ArrayList<>();

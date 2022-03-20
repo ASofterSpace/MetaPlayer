@@ -384,6 +384,17 @@ public class GUI extends MainWindow {
 		});
 		playlists.add(allSongs);
 
+		JMenuItem songsOfAllPlaylistsWithCurSong = new JMenuItem("Songs of All Playlists Including Current Song");
+		songsOfAllPlaylistsWithCurSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.selectSongsOfPlaylistsWithCurSong(currentlyPlayedSong, allPlaylistRecords);
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		playlists.add(songsOfAllPlaylistsWithCurSong);
+
 		playlists.addSeparator();
 
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
