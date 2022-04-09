@@ -21,6 +21,7 @@ public class SongCtrl {
 	public final static String PLAYLIST_SONGS_KEY = "songs";
 	public final static String PLAYLIST_ARTISTS_KEY = "artists";
 	public final static String PLAYLIST_EXTENDS_KEY = "extends";
+	public final static String PLAYLIST_EXT_MIN_RATING_KEY = "extendMinimumRating";
 	public final static String PLAYLIST_NAME_KEY = "name";
 	public final static String PLAYLIST_SUBLISTS_KEY = "sublists";
 
@@ -212,10 +213,23 @@ public class SongCtrl {
 			}
 		}
 
+		Integer extMinRating = playlist.getInteger(PLAYLIST_EXT_MIN_RATING_KEY);
+
 		for (String extendedPlaylist : playlist.getArrayAsStringList(PLAYLIST_EXTENDS_KEY)) {
 			for (Record curPlaylist : allPlaylists) {
 				if (curPlaylist.getString(PLAYLIST_NAME_KEY).equals(extendedPlaylist)) {
 					for (Song song : getSongsForPlaylist(curPlaylist, allPlaylists, allConsideredSongs)) {
+
+						// if there is an extend minimum rating...
+						if (extMinRating != null) {
+							// ... and if the song's rating is below it...
+							if (song.getRating() < extMinRating) {
+								// do not add it to the playlist
+								continue;
+							}
+						}
+
+						// if the playlist does not already contain the song, add it
 						if (!result.contains(song)) {
 							result.add(song);
 						}
