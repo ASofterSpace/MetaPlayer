@@ -77,6 +77,18 @@ public class SongCtrl {
 		}
 	}
 
+	public List<Song> getTopRatedSongs(int amount) {
+		List<Song> sortedSongs = new ArrayList<>(allSongs);
+
+		Collections.sort(sortedSongs, new Comparator<Song>() {
+			public int compare(Song a, Song b) {
+				return b.getRating() - a.getRating();
+			}
+		});
+
+		return sortedSongs.subList(0, amount);
+	}
+
 	public void selectSongsOfPlaylistsWithCurSong(Song currentlyPlayedSong, List<Record> allPlaylists) {
 
 		currentSongs = new ArrayList<>();

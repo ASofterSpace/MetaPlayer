@@ -6,8 +6,14 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
+
+import java.util.Date;
 
 import javax.swing.SwingUtilities;
 
@@ -15,8 +21,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.1.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 10. April 2022";
+	public final static String VERSION_NUMBER = "0.0.1.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 2. May 2022";
 
 	private static ConfigFile config;
 
@@ -89,6 +95,18 @@ public class MetaPlayer {
 		GUI gui = new GUI(timingCtrl, playerCtrl, songCtrl, config);
 		songCtrl.setGUI(gui);
 		SwingUtilities.invokeLater(gui);
+
+		Date now = DateUtils.now();
+		String topSongFileName = "top_songs_" + DateUtils.getYear(now) + "_" +
+			StrUtils.leftPad0(DateUtils.getMonth(now) + "", 2) + ".json";
+		JsonFile topSongs = new JsonFile(config.getParentDirectory(), topSongFileName);
+		if (!topSongs.exists()) {
+			Record rec = Record.emptyArray();
+			for (Song song : songCtrl.getTopRatedSongs(256)) {
+				rec.append(song.toRecord());
+			}
+			topSongs.save(rec);
+		}
 	}
 
 }
