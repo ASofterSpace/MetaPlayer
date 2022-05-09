@@ -265,11 +265,18 @@ public class Song {
 
 	public void setLength(Integer length) {
 		this.length = length;
+		if (!(this.length == null)) {
+			// 9 seconds minimum length
+			int minLength = 9*1000;
+			if (this.length < minLength) {
+				this.length = minLength;
+			}
+		}
 	}
 
 	public void setStrLength(String length) {
 		try {
-			this.length = Integer.parseInt(length);
+			setLength(Integer.parseInt(length));
 		} catch (NumberFormatException e) {}
 	}
 
