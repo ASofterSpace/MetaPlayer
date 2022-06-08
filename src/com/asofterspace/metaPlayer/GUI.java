@@ -471,7 +471,7 @@ public class GUI extends MainWindow {
 
 		skip.addSeparator();
 
-		JMenuItem skipNone = new JMenuItem("Skip None / Play All From Current Playlist");
+		JMenuItem skipNone = new JMenuItem("Play All");
 		skipNone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -490,6 +490,46 @@ public class GUI extends MainWindow {
 			}
 		});
 		skip.add(skipNone);
+
+		JMenuItem discoverNew = new JMenuItem("Discover New Songs");
+		discoverNew.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				skipWithDuration.setSelected(true);
+				skipWithoutDuration.setSelected(false);
+				skipWithRating.setSelected(true);
+				skipBelow95.setSelected(false);
+				skipBelow90.setSelected(false);
+				skipBelow80.setSelected(false);
+				skipBelow70.setSelected(false);
+				skipBelow60.setSelected(false);
+				skipBelow50.setSelected(false);
+				skipBelow45.setSelected(false);
+				skipWithoutRating.setSelected(false);
+				saveSkipState();
+			}
+		});
+		skip.add(discoverNew);
+
+		JMenuItem defaultSkipping = new JMenuItem("Default Skipping");
+		defaultSkipping.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				skipWithDuration.setSelected(false);
+				skipWithoutDuration.setSelected(false);
+				skipWithRating.setSelected(false);
+				skipBelow95.setSelected(false);
+				skipBelow90.setSelected(false);
+				skipBelow80.setSelected(false);
+				skipBelow70.setSelected(false);
+				skipBelow60.setSelected(false);
+				skipBelow50.setSelected(false);
+				skipBelow45.setSelected(true);
+				skipWithoutRating.setSelected(false);
+				saveSkipState();
+			}
+		});
+		skip.add(defaultSkipping);
 
 		menu.add(new MenuItemForMainMenu("|"));
 
