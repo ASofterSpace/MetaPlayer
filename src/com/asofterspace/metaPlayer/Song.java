@@ -112,7 +112,8 @@ public class Song {
 			return result;
 		}
 
-		String artistsStr = artist.replaceAll(" and ", ", ");
+		String artistsStr = artist.replaceAll(" und ", ", ");
+		artistsStr = artistsStr.replaceAll(" and ", ", ");
 		artistsStr = artistsStr.replaceAll(" ft. ", ", ");
 		artistsStr = artistsStr.replaceAll(" feat ", ", ");
 		artistsStr = artistsStr.replaceAll(" feat. ", ", ");
@@ -164,6 +165,11 @@ public class Song {
 
 		// matches Bar, Foo, Barbara - Bar for argument "foo"
 		if (loArtist.contains(", " + loPotentialArtist + ",")) {
+			return true;
+		}
+
+		// matches Bar und Foo - Bar for argument "foo"
+		if (loArtist.contains(" und " + loPotentialArtist + " ")) {
 			return true;
 		}
 
