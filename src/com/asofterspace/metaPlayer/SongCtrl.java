@@ -82,7 +82,7 @@ public class SongCtrl {
 
 		Collections.sort(sortedSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				return b.getRating() - a.getRating();
+				return b.getRatingInt() - a.getRatingInt();
 			}
 		});
 
@@ -237,7 +237,7 @@ public class SongCtrl {
 							// ... and if the song has a rating (songs without ratings are assumed to be awesome)...
 							if (song.hasRating()) {
 								// ... and if the song's rating is below it...
-								if (song.getRating() < extMinRating) {
+								if (song.getRatingInt() < extMinRating) {
 									// do not add it to the playlist
 									continue;
 								}
@@ -275,7 +275,7 @@ public class SongCtrl {
 						bStr = b.getTitle() + " (" + b.getArtist() + ")";
 						return aStr.toLowerCase().compareTo(bStr.toLowerCase());
 					case RATING:
-						return b.getRating() - a.getRating();
+						return b.getRatingInt() - a.getRatingInt();
 					default:
 						return 0;
 				}
@@ -360,10 +360,11 @@ public class SongCtrl {
 				}
 				// ... and the higher rating
 				if (otherSong.hasRating()) {
-					if (!curSong.hasRating()) {
-						curSong.setRating(otherSong.getRating());
-					}
-					if (curSong.getRating() < otherSong.getRating()) {
+					if (curSong.hasRating()) {
+						if (curSong.getRatingInt() < otherSong.getRatingInt()) {
+							curSong.setRating(otherSong.getRating());
+						}
+					} else {
 						curSong.setRating(otherSong.getRating());
 					}
 				}

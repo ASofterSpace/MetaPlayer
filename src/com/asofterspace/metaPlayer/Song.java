@@ -289,7 +289,11 @@ public class Song {
 		} catch (NumberFormatException e) {}
 	}
 
-	public int getRating() {
+	public Integer getRating() {
+		return rating;
+	}
+
+	public int getRatingInt() {
 		if (rating == null) {
 			return -1;
 		}

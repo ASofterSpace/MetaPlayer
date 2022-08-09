@@ -649,10 +649,6 @@ public class GUI extends MainWindow {
 			@Override
 			public void onBarMove(int position) {
 				if (currentlyPlayedSong != null) {
-					// do not set rating below zero, as that is the placeholder for no value being set
-					if (position < 0) {
-						position = 0;
-					}
 					currentlyPlayedSong.setRating(position);
 					songCtrl.save();
 				}
@@ -1278,25 +1274,26 @@ public class GUI extends MainWindow {
 		}
 
 		if (song.hasRating()) {
-			if (skipBelow95.isSelected() && (song.getRating() < 95)) {
+			int rating = song.getRatingInt();
+			if (skipBelow95.isSelected() && (rating < 95)) {
 				return true;
 			}
-			if (skipBelow90.isSelected() && (song.getRating() < 90)) {
+			if (skipBelow90.isSelected() && (rating < 90)) {
 				return true;
 			}
-			if (skipBelow80.isSelected() && (song.getRating() < 80)) {
+			if (skipBelow80.isSelected() && (rating < 80)) {
 				return true;
 			}
-			if (skipBelow70.isSelected() && (song.getRating() < 70)) {
+			if (skipBelow70.isSelected() && (rating < 70)) {
 				return true;
 			}
-			if (skipBelow60.isSelected() && (song.getRating() < 60)) {
+			if (skipBelow60.isSelected() && (rating < 60)) {
 				return true;
 			}
-			if (skipBelow50.isSelected() && (song.getRating() < 50)) {
+			if (skipBelow50.isSelected() && (rating < 50)) {
 				return true;
 			}
-			if (skipBelow45.isSelected() && (song.getRating() < 45)) {
+			if (skipBelow45.isSelected() && (rating < 45)) {
 				return true;
 			}
 		}
