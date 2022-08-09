@@ -88,12 +88,15 @@ public class Song {
 
 	public Record toRecord() {
 		Record result = new Record();
-		result.set("artist", new Record(artist));
-		result.set("title", new Record(title));
-		result.set("path", new Record(path));
-		result.set("length", new Record(length));
-		result.set("rating", new Record(rating));
-		result.set("fileExists", new Record(fileExists));
+		result.set("artist", artist);
+		result.set("title", title);
+		result.set("path", path);
+		result.set("length", length);
+		if ((rating != null) && (rating < 0)) {
+			rating = null;
+		}
+		result.set("rating", rating);
+		result.set("fileExists", fileExists);
 		return result;
 	}
 
@@ -288,13 +291,13 @@ public class Song {
 
 	public int getRating() {
 		if (rating == null) {
-			return 0;
+			return -1;
 		}
 		return rating;
 	}
 
 	public boolean hasRating() {
-		return (rating != null) && (rating > 0);
+		return (rating != null) && (rating >= 0);
 	}
 
 	public void setRating(Integer rating) {

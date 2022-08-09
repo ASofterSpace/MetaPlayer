@@ -234,10 +234,13 @@ public class SongCtrl {
 
 						// if there is an extend minimum rating...
 						if (extMinRating != null) {
-							// ... and if the song's rating is below it...
-							if (song.getRating() < extMinRating) {
-								// do not add it to the playlist
-								continue;
+							// ... and if the song has a rating (songs without ratings are assumed to be awesome)...
+							if (song.hasRating()) {
+								// ... and if the song's rating is below it...
+								if (song.getRating() < extMinRating) {
+									// do not add it to the playlist
+									continue;
+								}
 							}
 						}
 

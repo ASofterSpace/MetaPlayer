@@ -649,6 +649,10 @@ public class GUI extends MainWindow {
 			@Override
 			public void onBarMove(int position) {
 				if (currentlyPlayedSong != null) {
+					// do not set rating below zero, as that is the placeholder for no value being set
+					if (position < 0) {
+						position = 0;
+					}
 					currentlyPlayedSong.setRating(position);
 					songCtrl.save();
 				}
@@ -1009,7 +1013,8 @@ public class GUI extends MainWindow {
 		currentlyPlayedSong = song;
 		songItem.setText(song.toString());
 
-		ratingItem.setBarPosition(song.getRating());
+		boolean notifyListeners = false;
+		ratingItem.setBarPosition(song.getRating(), notifyListeners);
 
 		// explicitly continue a paused song (if there is any), such that it can be stopped
 		// in the next line
