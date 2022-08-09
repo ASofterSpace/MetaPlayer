@@ -647,7 +647,7 @@ public class GUI extends MainWindow {
 		ratingItem.setMaximum(100);
 		ratingItem.addBarListener(new BarListener() {
 			@Override
-			public void onBarMove(int position) {
+			public void onBarMove(Integer position) {
 				if (currentlyPlayedSong != null) {
 					currentlyPlayedSong.setRating(position);
 					songCtrl.save();
