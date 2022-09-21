@@ -13,9 +13,9 @@ import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.OpenFileDialog;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.CallbackWithStatus;
-import com.asofterspace.toolbox.utils.ProcessUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.utils.TextEncoding;
@@ -1020,7 +1020,7 @@ public class GUI extends MainWindow {
 		timingCtrl.stopPlaying();
 
 		try {
-			Process process = ProcessUtils.startProcess(player, song.getPath());
+			Process process = IoUtils.executeAsync(player, song.getPath());
 
 			pauseItem.setText("Pause");
 
