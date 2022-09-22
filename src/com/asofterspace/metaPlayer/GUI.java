@@ -147,12 +147,47 @@ public class GUI extends MainWindow {
 			}
 		});
 
+
+		// automatically play pre-selected song after startup
+		String afterStartupPlaySong = MetaPlayer.getAfterStartupPlaySong();
+		Song forceThisSong = null;
+
+		if (afterStartupPlaySong != null) {
+			afterStartupPlaySong = afterStartupPlaySong.trim().toLowerCase();
+			List<Song> songs = songCtrl.getSongs();
+			for (Song song : songs) {
+				if (afterStartupPlaySong.equals(song.toString().trim().toLowerCase())) {
+					forceThisSong = song;
+					songCtrl.selectSongsOfArtists(forceThisSong.getArtists());
+					break;
+				}
+			}
+		}
+
+		// automatically play pre-selected playlist after startup
+		String afterStartupPlayPlaylist = MetaPlayer.getAfterStartupPlayPlaylist();
+
+		if (afterStartupPlayPlaylist != null) {
+			afterStartupPlayPlaylist = afterStartupPlayPlaylist.trim().toLowerCase();
+
+			for (Record pl : allPlaylistRecords) {
+				if (afterStartupPlayPlaylist.equals(pl.getString(SongCtrl.PLAYLIST_NAME_KEY).toLowerCase())) {
+					songCtrl.selectPlaylist(pl, allPlaylistRecords);
+					break;
+				}
+			}
+		}
+
 		songCtrl.randomize();
 
 		regenerateSongList();
 
 		// play the first song
-		playNextSong();
+		if (forceThisSong == null) {
+			playNextSong();
+		} else {
+			playSong(forceThisSong);
+		}
 	}
 
 	private JMenuBar createMenu(JFrame parent) {

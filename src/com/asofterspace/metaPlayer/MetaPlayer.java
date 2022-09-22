@@ -21,14 +21,17 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.1.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 9. August 2022";
+	public final static String VERSION_NUMBER = "0.0.1.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 22. September 2022";
 
 	private static ConfigFile config;
 
 	private static TimingCtrl timingCtrl;
 	private static PlayerCtrl playerCtrl;
 	private static SongCtrl songCtrl;
+
+	private static String afterStartupPlaySong = null;
+	private static String afterStartupPlayPlaylist = null;
 
 
 	/**
@@ -54,6 +57,23 @@ public class MetaPlayer {
 			if (args[0].equals("--version_for_zip")) {
 				System.out.println("version " + Utils.getVersionNumber());
 				return;
+			}
+		}
+
+		if (args.length > 1) {
+			StringBuilder allArgsAfterFirst = new StringBuilder();
+			String sep = "";
+			for (int i = 1; i < args.length; i++) {
+				allArgsAfterFirst.append(sep);
+				allArgsAfterFirst.append(args[i]);
+				sep = " ";
+			}
+
+			if (args[0].equals("--song")) {
+				afterStartupPlaySong = allArgsAfterFirst.toString();
+			}
+			if (args[0].equals("--playlist")) {
+				afterStartupPlayPlaylist = allArgsAfterFirst.toString();
 			}
 		}
 
@@ -107,6 +127,14 @@ public class MetaPlayer {
 			}
 			topSongs.save(rec);
 		}
+	}
+
+	public static String getAfterStartupPlaySong() {
+		return afterStartupPlaySong;
+	}
+
+	public static String getAfterStartupPlayPlaylist() {
+		return afterStartupPlayPlaylist;
 	}
 
 }

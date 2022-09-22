@@ -461,38 +461,45 @@ public class SongCtrl {
 
 	public Song getNextSong(Song currentlyPlayedSong) {
 
+		int startIteratingFrom = 0;
+
 		// iterate over all songs...
 		for (int i = 0; i < currentSongs.size() - 1; i++) {
 			// ... and once we found the current song...
 			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
-				int j = i+1;
-				boolean escape = false;
-				// ... keep on iterating until we find a song that is not being skipped...
-				while (gui.skippingSong(currentSongs.get(j))) {
-					j++;
-					if (j >= currentSongs.size()) {
-						escape = true;
-						break;
-					}
-				}
-				if (escape) {
-					break;
-				}
+
+				// ... keep on iterating from the next one ...
+				startIteratingFrom = i+1;
+				break;
+			}
+		}
+
+		// ... until we find a song that is not being skipped...
+		for (int j = startIteratingFrom; j < currentSongs.size(); j++) {
+			if (!gui.skippingSong(currentSongs.get(j))) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
 		}
 
 		// on the other hand, if we found no song to play after the current song, retry from the beginning
-		int j = 0;
-		while (gui.skippingSong(currentSongs.get(j))) {
-			j++;
-			if (j >= currentSongs.size()) {
-				// finally give up, if we again found no playable song in the second iteration
-				return null;
+		for (int j = 0; j < startIteratingFrom; j++) {
+			if (!gui.skippingSong(currentSongs.get(j))) {
+				// ... and then play it!
+				return currentSongs.get(j);
 			}
 		}
-		return currentSongs.get(j);
+
+		// alrighty, ALL songs that we found are being skipped - so ignore skipping this time, just go for the next one!
+		if (startIteratingFrom < currentSongs.size()) {
+			return currentSongs.get(startIteratingFrom);
+		}
+		if (0 < currentSongs.size()) {
+			return currentSongs.get(0);
+		}
+
+		// finally give up, if we again found no playable song, even without any skipping at all!
+		return null;
 	}
 
 	/**
