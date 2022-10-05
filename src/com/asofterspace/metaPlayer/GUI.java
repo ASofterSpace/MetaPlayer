@@ -1136,10 +1136,13 @@ public class GUI extends MainWindow {
 		List<File> curFiles = parent.getAllFiles(recursive);
 
 		for (File curFile : curFiles) {
-			if (!(curFile.getFilename().endsWith(".jpg") ||
-				  curFile.getFilename().endsWith(".png") ||
-				  curFile.getFilename().endsWith(".bmp") ||
-				  curFile.getFilename().endsWith(".txt"))) {
+			String lowFilename = curFile.getFilename();
+			if (!(lowFilename.endsWith(".jpg") ||
+				  lowFilename.endsWith(".png") ||
+				  lowFilename.endsWith(".bmp") ||
+				  lowFilename.endsWith(".txt") ||
+				  lowFilename.endsWith(".lnk") ||
+				  lowFilename.endsWith(".srt"))) {
 				importSong(curFile);
 			}
 		}
