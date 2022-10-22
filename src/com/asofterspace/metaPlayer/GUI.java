@@ -1126,7 +1126,15 @@ public class GUI extends MainWindow {
 	}
 
 	private void importSong(File file) {
-		songCtrl.addUnlessAlreadyPresent(new Song(file));
+		String lowFilename = file.getFilename().toLowerCase();
+		if (!(lowFilename.endsWith(".jpg") ||
+			  lowFilename.endsWith(".png") ||
+			  lowFilename.endsWith(".bmp") ||
+			  lowFilename.endsWith(".txt") ||
+			  lowFilename.endsWith(".lnk") ||
+			  lowFilename.endsWith(".srt"))) {
+			songCtrl.addUnlessAlreadyPresent(new Song(file));
+		}
 	}
 
 	private void importSongsRecursively(Directory parent) {
@@ -1136,15 +1144,7 @@ public class GUI extends MainWindow {
 		List<File> curFiles = parent.getAllFiles(recursive);
 
 		for (File curFile : curFiles) {
-			String lowFilename = curFile.getFilename();
-			if (!(lowFilename.endsWith(".jpg") ||
-				  lowFilename.endsWith(".png") ||
-				  lowFilename.endsWith(".bmp") ||
-				  lowFilename.endsWith(".txt") ||
-				  lowFilename.endsWith(".lnk") ||
-				  lowFilename.endsWith(".srt"))) {
-				importSong(curFile);
-			}
+			importSong(curFile);
 		}
 	}
 
