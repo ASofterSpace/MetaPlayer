@@ -1103,7 +1103,7 @@ public class GUI extends MainWindow {
 					case OpenFileDialog.APPROVE_OPTION:
 
 						// load the files
-						configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getAbsoluteDirname());
+						configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getCanonicalDirname());
 
 						for (File curFile : filePicker.getSelectedFiles()) {
 							importSong(curFile);
