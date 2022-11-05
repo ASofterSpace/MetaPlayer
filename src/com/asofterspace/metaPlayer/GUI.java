@@ -359,6 +359,52 @@ public class GUI extends MainWindow {
 		});
 		artists.add(artistsOfCurlyPlayedSong);
 
+		JMenuItem firstArtistOfCurlyPlayedSong = new JMenuItem("First Artist of Currently Played Song");
+		firstArtistOfCurlyPlayedSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean foundSomeone = false;
+				if (currentlyPlayedSong != null) {
+					List<String> artists = currentlyPlayedSong.getArtists();
+					if (artists != null) {
+						if (artists.size() > 0) {
+							songCtrl.selectSongsOfArtist(artists.get(0));
+							foundSomeone = true;
+						}
+					}
+				}
+				if (!foundSomeone) {
+					songCtrl.selectSongsOfArtists(null);
+				}
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		artists.add(firstArtistOfCurlyPlayedSong);
+
+		JMenuItem secondArtistOfCurlyPlayedSong = new JMenuItem("Second Artist of Currently Played Song");
+		secondArtistOfCurlyPlayedSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean foundSomeone = false;
+				if (currentlyPlayedSong != null) {
+					List<String> artists = currentlyPlayedSong.getArtists();
+					if (artists != null) {
+						if (artists.size() > 1) {
+							songCtrl.selectSongsOfArtist(artists.get(1));
+							foundSomeone = true;
+						}
+					}
+				}
+				if (!foundSomeone) {
+					songCtrl.selectSongsOfArtists(null);
+				}
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		artists.add(secondArtistOfCurlyPlayedSong);
+
 		JMenuItem songsWithSameName = new JMenuItem("Songs with the Same Name (by Any Artist)");
 		songsWithSameName.addActionListener(new ActionListener() {
 			@Override
