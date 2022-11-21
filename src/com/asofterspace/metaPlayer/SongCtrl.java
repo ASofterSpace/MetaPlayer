@@ -425,41 +425,59 @@ public class SongCtrl {
 
 	public Song getPreviousSong(Song currentlyPlayedSong) {
 
+		if (currentSongs.size() < 1) {
+			return null;
+		}
+
+		int startIteratingFrom = 0;
+
 		// iterate over all songs...
-		for (int i = 1; i < currentSongs.size(); i++) {
+		for (int i = 0; i < currentSongs.size(); i++) {
 			// ... and once we found the current song...
 			if (currentSongs.get(i).equals(currentlyPlayedSong)) {
-				int j = i-1;
-				boolean escape = false;
-				// ... keep on iterating until we find a song that is not being skipped...
-				while (gui.skippingSong(currentSongs.get(j))) {
-					j--;
-					if (j < 0) {
-						escape = true;
-						break;
-					}
-				}
-				if (escape) {
-					break;
-				}
+
+				// ... keep on iterating from the next one ...
+				startIteratingFrom = i-1;
+				break;
+			}
+		}
+		if (startIteratingFrom < 0) {
+			startIteratingFrom = currentSongs.size() - 1;
+		}
+
+		// ... until we find a song that is not being skipped...
+		for (int j = startIteratingFrom; j >= 0; j--) {
+			if (!gui.skippingSong(currentSongs.get(j))) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
 		}
 
-		// on the other hand, if we found no song to play after the current song, retry from the end
-		int j = currentSongs.size() - 1;
-		while (gui.skippingSong(currentSongs.get(j))) {
-			j--;
-			if (j < 0) {
-				// finally give up, if we again found no playable song in the second iteration
-				return null;
+		// on the other hand, if we found no song to play after the current song, retry from the beginning
+		for (int j = currentSongs.size() - 1; j > startIteratingFrom; j--) {
+			if (!gui.skippingSong(currentSongs.get(j))) {
+				// ... and then play it!
+				return currentSongs.get(j);
 			}
 		}
-		return currentSongs.get(j);
+
+		// alrighty, ALL songs that we found are being skipped - so ignore skipping this time, just go for the next one!
+		if (startIteratingFrom >= 0) {
+			return currentSongs.get(startIteratingFrom);
+		}
+		if (0 < currentSongs.size()) {
+			return currentSongs.get(0);
+		}
+
+		// finally give up, if we again found no playable song, even without any skipping at all!
+		return null;
 	}
 
 	public Song getNextSong(Song currentlyPlayedSong) {
+
+		if (currentSongs.size() < 1) {
+			return null;
+		}
 
 		int startIteratingFrom = 0;
 
