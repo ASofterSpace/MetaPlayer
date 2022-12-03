@@ -1283,6 +1283,14 @@ public class GUI extends MainWindow {
 		timingCtrl.continueSong();
 	}
 
+	public void currentSongPlayedAllTheWayThrough() {
+		if (currentlyPlayedSong != null) {
+			currentlyPlayedSong.incPlayAmount();
+
+			songCtrl.save();
+		}
+	}
+
 	private void curSongIsOver() {
 		if (currentlyPlayedSong != null) {
 			Long newLength = timingCtrl.getElapsedTimeSinceLastSongStart();
@@ -1291,8 +1299,12 @@ public class GUI extends MainWindow {
 			} else {
 				currentlyPlayedSong.setLength(newLength.intValue());
 			}
-			songCtrl.save();
+
+			// in this function, will call songCtrl.save(),
+			// so no need to save another time before calling it
+			currentSongPlayedAllTheWayThrough();
 		}
+
 		playNextSong();
 	}
 

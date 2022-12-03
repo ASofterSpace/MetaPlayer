@@ -89,6 +89,18 @@ public class SongCtrl {
 		return sortedSongs.subList(0, amount);
 	}
 
+	public List<Song> getTopPlayedSongs(int amount) {
+		List<Song> sortedSongs = new ArrayList<>(allSongs);
+
+		Collections.sort(sortedSongs, new Comparator<Song>() {
+			public int compare(Song a, Song b) {
+				return b.getPlayAmount() - a.getPlayAmount();
+			}
+		});
+
+		return sortedSongs.subList(0, amount);
+	}
+
 	public void selectSongsOfPlaylistsWithCurSong(Song currentlyPlayedSong, List<Record> allPlaylists) {
 
 		currentSongs = new ArrayList<>();
@@ -518,6 +530,12 @@ public class SongCtrl {
 
 		// finally give up, if we again found no playable song, even without any skipping at all!
 		return null;
+	}
+
+	public void resetTopPlayAmounts() {
+		for (Song song : allSongs) {
+			song.resetPlayAmount();
+		}
 	}
 
 	/**

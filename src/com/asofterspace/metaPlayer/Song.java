@@ -18,6 +18,7 @@ public class Song {
 	private String path;
 	private Integer length;
 	private Integer rating;
+	private Integer playAmount;
 	private boolean fileExists;
 	private String clipboardText = null;
 
@@ -83,6 +84,7 @@ public class Song {
 		this.path = record.getString("path");
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
+		this.playAmount = record.getInteger("playAmount");
 		this.fileExists = (new File(path)).exists();
 	}
 
@@ -96,6 +98,9 @@ public class Song {
 			rating = null;
 		}
 		result.set("rating", rating);
+		if ((playAmount != null) && (playAmount > 0)) {
+			result.set("playAmount", playAmount);
+		}
 		result.set("fileExists", fileExists);
 		return result;
 	}
@@ -312,6 +317,21 @@ public class Song {
 		try {
 			this.rating = Integer.parseInt(rating);
 		} catch (NumberFormatException e) {}
+	}
+
+	public int getPlayAmount() {
+		if (playAmount == null) {
+			return 0;
+		}
+		return playAmount;
+	}
+
+	public void incPlayAmount() {
+		this.playAmount = getPlayAmount() + 1;
+	}
+
+	public void resetPlayAmount() {
+		this.playAmount = null;
 	}
 
 	@Override

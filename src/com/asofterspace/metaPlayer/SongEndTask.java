@@ -4,7 +4,6 @@
  */
 package com.asofterspace.metaPlayer;
 
-import java.util.Date;
 
 
 public class SongEndTask {
@@ -22,6 +21,8 @@ public class SongEndTask {
 	public void songIsOver() {
 
 		stopPlayer();
+
+		gui.currentSongPlayedAllTheWayThrough();
 
 		gui.playNextSong();
 	}
