@@ -94,7 +94,13 @@ public class SongCtrl {
 
 		Collections.sort(sortedSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				return b.getPlayAmount() - a.getPlayAmount();
+				// sort by play amount...
+				int res = b.getPlayAmount() - a.getPlayAmount();
+				if (res != 0) {
+					return res;
+				}
+				// ... but in case of same play amount, sort by rating
+				return b.getRatingInt() - a.getRatingInt();
 			}
 		});
 
