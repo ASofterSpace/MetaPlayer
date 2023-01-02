@@ -21,8 +21,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.1.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 21. December 2022";
+	public final static String VERSION_NUMBER = "0.0.2.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 2. January 2023";
 
 	private static ConfigFile config;
 
@@ -131,14 +131,16 @@ public class MetaPlayer {
 
 			Record topByPlayAmount = Record.emptyArray();
 			for (Song song : songCtrl.getTopPlayedSongs(256)) {
-				topByPlayAmount.append(song.toRecord());
+				if (song.getPlayAmount() > 0) {
+					topByPlayAmount.append(song.toRecord());
+				}
 			}
 			rec.set("top_by_play_amount", topByPlayAmount);
-			songCtrl.resetTopPlayAmounts();
 
 			topSongs.save(rec);
 
 			// save after resetting the top play amounts for all songs
+			songCtrl.resetTopPlayAmounts();
 			songCtrl.save();
 		}
 	}
