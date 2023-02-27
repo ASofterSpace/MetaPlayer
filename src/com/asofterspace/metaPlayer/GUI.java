@@ -97,6 +97,7 @@ public class GUI extends MainWindow {
 	private JCheckBoxMenuItem skipWithDuration;
 	private JCheckBoxMenuItem skipWithoutDuration;
 	private JCheckBoxMenuItem skipWithRating;
+	private JCheckBoxMenuItem skipBelowPlAvg;
 	private JCheckBoxMenuItem skipBelow95;
 	private JCheckBoxMenuItem skipBelow90;
 	private JCheckBoxMenuItem skipBelow80;
@@ -510,6 +511,11 @@ public class GUI extends MainWindow {
 		skipWithRating.addActionListener(skipClickListener);
 		skip.add(skipWithRating);
 
+		skipBelowPlAvg = new JCheckBoxMenuItem("Skip Songs With Rating Below Playlist Average");
+		skipBelowPlAvg.setSelected(configuration.getBoolean("skipSongsBelowPlaylistAvg", false));
+		skipBelowPlAvg.addActionListener(skipClickListener);
+		skip.add(skipBelowPlAvg);
+
 		skipBelow95 = new JCheckBoxMenuItem("Skip Songs With Rating Below 95%");
 		skipBelow95.setSelected(configuration.getBoolean("skipSongsBelow95", false));
 		skipBelow95.addActionListener(skipClickListener);
@@ -559,6 +565,7 @@ public class GUI extends MainWindow {
 				skipWithDuration.setSelected(false);
 				skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(false);
+				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
 				skipBelow90.setSelected(false);
 				skipBelow80.setSelected(false);
@@ -579,6 +586,7 @@ public class GUI extends MainWindow {
 				skipWithDuration.setSelected(true);
 				skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(true);
+				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
 				skipBelow90.setSelected(false);
 				skipBelow80.setSelected(false);
@@ -592,6 +600,27 @@ public class GUI extends MainWindow {
 		});
 		skip.add(discoverNew);
 
+		JMenuItem playFavoriteSongs = new JMenuItem("Play Favorite Songs");
+		playFavoriteSongs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				skipWithDuration.setSelected(false);
+				skipWithoutDuration.setSelected(true);
+				skipWithRating.setSelected(false);
+				skipBelowPlAvg.setSelected(true);
+				skipBelow95.setSelected(false);
+				skipBelow90.setSelected(false);
+				skipBelow80.setSelected(false);
+				skipBelow70.setSelected(false);
+				skipBelow60.setSelected(false);
+				skipBelow50.setSelected(false);
+				skipBelow45.setSelected(false);
+				skipWithoutRating.setSelected(true);
+				saveSkipState();
+			}
+		});
+		skip.add(playFavoriteSongs);
+
 		JMenuItem defaultSkipping = new JMenuItem("Default Skipping");
 		defaultSkipping.addActionListener(new ActionListener() {
 			@Override
@@ -599,6 +628,7 @@ public class GUI extends MainWindow {
 				skipWithDuration.setSelected(false);
 				skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(false);
+				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
 				skipBelow90.setSelected(false);
 				skipBelow80.setSelected(false);
@@ -804,6 +834,7 @@ public class GUI extends MainWindow {
 		configuration.set("skipSongsWithDuration", skipWithDuration.isSelected());
 		configuration.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
 		configuration.set("skipSongsWithRating", skipWithRating.isSelected());
+		configuration.set("skipSongsBelowPlaylistAvg", skipBelowPlAvg.isSelected());
 		configuration.set("skipSongsBelow95", skipBelow95.isSelected());
 		configuration.set("skipSongsBelow90", skipBelow90.isSelected());
 		configuration.set("skipSongsBelow80", skipBelow80.isSelected());
@@ -1353,9 +1384,17 @@ public class GUI extends MainWindow {
 	}
 
 	/**
+	 * Is the average rating of the playlist actually needed?
+	 * (Otherwise, its calculation can be skipped...)
+	 */
+	public boolean isAverageRatingOfPlaylistNeeded() {
+		return skipBelowPlAvg.isSelected();
+	}
+
+	/**
 	 * Are we skipping this song?
 	 */
-	public boolean skippingSong(Song song) {
+	public boolean skippingSong(Song song, int averageRatingOfPlaylist) {
 
 		if (skipWithDuration.isSelected() && song.hasLength()) {
 			return true;
@@ -1371,6 +1410,9 @@ public class GUI extends MainWindow {
 
 		if (song.hasRating()) {
 			int rating = song.getRatingInt();
+			if (skipBelowPlAvg.isSelected() && (rating < averageRatingOfPlaylist)) {
+				return true;
+			}
 			if (skipBelow95.isSelected() && (rating < 95)) {
 				return true;
 			}

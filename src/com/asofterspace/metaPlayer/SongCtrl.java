@@ -441,6 +441,24 @@ public class SongCtrl {
 		add(song);
 	}
 
+	private int getAverageRatingOfPlaylistIfNeeded() {
+		if (!gui.isAverageRatingOfPlaylistNeeded()) {
+			return 0;
+		}
+
+		int counter = 0;
+		int amount = 0;
+		for (Song song : currentSongs) {
+			Integer curRating = song.getRating();
+			if (curRating != null) {
+				counter += curRating;
+				amount++;
+			}
+		}
+
+		return counter / amount;
+	}
+
 	public Song getPreviousSong(Song currentlyPlayedSong) {
 
 		if (currentSongs.size() < 1) {
@@ -463,9 +481,11 @@ public class SongCtrl {
 			startIteratingFrom = currentSongs.size() - 1;
 		}
 
+		int averageRatingOfPlaylist = getAverageRatingOfPlaylistIfNeeded();
+
 		// ... until we find a song that is not being skipped...
 		for (int j = startIteratingFrom; j >= 0; j--) {
-			if (!gui.skippingSong(currentSongs.get(j))) {
+			if (!gui.skippingSong(currentSongs.get(j), averageRatingOfPlaylist)) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
@@ -473,7 +493,7 @@ public class SongCtrl {
 
 		// on the other hand, if we found no song to play after the current song, retry from the beginning
 		for (int j = currentSongs.size() - 1; j > startIteratingFrom; j--) {
-			if (!gui.skippingSong(currentSongs.get(j))) {
+			if (!gui.skippingSong(currentSongs.get(j), averageRatingOfPlaylist)) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
@@ -510,9 +530,11 @@ public class SongCtrl {
 			}
 		}
 
+		int averageRatingOfPlaylist = getAverageRatingOfPlaylistIfNeeded();
+
 		// ... until we find a song that is not being skipped...
 		for (int j = startIteratingFrom; j < currentSongs.size(); j++) {
-			if (!gui.skippingSong(currentSongs.get(j))) {
+			if (!gui.skippingSong(currentSongs.get(j), averageRatingOfPlaylist)) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
@@ -520,7 +542,7 @@ public class SongCtrl {
 
 		// on the other hand, if we found no song to play after the current song, retry from the beginning
 		for (int j = 0; j < startIteratingFrom; j++) {
-			if (!gui.skippingSong(currentSongs.get(j))) {
+			if (!gui.skippingSong(currentSongs.get(j), averageRatingOfPlaylist)) {
 				// ... and then play it!
 				return currentSongs.get(j);
 			}
