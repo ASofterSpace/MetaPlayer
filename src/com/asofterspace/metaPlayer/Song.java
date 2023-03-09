@@ -4,6 +4,7 @@
  */
 package com.asofterspace.metaPlayer;
 
+import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -256,6 +257,14 @@ public class Song {
 			result.append("\n");
 			result.append(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
 		}
+
+		result.append("\n");
+		result.append("\n");
+		result.append("cd ");
+		Directory hereDir = new Directory(System.getProperty("java.class.path") + "/..");
+		result.append(hereDir.getCanonicalDirname());
+		result.append("\n");
+		result.append("run.bat --song \"" + toString() + "\"");
 
 		clipboardText = result.toString();
 
