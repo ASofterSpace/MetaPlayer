@@ -351,6 +351,18 @@ public class Song {
 		return getTitle();
 	}
 
+	public String getCaptionString(SongCtrl songCtrl, List<Record> allPlaylists) {
+
+		String result = toString();
+
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
+		if (playlistsWithThisSong.size() < 1) {
+			return result + "   (not included in any playlists)";
+		}
+		return result + "   (included in " + playlistsWithThisSong.size() + " playlist" +
+			((playlistsWithThisSong.size() == 1) ? "" : "s") + ")";
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {

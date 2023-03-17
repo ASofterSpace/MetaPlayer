@@ -1119,7 +1119,7 @@ public class GUI extends MainWindow {
 		}
 
 		currentlyPlayedSong = song;
-		songItem.setText(song.toString());
+		songItem.setText(song.getCaptionString(songCtrl, allPlaylistRecords));
 
 		boolean notifyListeners = false;
 		ratingItem.setBarPosition(song.getRating(), notifyListeners);
