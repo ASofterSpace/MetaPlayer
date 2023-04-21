@@ -570,17 +570,13 @@ public class SongCtrl {
 	 * Gets a list of artists that have performed the most songs, without knowing in advance
 	 * how many songs that would be - but no more than a certain maximum amount
 	 */
-	public List<String> getTopArtists(int maxAmount) {
+	public List<Artist> getTopArtists(int maxAmount) {
 		return getTopArtists(maxAmount, null);
 	}
 
-	public List<String> getTopArtists(int maxAmount, String bucketName) {
+	public List<Artist> getTopArtists(int maxAmount, Character bucketChar) {
 
-		List<Artist> allArtists = new ArrayList<>();
-		char bucketChar = '*';
-		if (bucketName != null) {
-			bucketChar = bucketName.toUpperCase().charAt(0);
-		}
+		List<Artist> result = new ArrayList<>();
 
 		for (Song song : allSongs) {
 
@@ -592,45 +588,39 @@ public class SongCtrl {
 					continue;
 				}
 
-				if (bucketName != null) {
+				if (bucketChar != null) {
 					char firstChar = curArtistStr.toUpperCase().charAt(0);
-					if (bucketName.length() == 1) {
-						if (firstChar != bucketChar) {
+					if (bucketChar == '*') {
+						// "other" bucket
+						if ((firstChar >= 'A') && (firstChar <= 'Z')) {
 							continue;
 						}
 					} else {
-						// "other" bucket
-						if ((firstChar >= 'A') && (firstChar <= 'Z')) {
+						if (firstChar != bucketChar) {
 							continue;
 						}
 					}
 				}
 
 				Artist curArtist = new Artist(curArtistStr);
-				int contained = allArtists.indexOf(curArtist);
+				int contained = result.indexOf(curArtist);
 				if (contained >= 0) {
-					allArtists.get(contained).addSong();
+					result.get(contained).addSong();
 				} else {
-					allArtists.add(curArtist);
+					result.add(curArtist);
 				}
 			}
 		}
 
-		Collections.sort(allArtists, new Comparator<Artist>() {
+		Collections.sort(result, new Comparator<Artist>() {
 			public int compare(Artist a, Artist b) {
 				return b.getSongAmount() - a.getSongAmount();
 			}
 		});
 
-		List<String> result = new ArrayList<>();
-
-		for (int i = 0; i < allArtists.size(); i++) {
-			result.add(allArtists.get(i).getName());
-			if (i >= maxAmount) {
-				break;
-			}
+		if (result.size() > maxAmount) {
+			return result.subList(0, maxAmount);
 		}
-
 		return result;
 	}
 

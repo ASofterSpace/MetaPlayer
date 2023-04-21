@@ -425,9 +425,9 @@ public class GUI extends MainWindow {
 		artists.add(artistsByName);
 
 		for (char c = 'A'; c <= 'Z'; c++) {
-			addArtistsByNameSubMenu(artistsByName, ""+c);
+			addArtistsByNameSubMenu(artistsByName, c);
 		}
-		addArtistsByNameSubMenu(artistsByName, "Other");
+		addArtistsByNameSubMenu(artistsByName, '*');
 
 		artists.addSeparator();
 
@@ -436,7 +436,11 @@ public class GUI extends MainWindow {
 		List<String> artistNames = configuration.getList(CONFIG_KEY_MAIN_ARTISTS);
 		// and only get the top artists if there is no such configuration:
 		if ((artistNames == null) || (artistNames.size() == 0)) {
-			artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET);
+			artistNames = new ArrayList<>();
+			List<Artist> topArtists = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET);
+			for (Artist artist : topArtists) {
+				artistNames.add(artist.getName());
+			}
 		}
 
 		for (final String artistName : artistNames) {
@@ -1443,20 +1447,24 @@ public class GUI extends MainWindow {
 		return false;
 	}
 
-	private void addArtistsByNameSubMenu(JMenu artistsByName, String bucketName) {
+	private void addArtistsByNameSubMenu(JMenu artistsByName, char bucketChar) {
 
-		JMenu bucketMenu = new JMenu(bucketName + "...");
+		String itemTitle = bucketChar + "...";
+		if (bucketChar == '*') {
+			itemTitle = "Other...";
+		}
+		JMenu bucketMenu = new JMenu(itemTitle);
 		artistsByName.add(bucketMenu);
 
 		// add the top 32 artists for each bucket
-		List<String> artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET, bucketName);
+		List<Artist> artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET, bucketChar);
 
-		for (final String artistName : artistNames) {
-			JMenuItem artistItem = new JMenuItem(artistName);
+		for (final Artist artist : artistNames) {
+			JMenuItem artistItem = new JMenuItem(artist.getName() + " (" + artist.getSongAmount() + " songs)");
 			artistItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					songCtrl.selectSongsOfArtist(artistName);
+					songCtrl.selectSongsOfArtist(artist.getName());
 					songCtrl.randomize();
 					regenerateSongList();
 				}
