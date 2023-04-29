@@ -81,6 +81,7 @@ public class GUI extends MainWindow {
 	private JPanel searchPanel;
 	private JTextField searchField;
 
+	private JMenuItem songAmountItem;
 	private JMenuItem songItem;
 	private MenuItemForMainMenu pauseItem;
 	private MenuItemForMainMenu timeRemainingItem;
@@ -125,11 +126,14 @@ public class GUI extends MainWindow {
 
 		super.create();
 
-		refreshTitleBar();
+		// remove title bar
+		mainFrame.setUndecorated(true);
 
 		createMenu(mainFrame);
 
 		createMainPanel(mainFrame);
+
+		refreshSongAmountText();
 
 		// do not call super.show, as we are doing things a little bit
 		// differently around here (including restoring from previous
@@ -197,6 +201,11 @@ public class GUI extends MainWindow {
 
 		JMenu songs = new JMenu("Songs");
 		menu.add(songs);
+
+		songAmountItem = new JMenuItem("[]");
+		songs.add(songAmountItem);
+
+		songs.addSeparator();
 
 		JMenuItem startPlaying = new JMenuItem("Start Playing");
 		startPlaying.addActionListener(new ActionListener() {
@@ -998,28 +1007,28 @@ public class GUI extends MainWindow {
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		int width = (int) screenSize.getWidth() + 20;
+		int width = (int) screenSize.getWidth();
 		int height = (int) screenSize.getHeight() - 73;
 
 		mainFrame.setSize(width, height);
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(-8, (int) screenSize.getHeight() - 50));
+		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 20));
 	}
 
 	private void maximize() {
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		int width = (int) screenSize.getWidth() - 166;
-		int height = (int) screenSize.getHeight() - 73;
+		int width = (int) screenSize.getWidth();
+		int height = (int) screenSize.getHeight() - 26;
 
 		mainFrame.setSize(width, height);
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(83, 26));
+		mainFrame.setLocation(new Point(0, 26));
 	}
 
 	/**
@@ -1074,7 +1083,7 @@ public class GUI extends MainWindow {
 		highlightTabInLeftListOrTree(currentlyPlayedSong);
 		*/
 
-		refreshTitleBar();
+		refreshSongAmountText();
 	}
 
 	/*
@@ -1096,8 +1105,9 @@ public class GUI extends MainWindow {
 	}
 	*/
 
-	private void refreshTitleBar() {
+	private void refreshSongAmountText() {
 		mainFrame.setTitle(MetaPlayer.PROGRAM_TITLE + " - " + songCtrl.getSongAmount() + " songs loaded");
+		songAmountItem.setText("[" + songCtrl.getSongAmount() + " songs loaded]");
 	}
 
 	private void stopPlaying() {
