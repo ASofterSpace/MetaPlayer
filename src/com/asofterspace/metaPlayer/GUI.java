@@ -8,9 +8,11 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.BarListener;
 import com.asofterspace.toolbox.gui.BarMenuItemForMainMenu;
+import com.asofterspace.toolbox.gui.ColorMenuBar;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.OpenFileDialog;
+import com.asofterspace.toolbox.images.ColorRGBA;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.IoUtils;
@@ -23,6 +25,7 @@ import com.asofterspace.toolbox.Utils;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.Desktop;
@@ -41,9 +44,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.BorderFactory;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -56,7 +60,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 
@@ -69,6 +72,11 @@ public class GUI extends MainWindow {
 
 	private final static Integer MAX_ARTISTS_PER_BUCKET = 32;
 
+	private final static ColorRGBA bgColor = new ColorRGBA(32, 0, 64);
+	private final static Color bgColorCol = bgColor.toColor();
+	private final static ColorRGBA fgColor = new ColorRGBA(167, 62, 249);
+	private final static Color fgColorCol = fgColor.toColor();
+
 	private TimingCtrl timingCtrl;
 	private PlayerCtrl playerCtrl;
 	private SongCtrl songCtrl;
@@ -77,9 +85,6 @@ public class GUI extends MainWindow {
 	private Song currentlySelectedSong = null;
 
 	private JPanel mainPanelRight;
-
-	private JPanel searchPanel;
-	private JTextField searchField;
 
 	private JMenuItem songAmountItem;
 	private JMenuItem songItem;
@@ -197,17 +202,20 @@ public class GUI extends MainWindow {
 
 	private JMenuBar createMenu(JFrame parent) {
 
-		JMenuBar menu = new JMenuBar();
+		ColorMenuBar menu = new ColorMenuBar();
+		menu.setBackgroundColor(bgColorCol);
+		Border noBorder = new EmptyBorder(0, 0, 0, 0);
+		menu.setBorder(noBorder);
 
-		JMenu songs = new JMenu("Songs");
+		JMenu songs = createJMenu("Songs");
 		menu.add(songs);
 
-		songAmountItem = new JMenuItem("[]");
+		songAmountItem = createJMenuItem("[]");
 		songs.add(songAmountItem);
 
-		songs.addSeparator();
+		songs.add(createSeparator());
 
-		JMenuItem startPlaying = new JMenuItem("Start Playing");
+		JMenuItem startPlaying = createJMenuItem("Start Playing");
 		startPlaying.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -216,7 +224,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(startPlaying);
 
-		JMenuItem stopPlaying = new JMenuItem("Stop Playing");
+		JMenuItem stopPlaying = createJMenuItem("Stop Playing");
 		stopPlaying.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -225,9 +233,9 @@ public class GUI extends MainWindow {
 		});
 		songs.add(stopPlaying);
 
-		songs.addSeparator();
+		songs.add(createSeparator());
 
-		JMenuItem jumpToPlaying = new JMenuItem("Jump to Playing Song");
+		JMenuItem jumpToPlaying = createJMenuItem("Jump to Playing Song");
 		jumpToPlaying.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -236,7 +244,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(jumpToPlaying);
 
-		JMenuItem jumpToSelected = new JMenuItem("Jump to Selected Song");
+		JMenuItem jumpToSelected = createJMenuItem("Jump to Selected Song");
 		jumpToSelected.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -245,9 +253,9 @@ public class GUI extends MainWindow {
 		});
 		songs.add(jumpToSelected);
 
-		songs.addSeparator();
+		songs.add(createSeparator());
 
-		JMenuItem randomize = new JMenuItem("Randomize");
+		JMenuItem randomize = createJMenuItem("Randomize");
 		randomize.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -257,7 +265,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(randomize);
 
-		JMenuItem sortArtist = new JMenuItem("Sort by Artist");
+		JMenuItem sortArtist = createJMenuItem("Sort by Artist");
 		sortArtist.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -267,7 +275,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(sortArtist);
 
-		JMenuItem sortTitle = new JMenuItem("Sort by Song Title");
+		JMenuItem sortTitle = createJMenuItem("Sort by Song Title");
 		sortTitle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -277,7 +285,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(sortTitle);
 
-		JMenuItem sortRating = new JMenuItem("Sort by Rating");
+		JMenuItem sortRating = createJMenuItem("Sort by Rating");
 		sortRating.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -287,7 +295,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(sortRating);
 
-		JMenuItem invertOrder = new JMenuItem("Invert Current Order");
+		JMenuItem invertOrder = createJMenuItem("Invert Current Order");
 		invertOrder.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -297,9 +305,9 @@ public class GUI extends MainWindow {
 		});
 		songs.add(invertOrder);
 
-		songs.addSeparator();
+		songs.add(createSeparator());
 
-		JMenuItem importSongs = new JMenuItem("Import Songs");
+		JMenuItem importSongs = createJMenuItem("Import Songs");
 		importSongs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -308,7 +316,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(importSongs);
 
-		JMenuItem importLegacyPlaylist = new JMenuItem("Import Songs from Legacy Playlist");
+		JMenuItem importLegacyPlaylist = createJMenuItem("Import Songs from Legacy Playlist");
 		importLegacyPlaylist.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -317,7 +325,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(importLegacyPlaylist);
 
-		JMenuItem cullMultiples = new JMenuItem("Cull Multiples");
+		JMenuItem cullMultiples = createJMenuItem("Cull Multiples");
 		cullMultiples.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -328,9 +336,9 @@ public class GUI extends MainWindow {
 		});
 		songs.add(cullMultiples);
 
-		songs.addSeparator();
+		songs.add(createSeparator());
 
-		JMenuItem save = new JMenuItem("Save");
+		JMenuItem save = createJMenuItem("Save");
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -340,10 +348,10 @@ public class GUI extends MainWindow {
 		});
 		songs.add(save);
 
-		JMenu artists = new JMenu("Artists");
+		JMenu artists = createJMenu("Artists");
 		menu.add(artists);
 
-		JMenuItem allArtists = new JMenuItem("All Artists");
+		JMenuItem allArtists = createJMenuItem("All Artists");
 		allArtists.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -354,7 +362,7 @@ public class GUI extends MainWindow {
 		});
 		artists.add(allArtists);
 
-		JMenuItem artistsOfCurlyPlayedSong = new JMenuItem("Artists of Currently Played Song");
+		JMenuItem artistsOfCurlyPlayedSong = createJMenuItem("Artists of Currently Played Song");
 		artistsOfCurlyPlayedSong.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -369,7 +377,7 @@ public class GUI extends MainWindow {
 		});
 		artists.add(artistsOfCurlyPlayedSong);
 
-		JMenuItem firstArtistOfCurlyPlayedSong = new JMenuItem("First Artist of Currently Played Song");
+		JMenuItem firstArtistOfCurlyPlayedSong = createJMenuItem("First Artist of Currently Played Song");
 		firstArtistOfCurlyPlayedSong.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -392,7 +400,7 @@ public class GUI extends MainWindow {
 		});
 		artists.add(firstArtistOfCurlyPlayedSong);
 
-		JMenuItem secondArtistOfCurlyPlayedSong = new JMenuItem("Second Artist of Currently Played Song");
+		JMenuItem secondArtistOfCurlyPlayedSong = createJMenuItem("Second Artist of Currently Played Song");
 		secondArtistOfCurlyPlayedSong.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -415,7 +423,7 @@ public class GUI extends MainWindow {
 		});
 		artists.add(secondArtistOfCurlyPlayedSong);
 
-		JMenuItem songsWithSameName = new JMenuItem("Songs with the Same Name (by Any Artist)");
+		JMenuItem songsWithSameName = createJMenuItem("Songs with the Same Name (by Any Artist)");
 		songsWithSameName.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -430,7 +438,7 @@ public class GUI extends MainWindow {
 		});
 		artists.add(songsWithSameName);
 
-		JMenu artistsByName = new JMenu("Artists by Name...");
+		JMenu artistsByName = createJMenu("Artists by Name...");
 		artists.add(artistsByName);
 
 		for (char c = 'A'; c <= 'Z'; c++) {
@@ -438,7 +446,7 @@ public class GUI extends MainWindow {
 		}
 		addArtistsByNameSubMenu(artistsByName, '*');
 
-		artists.addSeparator();
+		artists.add(createSeparator());
 
 		// actually, the artists that we have a lot of songs of are not necessarily the ones that
 		// we want to see in the list, so load this from configuration by default:
@@ -453,7 +461,7 @@ public class GUI extends MainWindow {
 		}
 
 		for (final String artistName : artistNames) {
-			JMenuItem artistItem = new JMenuItem(artistName);
+			JMenuItem artistItem = createJMenuItem(artistName);
 			artistItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -465,10 +473,10 @@ public class GUI extends MainWindow {
 			artists.add(artistItem);
 		}
 
-		JMenu playlists = new JMenu("Playlists");
+		JMenu playlists = createJMenu("Playlists");
 		menu.add(playlists);
 
-		JMenuItem allSongs = new JMenuItem("All Songs");
+		JMenuItem allSongs = createJMenuItem("All Songs");
 		allSongs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -479,7 +487,7 @@ public class GUI extends MainWindow {
 		});
 		playlists.add(allSongs);
 
-		JMenuItem songsOfAllPlaylistsWithCurSong = new JMenuItem("Songs of All Playlists Including Current Song");
+		JMenuItem songsOfAllPlaylistsWithCurSong = createJMenuItem("Songs of All Playlists Including Current Song");
 		songsOfAllPlaylistsWithCurSong.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -490,14 +498,14 @@ public class GUI extends MainWindow {
 		});
 		playlists.add(songsOfAllPlaylistsWithCurSong);
 
-		playlists.addSeparator();
+		playlists.add(createSeparator());
 
 		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
 		allPlaylistRecords = new ArrayList<>();
 		addPlaylistsBasedOnRecords(playlistRecords, playlists);
 
-		JMenu skip = new JMenu("Skip");
+		JMenu skip = createJMenu("Skip");
 		menu.add(skip);
 
 		ActionListener skipClickListener = new ActionListener() {
@@ -507,71 +515,71 @@ public class GUI extends MainWindow {
 			}
 		};
 
-		skipWithDuration = new JCheckBoxMenuItem("Skip Songs With Duration");
+		skipWithDuration = createJCheckBoxMenuItem("Skip Songs With Duration");
 		skipWithDuration.setSelected(configuration.getBoolean("skipSongsWithDuration", false));
 		skipWithDuration.addActionListener(skipClickListener);
 		skip.add(skipWithDuration);
 
-		skipWithoutDuration = new JCheckBoxMenuItem("Skip Songs Without Duration");
+		skipWithoutDuration = createJCheckBoxMenuItem("Skip Songs Without Duration");
 		skipWithoutDuration.setSelected(configuration.getBoolean("skipSongsWithoutDuration", false));
 		skipWithoutDuration.addActionListener(skipClickListener);
 		skip.add(skipWithoutDuration);
 
-		skip.addSeparator();
+		skip.add(createSeparator());
 
-		skipWithRating = new JCheckBoxMenuItem("Skip Songs With Rating");
+		skipWithRating = createJCheckBoxMenuItem("Skip Songs With Rating");
 		skipWithRating.setSelected(configuration.getBoolean("skipSongsWithRating", false));
 		skipWithRating.addActionListener(skipClickListener);
 		skip.add(skipWithRating);
 
-		skipBelowPlAvg = new JCheckBoxMenuItem("Skip Songs With Rating Below Playlist Average");
+		skipBelowPlAvg = createJCheckBoxMenuItem("Skip Songs With Rating Below Playlist Average");
 		skipBelowPlAvg.setSelected(configuration.getBoolean("skipSongsBelowPlaylistAvg", false));
 		skipBelowPlAvg.addActionListener(skipClickListener);
 		skip.add(skipBelowPlAvg);
 
-		skipBelow95 = new JCheckBoxMenuItem("Skip Songs With Rating Below 95%");
+		skipBelow95 = createJCheckBoxMenuItem("Skip Songs With Rating Below 95%");
 		skipBelow95.setSelected(configuration.getBoolean("skipSongsBelow95", false));
 		skipBelow95.addActionListener(skipClickListener);
 		skip.add(skipBelow95);
 
-		skipBelow90 = new JCheckBoxMenuItem("Skip Songs With Rating Below 90%");
+		skipBelow90 = createJCheckBoxMenuItem("Skip Songs With Rating Below 90%");
 		skipBelow90.setSelected(configuration.getBoolean("skipSongsBelow90", false));
 		skipBelow90.addActionListener(skipClickListener);
 		skip.add(skipBelow90);
 
-		skipBelow80 = new JCheckBoxMenuItem("Skip Songs With Rating Below 80%");
+		skipBelow80 = createJCheckBoxMenuItem("Skip Songs With Rating Below 80%");
 		skipBelow80.setSelected(configuration.getBoolean("skipSongsBelow80", false));
 		skipBelow80.addActionListener(skipClickListener);
 		skip.add(skipBelow80);
 
-		skipBelow70 = new JCheckBoxMenuItem("Skip Songs With Rating Below 70%");
+		skipBelow70 = createJCheckBoxMenuItem("Skip Songs With Rating Below 70%");
 		skipBelow70.setSelected(configuration.getBoolean("skipSongsBelow70", false));
 		skipBelow70.addActionListener(skipClickListener);
 		skip.add(skipBelow70);
 
-		skipBelow60 = new JCheckBoxMenuItem("Skip Songs With Rating Below 60%");
+		skipBelow60 = createJCheckBoxMenuItem("Skip Songs With Rating Below 60%");
 		skipBelow60.setSelected(configuration.getBoolean("skipSongsBelow60", false));
 		skipBelow60.addActionListener(skipClickListener);
 		skip.add(skipBelow60);
 
-		skipBelow50 = new JCheckBoxMenuItem("Skip Songs With Rating Below 50%");
+		skipBelow50 = createJCheckBoxMenuItem("Skip Songs With Rating Below 50%");
 		skipBelow50.setSelected(configuration.getBoolean("skipSongsBelow50", false));
 		skipBelow50.addActionListener(skipClickListener);
 		skip.add(skipBelow50);
 
-		skipBelow45 = new JCheckBoxMenuItem("Skip Songs With Rating Below 45%");
+		skipBelow45 = createJCheckBoxMenuItem("Skip Songs With Rating Below 45%");
 		skipBelow45.setSelected(configuration.getBoolean("skipSongsBelow45", false));
 		skipBelow45.addActionListener(skipClickListener);
 		skip.add(skipBelow45);
 
-		skipWithoutRating = new JCheckBoxMenuItem("Skip Songs Without Rating");
+		skipWithoutRating = createJCheckBoxMenuItem("Skip Songs Without Rating");
 		skipWithoutRating.setSelected(configuration.getBoolean("skipSongsWithoutRating", false));
 		skipWithoutRating.addActionListener(skipClickListener);
 		skip.add(skipWithoutRating);
 
-		skip.addSeparator();
+		skip.add(createSeparator());
 
-		JMenuItem skipNone = new JMenuItem("Play All");
+		JMenuItem skipNone = createJMenuItem("Play All");
 		skipNone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -592,7 +600,7 @@ public class GUI extends MainWindow {
 		});
 		skip.add(skipNone);
 
-		JMenuItem discoverNew = new JMenuItem("Discover New Songs");
+		JMenuItem discoverNew = createJMenuItem("Discover New Songs");
 		discoverNew.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -613,7 +621,7 @@ public class GUI extends MainWindow {
 		});
 		skip.add(discoverNew);
 
-		JMenuItem playFavoriteSongs = new JMenuItem("Play Favorite Songs");
+		JMenuItem playFavoriteSongs = createJMenuItem("Play Favorite Songs");
 		playFavoriteSongs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -634,7 +642,7 @@ public class GUI extends MainWindow {
 		});
 		skip.add(playFavoriteSongs);
 
-		JMenuItem defaultSkipping = new JMenuItem("Default Skipping");
+		JMenuItem defaultSkipping = createJMenuItem("Default Skipping");
 		defaultSkipping.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -655,9 +663,9 @@ public class GUI extends MainWindow {
 		});
 		skip.add(defaultSkipping);
 
-		menu.add(new MenuItemForMainMenu("|"));
+		menu.add(createMenuItemForMainMenu("|"));
 
-		MenuItemForMainMenu prev = new MenuItemForMainMenu("Previous");
+		MenuItemForMainMenu prev = createMenuItemForMainMenu("Previous");
 		prev.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -666,7 +674,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(prev);
 
-		pauseItem = new MenuItemForMainMenu("Pause");
+		pauseItem = createMenuItemForMainMenu("Pause");
 		pauseItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -681,7 +689,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(pauseItem);
 
-		MenuItemForMainMenu next = new MenuItemForMainMenu("Next");
+		MenuItemForMainMenu next = createMenuItemForMainMenu("Next");
 		next.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -690,9 +698,9 @@ public class GUI extends MainWindow {
 		});
 		menu.add(next);
 
-		menu.add(new MenuItemForMainMenu("|"));
+		menu.add(createMenuItemForMainMenu("|"));
 
-		MenuItemForMainMenu songIsOver = new MenuItemForMainMenu("Song is Over");
+		MenuItemForMainMenu songIsOver = createMenuItemForMainMenu("Song is Over");
 		songIsOver.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -701,7 +709,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(songIsOver);
 
-		MenuItemForMainMenu resetLength = new MenuItemForMainMenu("Reset Length");
+		MenuItemForMainMenu resetLength = createMenuItemForMainMenu("Reset Length");
 		resetLength.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -710,9 +718,9 @@ public class GUI extends MainWindow {
 		});
 		menu.add(resetLength);
 
-		menu.add(new MenuItemForMainMenu("|"));
+		menu.add(createMenuItemForMainMenu("|"));
 
-		minimizeMaximize = new MenuItemForMainMenu("Maximize");
+		minimizeMaximize = createMenuItemForMainMenu("Maximize");
 		minimizeMaximize.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -727,7 +735,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(minimizeMaximize);
 
-		MenuItemForMainMenu close = new MenuItemForMainMenu("Close");
+		MenuItemForMainMenu close = createMenuItemForMainMenu("Close");
 		close.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -737,9 +745,9 @@ public class GUI extends MainWindow {
 		});
 		menu.add(close);
 
-		JMenu huh = new JMenu("?");
+		JMenu huh = createJMenu("?");
 
-		JMenuItem openConfigPath = new JMenuItem("Open Config Path");
+		JMenuItem openConfigPath = createJMenuItem("Open Config Path");
 		openConfigPath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -752,7 +760,7 @@ public class GUI extends MainWindow {
 		});
 		huh.add(openConfigPath);
 
-		JMenuItem about = new JMenuItem("About");
+		JMenuItem about = createJMenuItem("About");
 		about.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -765,9 +773,13 @@ public class GUI extends MainWindow {
 		huh.add(about);
 		menu.add(huh);
 
-		menu.add(new MenuItemForMainMenu("|"));
+		menu.add(createMenuItemForMainMenu("|"));
 
 		ratingItem = new BarMenuItemForMainMenu();
+		Border noBorderRI = new EmptyBorder(1, 1, 1, 1);
+		ratingItem.setBorder(noBorderRI);
+		ratingItem.setBackground(bgColorCol);
+		ratingItem.setForeground(fgColorCol);
 		ratingItem.setMaximum(100);
 		ratingItem.addBarListener(new BarListener() {
 			@Override
@@ -780,7 +792,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(ratingItem);
 
-		songItem = new JMenuItem("");
+		songItem = createJMenuItem("");
 		songItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -794,7 +806,7 @@ public class GUI extends MainWindow {
 		});
 		menu.add(songItem);
 
-		timeRemainingItem = new MenuItemForMainMenu("");
+		timeRemainingItem = createMenuItemForMainMenu("");
 		menu.add(timeRemainingItem);
 
 		parent.setJMenuBar(menu);
@@ -810,7 +822,7 @@ public class GUI extends MainWindow {
 
 			if ((sublists != null) && (sublists.size() > 0)) {
 
-				JMenu submenu = new JMenu(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
+				JMenu submenu = createJMenu(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
 
 				addPlaylistsBasedOnRecords(sublists, submenu);
 
@@ -829,7 +841,7 @@ public class GUI extends MainWindow {
 
 				allPlaylistRecords.add(playlistRecord);
 
-				JMenuItem playlistItem = new JMenuItem(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
+				JMenuItem playlistItem = createJMenuItem(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
 				playlistItem.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -861,23 +873,33 @@ public class GUI extends MainWindow {
 	private JPanel createMainPanel(JFrame parent) {
 
 		JPanel mainPanel = new JPanel();
+		mainPanel.setForeground(fgColorCol);
+		mainPanel.setBackground(bgColorCol);
 		mainPanel.setPreferredSize(new Dimension(800, 500));
 		GridBagLayout mainPanelLayout = new GridBagLayout();
 		mainPanel.setLayout(mainPanelLayout);
 
 		JPanel mainPanelRightOuter = new JPanel();
+		mainPanelRightOuter.setForeground(fgColorCol);
+		mainPanelRightOuter.setBackground(bgColorCol);
 		GridBagLayout mainPanelRightOuterLayout = new GridBagLayout();
 		mainPanelRightOuter.setLayout(mainPanelRightOuterLayout);
 
 		mainPanelRight = new JPanel();
+		mainPanelRight.setForeground(fgColorCol);
+		mainPanelRight.setBackground(bgColorCol);
 		mainPanelRight.setLayout(new CardLayout());
 		mainPanelRight.setPreferredSize(new Dimension(8, 8));
 
 		JPanel gapPanel = new JPanel();
+		gapPanel.setForeground(fgColorCol);
+		gapPanel.setBackground(bgColorCol);
 		gapPanel.setPreferredSize(new Dimension(8, 8));
 
 		String[] songList = new String[0];
 		songListComponent = new JList<String>(songList);
+		songListComponent.setForeground(fgColorCol);
+		songListComponent.setBackground(bgColorCol);
 
 		songListComponent.addMouseListener(new MouseListener() {
 
@@ -943,47 +965,12 @@ public class GUI extends MainWindow {
 		});
 
 		songListScroller = new JScrollPane(songListComponent);
+		songListScroller.setForeground(fgColorCol);
+		songListScroller.setBackground(bgColorCol);
 		songListScroller.setPreferredSize(new Dimension(8, 8));
 		songListScroller.setBorder(BorderFactory.createEmptyBorder());
 
-		searchPanel = new JPanel();
-		searchPanel.setLayout(new GridBagLayout());
-		searchPanel.setVisible(false);
-
-		searchField = new JTextField();
-
-		// listen to text updates
-		searchField.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				search();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				search();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				search();
-			}
-			private void search() {
-				String searchFor = searchField.getText();
-
-				// TODO :: actually search for the song ;)
-			}
-		});
-
-		// listen to the enter key being pressed (which does not create text updates)
-		searchField.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String searchFor = searchField.getText();
-
-				// TODO :: actually search for the song ;)
-			}
-		});
-
-		searchPanel.add(searchField, new Arrangement(0, 0, 1.0, 1.0));
-
 		mainPanelRightOuter.add(mainPanelRight, new Arrangement(0, 0, 1.0, 1.0));
-
-		mainPanelRightOuter.add(searchPanel, new Arrangement(0, 1, 1.0, 0.0));
 
 		mainPanel.add(songListScroller, new Arrangement(0, 0, 0.2, 1.0));
 
@@ -992,15 +979,10 @@ public class GUI extends MainWindow {
 		mainPanel.add(mainPanelRightOuter, new Arrangement(3, 0, 1.0, 1.0));
 
 		parent.add(mainPanel, BorderLayout.CENTER);
+		parent.setForeground(fgColorCol);
+		parent.setBackground(bgColorCol);
 
 		return mainPanel;
-	}
-
-	private void showSearchBar() {
-
-		searchPanel.setVisible(true);
-
-		searchField.requestFocus();
 	}
 
 	private void minimize() {
@@ -1014,7 +996,7 @@ public class GUI extends MainWindow {
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 20));
+		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 17));
 	}
 
 	private void maximize() {
@@ -1463,14 +1445,14 @@ public class GUI extends MainWindow {
 		if (bucketChar == '*') {
 			itemTitle = "Other...";
 		}
-		JMenu bucketMenu = new JMenu(itemTitle);
+		JMenu bucketMenu = createJMenu(itemTitle);
 		artistsByName.add(bucketMenu);
 
 		// add the top 32 artists for each bucket
 		List<Artist> artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET, bucketChar);
 
 		for (final Artist artist : artistNames) {
-			JMenuItem artistItem = new JMenuItem(artist.getName() + " (" + artist.getSongAmount() + " songs)");
+			JMenuItem artistItem = createJMenuItem(artist.getName() + " (" + artist.getSongAmount() + " songs)");
 			artistItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -1481,6 +1463,52 @@ public class GUI extends MainWindow {
 			});
 			bucketMenu.add(artistItem);
 		}
+	}
+
+	private JMenu createJMenu(String text) {
+		JMenu result = new JMenu(text);
+		result.setOpaque(true);
+		result.setForeground(fgColorCol);
+		result.setBackground(bgColorCol);
+		Border noBorder = new EmptyBorder(0, 0, 0, 0);
+		result.setBorder(noBorder);
+		Border border = new LineBorder(fgColorCol);
+		result.getPopupMenu().setBorder(border);
+		return result;
+	}
+
+	private JMenuItem createJMenuItem(String text) {
+		JMenuItem result = new JMenuItem(text);
+		result.setOpaque(true);
+		result.setForeground(fgColorCol);
+		result.setBackground(bgColorCol);
+		Border noBorder = new EmptyBorder(0, 0, 0, 0);
+		result.setBorder(noBorder);
+		return result;
+	}
+
+	private JMenuItem createSeparator() {
+		return createJMenuItem("—————————————————————————");
+	}
+
+	private MenuItemForMainMenu createMenuItemForMainMenu(String text) {
+		MenuItemForMainMenu result = new MenuItemForMainMenu(text);
+		result.setOpaque(true);
+		result.setForeground(fgColorCol);
+		result.setBackground(bgColorCol);
+		Border noBorder = new EmptyBorder(1, 0, 1, 0);
+		result.setBorder(noBorder);
+		return result;
+	}
+
+	private JCheckBoxMenuItem createJCheckBoxMenuItem(String text) {
+		JCheckBoxMenuItem result = new JCheckBoxMenuItem(text);
+		result.setOpaque(true);
+		result.setForeground(fgColorCol);
+		result.setBackground(bgColorCol);
+		Border noBorder = new EmptyBorder(0, 0, 0, 0);
+		result.setBorder(noBorder);
+		return result;
 	}
 
 }

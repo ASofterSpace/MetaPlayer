@@ -13,6 +13,7 @@ cd toolbox
 md coders
 md configuration
 md gui
+md images
 md io
 md utils
 md web
@@ -23,6 +24,7 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\*.java" "src\com\asofterspace
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\coders\*.*" "src\com\asofterspace\toolbox\coders"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\configuration\*.*" "src\com\asofterspace\toolbox\configuration"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\gui\*.*" "src\com\asofterspace\toolbox\gui"
+copy "..\Toolbox-Java\src\com\asofterspace\toolbox\images\*.*" "src\com\asofterspace\toolbox\images"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace\toolbox\io"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\utils\*.*" "src\com\asofterspace\toolbox\utils"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\web\*.*" "src\com\asofterspace\toolbox\web"

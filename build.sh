@@ -15,6 +15,7 @@ cd toolbox
 mkdir coders
 mkdir configuration
 mkdir gui
+mkdir images
 mkdir io
 mkdir utils
 mkdir web
@@ -25,6 +26,7 @@ cp ../Toolbox-Java/src/com/asofterspace/toolbox/*.java src/com/asofterspace/tool
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/coders/*.* src/com/asofterspace/toolbox/coders
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/configuration/*.* src/com/asofterspace/toolbox/configuration
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/gui/*.* src/com/asofterspace/toolbox/gui
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/images/*.* src/com/asofterspace/toolbox/images
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/toolbox/io
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
