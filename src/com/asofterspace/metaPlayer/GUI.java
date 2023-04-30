@@ -776,6 +776,7 @@ public class GUI extends MainWindow {
 		menu.add(createMenuItemForMainMenu("|"));
 
 		ratingItem = new BarMenuItemForMainMenu();
+		ratingItem.setOpaque(true);
 		Border noBorderRI = new EmptyBorder(1, 1, 1, 1);
 		ratingItem.setBorder(noBorderRI);
 		ratingItem.setBackground(bgColorCol);
@@ -996,7 +997,7 @@ public class GUI extends MainWindow {
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 17));
+		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 21));
 	}
 
 	private void maximize() {
@@ -1496,7 +1497,7 @@ public class GUI extends MainWindow {
 		result.setOpaque(true);
 		result.setForeground(fgColorCol);
 		result.setBackground(bgColorCol);
-		Border noBorder = new EmptyBorder(1, 0, 1, 0);
+		Border noBorder = new EmptyBorder(3, 0, 3, 0);
 		result.setBorder(noBorder);
 		return result;
 	}
