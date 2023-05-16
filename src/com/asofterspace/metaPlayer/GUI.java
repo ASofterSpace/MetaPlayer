@@ -790,6 +790,11 @@ public class GUI extends MainWindow {
 					songCtrl.save();
 				}
 			}
+
+			@Override
+			public void onBarDisplay(Integer position) {
+				// just do nothing on display only
+			}
 		});
 		menu.add(ratingItem);
 
