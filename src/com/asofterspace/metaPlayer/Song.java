@@ -148,13 +148,27 @@ public class Song {
 			return false;
 		}
 
-		String loArtist = artist.toLowerCase() + " ";
+		boolean matchOnlyThatArtistExactly = false;
+		if (potentialArtist.endsWith(" %ONLY%")) {
+			potentialArtist = potentialArtist.substring(0, potentialArtist.length() - 7);
+			matchOnlyThatArtistExactly = true;
+		}
+
+		String loArtist = artist.toLowerCase();
 		String loPotentialArtist = potentialArtist.toLowerCase();
 
 		// matches Foo - Bar for argument "foo"
 		if (loArtist.equals(loPotentialArtist)) {
 			return true;
 		}
+
+		// if we are only interested in that artist exactly and no cooperations,
+		// then return false if we did not match so far
+		if (matchOnlyThatArtistExactly) {
+			return false;
+		}
+
+		loArtist += " ";
 
 		// matches Foo Bar - Bar for argument "foo",
 		// but does not match FooBar - Barbara

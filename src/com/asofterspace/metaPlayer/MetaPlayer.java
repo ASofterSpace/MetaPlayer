@@ -21,10 +21,11 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.2.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 30. April 2023";
+	public final static String VERSION_NUMBER = "0.0.2.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 23. May 2023";
 
 	private static ConfigFile config;
+	private static ConfigFile playlistConfig;
 
 	private static TimingCtrl timingCtrl;
 	private static PlayerCtrl playerCtrl;
@@ -78,19 +79,34 @@ public class MetaPlayer {
 		}
 
 		try {
-			// load config
+			// load settings
 			config = new ConfigFile("settings", true);
 
 			// create a default config file, if necessary
 			if (config.getAllContents().isEmpty()) {
 				config.setAllContents(new JSON(
 					"{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[]," +
-					"\"" + GUI.CONFIG_KEY_PLAYLISTS + "\":[]," +
 					"\"" + GUI.CONFIG_KEY_MAIN_ARTISTS + "\":[]}"
 				));
 			}
 		} catch (JsonParseException e) {
 			System.err.println("Loading the settings failed:");
+			System.err.println(e);
+			System.exit(1);
+		}
+
+		try {
+			// load playlists
+			playlistConfig = new ConfigFile("playlists", true);
+
+			// create a default config file, if necessary
+			if (playlistConfig.getAllContents().isEmpty()) {
+				playlistConfig.setAllContents(new JSON(
+					"{\"" + GUI.CONFIG_KEY_PLAYLISTS + "\":[]}"
+				));
+			}
+		} catch (JsonParseException e) {
+			System.err.println("Loading the playlists failed:");
 			System.err.println(e);
 			System.exit(1);
 		}
@@ -112,7 +128,7 @@ public class MetaPlayer {
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 
-		GUI gui = new GUI(timingCtrl, playerCtrl, songCtrl, config);
+		GUI gui = new GUI(timingCtrl, playerCtrl, songCtrl, config, playlistConfig);
 		songCtrl.setGUI(gui);
 		SwingUtilities.invokeLater(gui);
 
@@ -143,6 +159,9 @@ public class MetaPlayer {
 			songCtrl.resetTopPlayAmounts();
 			songCtrl.save();
 		}
+
+		// save playlists on start so that the JSON is well-formatted
+		playlistConfig.create();
 	}
 
 	public static String getAfterStartupPlaySong() {

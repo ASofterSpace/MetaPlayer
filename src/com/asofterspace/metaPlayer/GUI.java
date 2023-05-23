@@ -93,7 +93,8 @@ public class GUI extends MainWindow {
 	private MenuItemForMainMenu minimizeMaximize;
 	private BarMenuItemForMainMenu ratingItem;
 
-	private ConfigFile configuration;
+	private ConfigFile config;
+	private ConfigFile playlistConfig;
 	private JList<String> songListComponent;
 	private JPopupMenu songListPopup;
 	private String[] strSongs;
@@ -114,7 +115,7 @@ public class GUI extends MainWindow {
 	private JCheckBoxMenuItem skipWithoutRating;
 
 
-	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
+	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config, ConfigFile playlistConfig) {
 
 		this.timingCtrl = timingCtrl;
 		timingCtrl.setGui(this);
@@ -123,7 +124,9 @@ public class GUI extends MainWindow {
 
 		this.songCtrl = songCtrl;
 
-		this.configuration = config;
+		this.config = config;
+
+		this.playlistConfig = playlistConfig;
 	}
 
 	@Override
@@ -343,7 +346,8 @@ public class GUI extends MainWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				songCtrl.save();
-				configuration.create();
+				config.create();
+				playlistConfig.create();
 			}
 		});
 		songs.add(save);
@@ -449,9 +453,9 @@ public class GUI extends MainWindow {
 		artists.add(createSeparator());
 
 		// actually, the artists that we have a lot of songs of are not necessarily the ones that
-		// we want to see in the list, so load this from configuration by default:
-		List<String> artistNames = configuration.getList(CONFIG_KEY_MAIN_ARTISTS);
-		// and only get the top artists if there is no such configuration:
+		// we want to see in the list, so load this from config by default:
+		List<String> artistNames = config.getList(CONFIG_KEY_MAIN_ARTISTS);
+		// and only get the top artists if there is no such config:
 		if ((artistNames == null) || (artistNames.size() == 0)) {
 			artistNames = new ArrayList<>();
 			List<Artist> topArtists = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET);
@@ -500,7 +504,7 @@ public class GUI extends MainWindow {
 
 		playlists.add(createSeparator());
 
-		List<Record> playlistRecords = configuration.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
+		List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
 		allPlaylistRecords = new ArrayList<>();
 		addPlaylistsBasedOnRecords(playlistRecords, playlists);
@@ -516,64 +520,64 @@ public class GUI extends MainWindow {
 		};
 
 		skipWithDuration = createJCheckBoxMenuItem("Skip Songs With Duration");
-		skipWithDuration.setSelected(configuration.getBoolean("skipSongsWithDuration", false));
+		skipWithDuration.setSelected(config.getBoolean("skipSongsWithDuration", false));
 		skipWithDuration.addActionListener(skipClickListener);
 		skip.add(skipWithDuration);
 
 		skipWithoutDuration = createJCheckBoxMenuItem("Skip Songs Without Duration");
-		skipWithoutDuration.setSelected(configuration.getBoolean("skipSongsWithoutDuration", false));
+		skipWithoutDuration.setSelected(config.getBoolean("skipSongsWithoutDuration", false));
 		skipWithoutDuration.addActionListener(skipClickListener);
 		skip.add(skipWithoutDuration);
 
 		skip.add(createSeparator());
 
 		skipWithRating = createJCheckBoxMenuItem("Skip Songs With Rating");
-		skipWithRating.setSelected(configuration.getBoolean("skipSongsWithRating", false));
+		skipWithRating.setSelected(config.getBoolean("skipSongsWithRating", false));
 		skipWithRating.addActionListener(skipClickListener);
 		skip.add(skipWithRating);
 
 		skipBelowPlAvg = createJCheckBoxMenuItem("Skip Songs With Rating Below Playlist Average");
-		skipBelowPlAvg.setSelected(configuration.getBoolean("skipSongsBelowPlaylistAvg", false));
+		skipBelowPlAvg.setSelected(config.getBoolean("skipSongsBelowPlaylistAvg", false));
 		skipBelowPlAvg.addActionListener(skipClickListener);
 		skip.add(skipBelowPlAvg);
 
 		skipBelow95 = createJCheckBoxMenuItem("Skip Songs With Rating Below 95%");
-		skipBelow95.setSelected(configuration.getBoolean("skipSongsBelow95", false));
+		skipBelow95.setSelected(config.getBoolean("skipSongsBelow95", false));
 		skipBelow95.addActionListener(skipClickListener);
 		skip.add(skipBelow95);
 
 		skipBelow90 = createJCheckBoxMenuItem("Skip Songs With Rating Below 90%");
-		skipBelow90.setSelected(configuration.getBoolean("skipSongsBelow90", false));
+		skipBelow90.setSelected(config.getBoolean("skipSongsBelow90", false));
 		skipBelow90.addActionListener(skipClickListener);
 		skip.add(skipBelow90);
 
 		skipBelow80 = createJCheckBoxMenuItem("Skip Songs With Rating Below 80%");
-		skipBelow80.setSelected(configuration.getBoolean("skipSongsBelow80", false));
+		skipBelow80.setSelected(config.getBoolean("skipSongsBelow80", false));
 		skipBelow80.addActionListener(skipClickListener);
 		skip.add(skipBelow80);
 
 		skipBelow70 = createJCheckBoxMenuItem("Skip Songs With Rating Below 70%");
-		skipBelow70.setSelected(configuration.getBoolean("skipSongsBelow70", false));
+		skipBelow70.setSelected(config.getBoolean("skipSongsBelow70", false));
 		skipBelow70.addActionListener(skipClickListener);
 		skip.add(skipBelow70);
 
 		skipBelow60 = createJCheckBoxMenuItem("Skip Songs With Rating Below 60%");
-		skipBelow60.setSelected(configuration.getBoolean("skipSongsBelow60", false));
+		skipBelow60.setSelected(config.getBoolean("skipSongsBelow60", false));
 		skipBelow60.addActionListener(skipClickListener);
 		skip.add(skipBelow60);
 
 		skipBelow50 = createJCheckBoxMenuItem("Skip Songs With Rating Below 50%");
-		skipBelow50.setSelected(configuration.getBoolean("skipSongsBelow50", false));
+		skipBelow50.setSelected(config.getBoolean("skipSongsBelow50", false));
 		skipBelow50.addActionListener(skipClickListener);
 		skip.add(skipBelow50);
 
 		skipBelow45 = createJCheckBoxMenuItem("Skip Songs With Rating Below 45%");
-		skipBelow45.setSelected(configuration.getBoolean("skipSongsBelow45", false));
+		skipBelow45.setSelected(config.getBoolean("skipSongsBelow45", false));
 		skipBelow45.addActionListener(skipClickListener);
 		skip.add(skipBelow45);
 
 		skipWithoutRating = createJCheckBoxMenuItem("Skip Songs Without Rating");
-		skipWithoutRating.setSelected(configuration.getBoolean("skipSongsWithoutRating", false));
+		skipWithoutRating.setSelected(config.getBoolean("skipSongsWithoutRating", false));
 		skipWithoutRating.addActionListener(skipClickListener);
 		skip.add(skipWithoutRating);
 
@@ -752,7 +756,7 @@ public class GUI extends MainWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Desktop.getDesktop().open(configuration.getParentDirectory().getJavaFile());
+					Desktop.getDesktop().open(config.getParentDirectory().getJavaFile());
 				} catch (IOException ex) {
 					// do nothing
 				}
@@ -862,18 +866,20 @@ public class GUI extends MainWindow {
 	}
 
 	private void saveSkipState() {
-		configuration.set("skipSongsWithDuration", skipWithDuration.isSelected());
-		configuration.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
-		configuration.set("skipSongsWithRating", skipWithRating.isSelected());
-		configuration.set("skipSongsBelowPlaylistAvg", skipBelowPlAvg.isSelected());
-		configuration.set("skipSongsBelow95", skipBelow95.isSelected());
-		configuration.set("skipSongsBelow90", skipBelow90.isSelected());
-		configuration.set("skipSongsBelow80", skipBelow80.isSelected());
-		configuration.set("skipSongsBelow70", skipBelow70.isSelected());
-		configuration.set("skipSongsBelow60", skipBelow60.isSelected());
-		configuration.set("skipSongsBelow50", skipBelow50.isSelected());
-		configuration.set("skipSongsBelow45", skipBelow45.isSelected());
-		configuration.set("skipSongsWithoutRating", skipWithoutRating.isSelected());
+		Record configContent = config.getAllContents();
+		configContent.set("skipSongsWithDuration", skipWithDuration.isSelected());
+		configContent.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
+		configContent.set("skipSongsWithRating", skipWithRating.isSelected());
+		configContent.set("skipSongsBelowPlaylistAvg", skipBelowPlAvg.isSelected());
+		configContent.set("skipSongsBelow95", skipBelow95.isSelected());
+		configContent.set("skipSongsBelow90", skipBelow90.isSelected());
+		configContent.set("skipSongsBelow80", skipBelow80.isSelected());
+		configContent.set("skipSongsBelow70", skipBelow70.isSelected());
+		configContent.set("skipSongsBelow60", skipBelow60.isSelected());
+		configContent.set("skipSongsBelow50", skipBelow50.isSelected());
+		configContent.set("skipSongsBelow45", skipBelow45.isSelected());
+		configContent.set("skipSongsWithoutRating", skipWithoutRating.isSelected());
+		config.setAllContents(configContent);
 	}
 
 	private JPanel createMainPanel(JFrame parent) {
@@ -1163,7 +1169,7 @@ public class GUI extends MainWindow {
 		OpenFileDialog filePicker = new OpenFileDialog();
 
 		// use the last-used directory
-		String lastDirectory = configuration.getValue(CONFIG_KEY_LAST_SONG_DIRECTORY);
+		String lastDirectory = config.getValue(CONFIG_KEY_LAST_SONG_DIRECTORY);
 
 		if ((lastDirectory != null) && !"".equals(lastDirectory)) {
 			filePicker.setCurrentDirectory(new Directory(lastDirectory));
@@ -1182,7 +1188,7 @@ public class GUI extends MainWindow {
 					case OpenFileDialog.APPROVE_OPTION:
 
 						// load the files
-						configuration.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getCanonicalDirname());
+						config.set(CONFIG_KEY_LAST_SONG_DIRECTORY, filePicker.getCurrentDirectory().getCanonicalDirname());
 
 						for (File curFile : filePicker.getSelectedFiles()) {
 							importSong(curFile);
@@ -1232,7 +1238,7 @@ public class GUI extends MainWindow {
 		JFileChooser filePicker;
 
 		// use the last-used directory
-		String lastDirectory = configuration.getValue(CONFIG_KEY_LAST_LEGACY_DIRECTORY);
+		String lastDirectory = config.getValue(CONFIG_KEY_LAST_LEGACY_DIRECTORY);
 
 		if ((lastDirectory != null) && !"".equals(lastDirectory)) {
 			filePicker = new JFileChooser(new java.io.File(lastDirectory));
@@ -1251,7 +1257,7 @@ public class GUI extends MainWindow {
 			case JFileChooser.APPROVE_OPTION:
 
 				// load the files
-				configuration.set(CONFIG_KEY_LAST_LEGACY_DIRECTORY, filePicker.getCurrentDirectory().getAbsolutePath());
+				config.set(CONFIG_KEY_LAST_LEGACY_DIRECTORY, filePicker.getCurrentDirectory().getAbsolutePath());
 
 				java.io.File curFile = filePicker.getSelectedFile();
 
