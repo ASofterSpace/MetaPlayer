@@ -809,7 +809,12 @@ public class GUI extends MainWindow {
 				// modifiers seems to be 16 for left click, 4 for right click
 				boolean isRightClick = (e.getModifiers() == 4);
 				if (isRightClick) {
-					songItem.setText(currentlyPlayedSong.getPlaylistText(songCtrl, allPlaylistRecords));
+					String playlistText = currentlyPlayedSong.getPlaylistText(songCtrl, allPlaylistRecords);
+					if (playlistText.equals(songItem.getText())) {
+						songItem.setText(currentlyPlayedSong.getCaptionString(songCtrl, allPlaylistRecords));
+					} else {
+						songItem.setText(playlistText);
+					}
 				} else {
 					if (currentlyPlayedSong != null) {
 						StringSelection selection = new StringSelection(
