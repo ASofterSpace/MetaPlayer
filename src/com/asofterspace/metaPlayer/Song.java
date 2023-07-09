@@ -285,6 +285,21 @@ public class Song {
 		return clipboardText;
 	}
 
+	public String getPlaylistText(SongCtrl songCtrl, List<Record> allPlaylists) {
+		StringBuilder result = new StringBuilder();
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
+		if (playlistsWithThisSong.size() < 1) {
+			result.append("(not included in any playlists)");
+		}
+		String sep = "";
+		for (Record playlistRecord : playlistsWithThisSong) {
+			result.append(sep);
+			sep = ", ";
+			result.append(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
+		}
+		return result.toString();
+	}
+
 	public void setPath(String path) {
 		this.path = path;
 	}

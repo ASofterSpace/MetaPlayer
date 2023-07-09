@@ -806,11 +806,17 @@ public class GUI extends MainWindow {
 		songItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (currentlyPlayedSong != null) {
-					StringSelection selection = new StringSelection(
-						currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
-					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-					clipboard.setContents(selection, selection);
+				// modifiers seems to be 16 for left click, 4 for right click
+				boolean isRightClick = (e.getModifiers() == 4);
+				if (isRightClick) {
+					songItem.setText(currentlyPlayedSong.getPlaylistText(songCtrl, allPlaylistRecords));
+				} else {
+					if (currentlyPlayedSong != null) {
+						StringSelection selection = new StringSelection(
+							currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
+						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+						clipboard.setContents(selection, selection);
+					}
 				}
 			}
 		});
