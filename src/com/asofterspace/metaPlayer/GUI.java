@@ -42,7 +42,9 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -57,7 +59,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -67,8 +68,11 @@ public class GUI extends MainWindow {
 
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
+	private final static String CONFIG_KEY_STAR_PLAYLIST_NAME = "starPlaylist";
 	public final static String CONFIG_KEY_MAIN_ARTISTS = "mainArtists";
 	public final static String CONFIG_KEY_PLAYLISTS = "playlists";
+	public final static String STAR_ON = "★";
+	public final static String STAR_OFF = "✰";
 
 	private final static Integer MAX_ARTISTS_PER_BUCKET = 32;
 
@@ -88,6 +92,7 @@ public class GUI extends MainWindow {
 
 	private JMenuItem songAmountItem;
 	private JMenuItem songItem;
+	private MenuItemForMainMenu starModeItem;
 	private MenuItemForMainMenu pauseItem;
 	private MenuItemForMainMenu timeRemainingItem;
 	private MenuItemForMainMenu minimizeMaximize;
@@ -96,10 +101,12 @@ public class GUI extends MainWindow {
 	private ConfigFile config;
 	private ConfigFile playlistConfig;
 	private JList<String> songListComponent;
-	private JPopupMenu songListPopup;
+	// private JPopupMenu songListPopup;
 	private String[] strSongs;
 	private JScrollPane songListScroller;
 	private List<Record> allPlaylistRecords = new ArrayList<>();
+	private Map<String, Record> allPlaylistsByName = new HashMap<>();
+	private boolean starMode = false;
 
 	private JCheckBoxMenuItem skipWithDuration;
 	private JCheckBoxMenuItem skipWithoutDuration;
@@ -209,6 +216,15 @@ public class GUI extends MainWindow {
 		menu.setBackgroundColor(bgColorCol);
 		Border noBorder = new EmptyBorder(0, 0, 0, 0);
 		menu.setBorder(noBorder);
+
+		starModeItem = createMenuItemForMainMenu(STAR_OFF);
+		starModeItem.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				toggleStarMode();
+			}
+		});
+		menu.add(starModeItem);
 
 		JMenu songs = createJMenu("Songs");
 		menu.add(songs);
@@ -507,6 +523,7 @@ public class GUI extends MainWindow {
 		List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
 
 		allPlaylistRecords = new ArrayList<>();
+		allPlaylistsByName = new HashMap<>();
 		addPlaylistsBasedOnRecords(playlistRecords, playlists);
 
 		JMenu skip = createJMenu("Skip");
@@ -629,19 +646,7 @@ public class GUI extends MainWindow {
 		playFavoriteSongs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				skipWithDuration.setSelected(false);
-				skipWithoutDuration.setSelected(true);
-				skipWithRating.setSelected(false);
-				skipBelowPlAvg.setSelected(true);
-				skipBelow95.setSelected(false);
-				skipBelow90.setSelected(false);
-				skipBelow80.setSelected(false);
-				skipBelow70.setSelected(false);
-				skipBelow60.setSelected(false);
-				skipBelow50.setSelected(false);
-				skipBelow45.setSelected(false);
-				skipWithoutRating.setSelected(true);
-				saveSkipState();
+				setSkipStateToPlayFavorites();
 			}
 		});
 		skip.add(playFavoriteSongs);
@@ -862,7 +867,10 @@ public class GUI extends MainWindow {
 
 				allPlaylistRecords.add(playlistRecord);
 
-				JMenuItem playlistItem = createJMenuItem(playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY));
+				String playlistName = playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY);
+				allPlaylistsByName.put(playlistName, playlistRecord);
+
+				JMenuItem playlistItem = createJMenuItem(playlistName);
 				playlistItem.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -1042,6 +1050,11 @@ public class GUI extends MainWindow {
 	 * is null, the lastly added one
 	 */
 	public void regenerateSongList() {
+
+		// in star mode, *always* enforce sort by rating, no matter what
+		if (starMode) {
+			songCtrl.sort(SortCriterion.RATING);
+		}
 
 		/*
 		// if there is no last shown tab...
@@ -1532,6 +1545,44 @@ public class GUI extends MainWindow {
 		Border noBorder = new EmptyBorder(0, 0, 0, 0);
 		result.setBorder(noBorder);
 		return result;
+	}
+
+	private void setSkipStateToPlayFavorites() {
+		skipWithDuration.setSelected(false);
+		skipWithoutDuration.setSelected(true);
+		skipWithRating.setSelected(false);
+		skipBelowPlAvg.setSelected(true);
+		skipBelow95.setSelected(false);
+		skipBelow90.setSelected(false);
+		skipBelow80.setSelected(false);
+		skipBelow70.setSelected(false);
+		skipBelow60.setSelected(false);
+		skipBelow50.setSelected(false);
+		skipBelow45.setSelected(false);
+		skipWithoutRating.setSelected(true);
+		saveSkipState();
+	}
+
+	private void toggleStarMode() {
+		starMode = !starMode;
+		if (starMode) {
+			starModeItem.setText(" " + STAR_ON + " ");
+
+			setSkipStateToPlayFavorites();
+
+			String starPlaylistName = config.getValue(CONFIG_KEY_STAR_PLAYLIST_NAME);
+			if (starPlaylistName != null) {
+				Record playlistRecord = allPlaylistsByName.get(starPlaylistName);
+				if (playlistRecord != null) {
+					songCtrl.selectPlaylist(playlistRecord, allPlaylistRecords);
+					// bit pointless here as we override in starMode anyway, but let's call it for consistency
+					songCtrl.randomize();
+					regenerateSongList();
+				}
+			}
+		} else {
+			starModeItem.setText(" " + STAR_OFF + " ");
+		}
 	}
 
 }
