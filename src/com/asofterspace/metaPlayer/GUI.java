@@ -160,6 +160,9 @@ public class GUI extends MainWindow {
 				// Stage everything to be shown
 				mainFrame.pack();
 
+				// Request to always be on top as this augments the main OS shell
+				mainFrame.setAlwaysOnTop(true);
+
 				// Actually display the whole jazz
 				mainFrame.setVisible(true);
 
