@@ -66,6 +66,12 @@ import javax.swing.SwingUtilities;
 
 public class GUI extends MainWindow {
 
+	private static final String NORM = "Norm";
+
+	private static final String MAX = "Max";
+
+	private static final String MIN = "Min";
+
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 	private final static String CONFIG_KEY_STAR_PLAYLIST_NAME = "starPlaylist";
@@ -95,7 +101,8 @@ public class GUI extends MainWindow {
 	private MenuItemForMainMenu starModeItem;
 	private MenuItemForMainMenu pauseItem;
 	private MenuItemForMainMenu timeRemainingItem;
-	private MenuItemForMainMenu minimizeMaximize;
+	private MenuItemForMainMenu miniItem;
+	private MenuItemForMainMenu maxiItem;
 	private BarMenuItemForMainMenu ratingItem;
 
 	private ConfigFile config;
@@ -120,6 +127,15 @@ public class GUI extends MainWindow {
 	private JCheckBoxMenuItem skipBelow50;
 	private JCheckBoxMenuItem skipBelow45;
 	private JCheckBoxMenuItem skipWithoutRating;
+
+	private MouseAdapter mouseListenerToNormalize = new MouseAdapter() {
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			if (!miniItem.getTextContent().trim().equals(MIN)) {
+				normalize();
+			}
+		}
+	};
 
 
 	public GUI(TimingCtrl timingCtrl, PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config, ConfigFile playlistConfig) {
@@ -166,7 +182,7 @@ public class GUI extends MainWindow {
 				// Actually display the whole jazz
 				mainFrame.setVisible(true);
 
-				minimize();
+				normalize();
 			}
 		});
 
@@ -219,6 +235,7 @@ public class GUI extends MainWindow {
 		menu.setBackgroundColor(bgColorCol);
 		Border noBorder = new EmptyBorder(0, 0, 0, 0);
 		menu.setBorder(noBorder);
+		menu.addMouseListener(mouseListenerToNormalize);
 
 		starModeItem = createMenuItemForMainMenu(STAR_OFF);
 		starModeItem.addMouseListener(new MouseAdapter() {
@@ -732,20 +749,35 @@ public class GUI extends MainWindow {
 
 		menu.add(createMenuItemForMainMenu("|"));
 
-		minimizeMaximize = createMenuItemForMainMenu("Maximize");
-		minimizeMaximize.addMouseListener(new MouseAdapter() {
+		miniItem = createMenuItemForMainMenu(MIN);
+		miniItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (minimizeMaximize.getTextContent().trim().equals("Maximize")) {
-					minimizeMaximize.setText("Minimize");
-					maximize();
-				} else {
-					minimizeMaximize.setText("Maximize");
+				if (miniItem.getTextContent().trim().equals(MIN)) {
+					miniItem.setText(NORM);
+					maxiItem.setText(MAX);
 					minimize();
+				} else {
+					normalize();
 				}
 			}
 		});
-		menu.add(minimizeMaximize);
+		menu.add(miniItem);
+
+		maxiItem = createMenuItemForMainMenu(MAX);
+		maxiItem.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (maxiItem.getTextContent().trim().equals(MAX)) {
+					maxiItem.setText(NORM);
+					miniItem.setText(MIN);
+					maximize();
+				} else {
+					normalize();
+				}
+			}
+		});
+		menu.add(maxiItem);
 
 		MenuItemForMainMenu close = createMenuItemForMainMenu("Close");
 		close.addMouseListener(new MouseAdapter() {
@@ -833,6 +865,7 @@ public class GUI extends MainWindow {
 				}
 			}
 		});
+		songItem.addMouseListener(mouseListenerToNormalize);
 		menu.add(songItem);
 
 		timeRemainingItem = createMenuItemForMainMenu("");
@@ -912,6 +945,7 @@ public class GUI extends MainWindow {
 		mainPanel.setPreferredSize(new Dimension(800, 500));
 		GridBagLayout mainPanelLayout = new GridBagLayout();
 		mainPanel.setLayout(mainPanelLayout);
+		mainPanel.addMouseListener(mouseListenerToNormalize);
 
 		JPanel mainPanelRightOuter = new JPanel();
 		mainPanelRightOuter.setForeground(fgColorCol);
@@ -1019,32 +1053,40 @@ public class GUI extends MainWindow {
 		return mainPanel;
 	}
 
-	private void minimize() {
+	private void adjustSizeAndMoveToOffset(int offset) {
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 		int width = (int) screenSize.getWidth();
-		int height = (int) screenSize.getHeight() - 73;
+		int height = (int) screenSize.getHeight() - 22;
 
 		mainFrame.setSize(width, height);
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		mainFrame.setLocation(new Point(0, (int) screenSize.getHeight() - 21));
+		if (offset < 0) {
+			offset += (int) screenSize.getHeight();
+		}
+
+		mainFrame.setLocation(new Point(0, offset));
+	}
+
+	private void minimize() {
+		adjustSizeAndMoveToOffset(-1);
+	}
+
+	private void normalize() {
+		adjustSizeAndMoveToOffset(-21);
+		if (maxiItem != null) {
+			maxiItem.setText(MAX);
+		}
+		if (miniItem != null) {
+			miniItem.setText(MIN);
+		}
 	}
 
 	private void maximize() {
-
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-		int width = (int) screenSize.getWidth();
-		int height = (int) screenSize.getHeight() - 26;
-
-		mainFrame.setSize(width, height);
-
-		mainFrame.setPreferredSize(new Dimension(width, height));
-
-		mainFrame.setLocation(new Point(0, 26));
+		adjustSizeAndMoveToOffset(22);
 	}
 
 	/**
