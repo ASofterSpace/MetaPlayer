@@ -21,8 +21,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.2.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 21. July 2023";
+	public final static String VERSION_NUMBER = "0.0.2.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 23. September 2023";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;
@@ -61,20 +61,36 @@ public class MetaPlayer {
 			}
 		}
 
+		// get --song Artist - Title or --playlist Playlist Name or both (!)
 		if (args.length > 1) {
-			StringBuilder allArgsAfterFirst = new StringBuilder();
-			String sep = "";
-			for (int i = 1; i < args.length; i++) {
-				allArgsAfterFirst.append(sep);
-				allArgsAfterFirst.append(args[i]);
-				sep = " ";
-			}
+			int pos = 0;
+			while (true) {
+				StringBuilder allArgsAfterFirst = new StringBuilder();
+				String sep = "";
+				boolean doContinue = false;
+				int i = pos + 1;
+				for (; i < args.length; i++) {
+					if (args[i].equals("--song") ||
+						args[i].equals("--playlist")) {
+						doContinue = true;
+						break;
+					}
+					allArgsAfterFirst.append(sep);
+					allArgsAfterFirst.append(args[i]);
+					sep = " ";
+				}
 
-			if (args[0].equals("--song")) {
-				afterStartupPlaySong = allArgsAfterFirst.toString();
-			}
-			if (args[0].equals("--playlist")) {
-				afterStartupPlayPlaylist = allArgsAfterFirst.toString();
+				if (args[pos].equals("--song")) {
+					afterStartupPlaySong = allArgsAfterFirst.toString();
+				}
+				if (args[pos].equals("--playlist")) {
+					afterStartupPlayPlaylist = allArgsAfterFirst.toString();
+				}
+				if (doContinue) {
+					pos = i;
+				} else {
+					break;
+				}
 			}
 		}
 
