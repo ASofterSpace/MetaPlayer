@@ -195,7 +195,7 @@ public class GUI extends MainWindow {
 			afterStartupPlaySong = afterStartupPlaySong.trim().toLowerCase();
 			List<Song> songs = songCtrl.getSongs();
 			for (Song song : songs) {
-				if (afterStartupPlaySong.equals(song.toString().trim().toLowerCase())) {
+				if (afterStartupPlaySong.equals(song.toLowTrimString())) {
 					forceThisSong = song;
 					songCtrl.selectSongsOfArtists(forceThisSong.getArtists());
 					break;
@@ -1282,9 +1282,13 @@ public class GUI extends MainWindow {
 	private void importSong(File file) {
 		String lowFilename = file.getFilename().toLowerCase();
 		if (!(lowFilename.endsWith(".jpg") ||
+			  lowFilename.endsWith(".jpeg") ||
 			  lowFilename.endsWith(".png") ||
+			  lowFilename.endsWith(".gif") ||
 			  lowFilename.endsWith(".bmp") ||
+			  lowFilename.endsWith(".webp") ||
 			  lowFilename.endsWith(".txt") ||
+			  lowFilename.endsWith(".ini") ||
 			  lowFilename.endsWith(".lnk") ||
 			  lowFilename.endsWith(".srt"))) {
 			songCtrl.addUnlessAlreadyPresent(new Song(file));

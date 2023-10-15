@@ -9,10 +9,25 @@ import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Song {
+
+	private Integer HASH_CODE = null;
+	private String STRING_REPRESENTATION = null;
+	private String STRING_REPRESENTATION_LOW = null;
+	private String STRING_REPRESENTATION_LOW_TRIM = null;
+	private String TITLE_LOW = null;
+	private String TITLE_LOW_TRIM = null;
+	private String TITLE_LOW_TRIM_NO_BRACKETS = null;
+	private String PATH_LOW = null;
+	private String ARTIST_LOW = null;
+	private String SORT_STR_ARTIST_TITLE = null;
+	private String SORT_STR_TITLE_ARTIST = null;
+	private Map<String, Boolean> HAS_ARTIST_MAP = new HashMap<>();
 
 	private String artist;
 	private String title;
@@ -106,11 +121,33 @@ public class Song {
 		return result;
 	}
 
+	private void resetPreComputations() {
+		HASH_CODE = null;
+		STRING_REPRESENTATION = null;
+		STRING_REPRESENTATION_LOW = null;
+		STRING_REPRESENTATION_LOW_TRIM = null;
+		TITLE_LOW = null;
+		TITLE_LOW_TRIM = null;
+		TITLE_LOW_TRIM_NO_BRACKETS = null;
+		PATH_LOW = null;
+		ARTIST_LOW = null;
+		SORT_STR_ARTIST_TITLE = null;
+		SORT_STR_TITLE_ARTIST = null;
+		HAS_ARTIST_MAP = new HashMap<>();
+	}
+
 	public String getArtist() {
 		if (artist == null) {
 			return "";
 		}
 		return artist;
+	}
+
+	public String getLowArtist() {
+		if (ARTIST_LOW == null) {
+			ARTIST_LOW = getArtist().toLowerCase();
+		}
+		return ARTIST_LOW;
 	}
 
 	public List<String> getArtists() {
@@ -148,13 +185,25 @@ public class Song {
 			return false;
 		}
 
+		Boolean storedResult = HAS_ARTIST_MAP.get(potentialArtist);
+		if (storedResult != null) {
+			return storedResult;
+		}
+
+		boolean result = hasArtistInternal(potentialArtist);
+		HAS_ARTIST_MAP.put(potentialArtist, result);
+		return result;
+	}
+
+	private boolean hasArtistInternal(String potentialArtist) {
+
 		boolean matchOnlyThatArtistExactly = false;
 		if (potentialArtist.endsWith(" %ONLY%")) {
 			potentialArtist = potentialArtist.substring(0, potentialArtist.length() - 7);
 			matchOnlyThatArtistExactly = true;
 		}
 
-		String loArtist = artist.toLowerCase();
+		String loArtist = getLowArtist();
 		String loPotentialArtist = potentialArtist.toLowerCase();
 
 		// matches Foo - Bar for argument "foo"
@@ -231,6 +280,7 @@ public class Song {
 
 	public void setArtist(String artist) {
 		this.artist = artist;
+		resetPreComputations();
 	}
 
 	public String getTitle() {
@@ -240,16 +290,67 @@ public class Song {
 		return title;
 	}
 
+	public String getLowTitle() {
+		if (TITLE_LOW == null) {
+			TITLE_LOW = getTitle().toLowerCase();
+		}
+		return TITLE_LOW;
+	}
+
+	public String getLowTrimTitle() {
+		if (TITLE_LOW_TRIM == null) {
+			TITLE_LOW_TRIM = getLowTitle().trim();
+		}
+		return TITLE_LOW_TRIM;
+	}
+
+	public String getLowTrimTitleWithoutBrackets() {
+		if (TITLE_LOW_TRIM_NO_BRACKETS == null) {
+			TITLE_LOW_TRIM_NO_BRACKETS = removeTitleBrackets(getLowTrimTitle());
+		}
+		return TITLE_LOW_TRIM_NO_BRACKETS;
+	}
+
+	public static String removeTitleBrackets(String cur) {
+		if (cur.contains(" (")) {
+			cur = cur.substring(0, cur.indexOf(" ("));
+		}
+		cur = cur.trim().toLowerCase();
+		return cur;
+	}
+
 	public boolean hasTitle() {
 		return title != null;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
+		resetPreComputations();
 	}
 
 	public String getPath() {
 		return path;
+	}
+
+	public String getLowPath() {
+		if (PATH_LOW == null) {
+			PATH_LOW = getPath().toLowerCase();
+		}
+		return PATH_LOW;
+	}
+
+	public String getArtistTitleSortStr() {
+		if (SORT_STR_ARTIST_TITLE == null) {
+			SORT_STR_ARTIST_TITLE = getArtist() + " :: " + getTitle();
+		}
+		return SORT_STR_ARTIST_TITLE;
+	}
+
+	public String getTitleArtistSortStr() {
+		if (SORT_STR_TITLE_ARTIST == null) {
+			SORT_STR_TITLE_ARTIST = getTitle() + " :: " + getArtist();
+		}
+		return SORT_STR_TITLE_ARTIST;
 	}
 
 	public String getClipboardText(SongCtrl songCtrl, List<Record> allPlaylists) {
@@ -302,6 +403,7 @@ public class Song {
 
 	public void setPath(String path) {
 		this.path = path;
+		resetPreComputations();
 	}
 
 	public int getLength() {
@@ -374,10 +476,28 @@ public class Song {
 
 	@Override
 	public String toString() {
-		if (hasArtist()) {
-			return getArtist() + " - " + getTitle();
+		if (STRING_REPRESENTATION == null) {
+			if (hasArtist()) {
+				STRING_REPRESENTATION = getArtist() + " - " + getTitle();
+			} else {
+				STRING_REPRESENTATION = getTitle();
+			}
 		}
-		return getTitle();
+		return STRING_REPRESENTATION;
+	}
+
+	public String toLowString() {
+		if (STRING_REPRESENTATION_LOW == null) {
+			STRING_REPRESENTATION_LOW = toString().toLowerCase();
+		}
+		return STRING_REPRESENTATION_LOW;
+	}
+
+	public String toLowTrimString() {
+		if (STRING_REPRESENTATION_LOW_TRIM == null) {
+			STRING_REPRESENTATION_LOW_TRIM = toLowString().trim();
+		}
+		return STRING_REPRESENTATION_LOW_TRIM;
 	}
 
 	public String getCaptionString(SongCtrl songCtrl, List<Record> allPlaylists) {
@@ -392,6 +512,9 @@ public class Song {
 			((playlistsWithThisSong.size() == 1) ? "" : "s") + ")";
 	}
 
+	/**
+	 * Compares if the two things point to the same path and are therefore the same
+	 */
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {
@@ -409,18 +532,27 @@ public class Song {
 			if (path == null) {
 				return false;
 			}
-			return otherSong.path.toLowerCase().equals(path.toLowerCase());
+			return otherSong.getLowPath().equals(getLowPath());
 		}
 		return false;
 	}
 
-	public boolean is(String otherArtist, String otherTitle) {
+	/**
+	 * Compares if the other song and this one have the same artist and title,
+	 * and are therefore factually same-ish, even though they may NOT point to
+	 * the same path on disk - used to find multiples in the database!
+	 */
+	public boolean is(Song other) {
 
-		if (!getArtist().toLowerCase().equals(otherArtist.toLowerCase())) {
+		if (other == null) {
 			return false;
 		}
 
-		if (!getTitle().toLowerCase().equals(otherTitle.toLowerCase())) {
+		if (!getLowArtist().equals(other.getLowArtist())) {
+			return false;
+		}
+
+		if (!getLowTitle().equals(other.getLowTitle())) {
 			return false;
 		}
 
@@ -429,10 +561,14 @@ public class Song {
 
 	@Override
 	public int hashCode() {
-		if (path == null) {
-			return 0;
+		if (HASH_CODE == null) {
+			if (path == null) {
+				HASH_CODE = 0;
+			} else {
+				HASH_CODE = path.hashCode();
+			}
 		}
-		return path.hashCode();
+		return HASH_CODE;
 	}
 
 }

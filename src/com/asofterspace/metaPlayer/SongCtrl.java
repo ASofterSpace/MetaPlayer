@@ -168,23 +168,10 @@ public class SongCtrl {
 			return;
 		}
 
-		if (title.contains(" (")) {
-			title = title.substring(0, title.indexOf(" ("));
-		}
-
-		title = title.toLowerCase().trim();
+		title = Song.removeTitleBrackets(title);
 
 		for (Song song : allSongs) {
-			String songTitle = song.getTitle();
-			if (songTitle == null) {
-				continue;
-			}
-
-			if (songTitle.contains(" (")) {
-				songTitle = songTitle.substring(0, songTitle.indexOf(" ("));
-			}
-
-			songTitle = songTitle.toLowerCase().trim();
+			String songTitle = song.getLowTrimTitleWithoutBrackets();
 
 			if (title.equals(songTitle)) {
 				if (!currentSongs.contains(song)) {
@@ -223,7 +210,7 @@ public class SongCtrl {
 		for (String curSongStr : songList) {
 			String curSongLoStr = curSongStr.toLowerCase();
 			for (Song song : allConsideredSongs) {
-				if (song.toString().toLowerCase().equals(curSongLoStr)) {
+				if (song.toLowString().equals(curSongLoStr)) {
 					if (!result.contains(song)) {
 						result.add(song);
 					}
@@ -281,21 +268,13 @@ public class SongCtrl {
 	public void sort(final SortCriterion criterion) {
 		Collections.sort(currentSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				String aStr;
-				String bStr;
 				switch (criterion) {
 					case ARTIST:
-						aStr = a.getArtist() + " - " + a.getTitle() + ")";
-						bStr = b.getArtist() + " - " + b.getTitle() + ")";
-						return aStr.toLowerCase().compareTo(bStr.toLowerCase());
+						return a.getArtistTitleSortStr().compareTo(b.getArtistTitleSortStr());
 					case TITLE:
-						aStr = a.getTitle() + " (" + a.getArtist() + ")";
-						bStr = b.getTitle() + " (" + b.getArtist() + ")";
-						return aStr.toLowerCase().compareTo(bStr.toLowerCase());
-					case RATING:
-						return b.getRatingInt() - a.getRatingInt();
+						return a.getTitleArtistSortStr().compareTo(b.getTitleArtistSortStr());
 					default:
-						return 0;
+						return b.getRatingInt() - a.getRatingInt();
 				}
 			}
 		});
@@ -388,7 +367,7 @@ public class SongCtrl {
 				}
 				return true;
 			}
-			if (curSong.is(otherSong.getArtist(), otherSong.getTitle())) {
+			if (curSong.is(otherSong)) {
 				otherSong.setTitle(otherSong.getTitle() + " (2)");
 			}
 		}
@@ -628,7 +607,7 @@ public class SongCtrl {
 
 		Collections.sort(allSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {
-				return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
+				return a.toLowString().compareTo(b.toLowString());
 			}
 		});
 

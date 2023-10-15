@@ -7,18 +7,24 @@ package com.asofterspace.metaPlayer;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.utils.Record;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class PlayerCtrl {
 
 	public final static String EXT_PLAYER_ASSOC_KEY = "externalPlayerAssociations";
 
-	private List<Record> extPlayerAssocs;
+	private Map<String, String> assocs = new HashMap<>();
 
 
 	public PlayerCtrl(JSON config) {
-		extPlayerAssocs = config.getArray(EXT_PLAYER_ASSOC_KEY);
+		List<Record> extPlayerAssocs = config.getArray(EXT_PLAYER_ASSOC_KEY);
+		assocs = new HashMap<>();
+		for (Record assoc : extPlayerAssocs) {
+			assocs.put(assoc.getString("ext").toLowerCase(), assoc.getString("play"));
+		}
 	}
 
 	public String getPlayerForSong(Song song) {
@@ -27,9 +33,11 @@ public class PlayerCtrl {
 
 	public String getPlayerForFile(String filename) {
 
-		for (Record assoc : extPlayerAssocs) {
-			if (filename.toLowerCase().endsWith(assoc.getString("ext").toLowerCase())) {
-				return assoc.getString("play");
+		String loFilename = filename.toLowerCase();
+
+		for (Map.Entry<String, String> assoc : assocs.entrySet()) {
+			if (loFilename.endsWith(assoc.getKey())) {
+				return assoc.getValue();
 			}
 		}
 
