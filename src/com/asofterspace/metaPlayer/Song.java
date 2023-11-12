@@ -341,14 +341,14 @@ public class Song {
 
 	public String getArtistTitleSortStr() {
 		if (SORT_STR_ARTIST_TITLE == null) {
-			SORT_STR_ARTIST_TITLE = getArtist() + " :: " + getTitle();
+			SORT_STR_ARTIST_TITLE = getLowArtist() + " - " + getLowTitle();
 		}
 		return SORT_STR_ARTIST_TITLE;
 	}
 
 	public String getTitleArtistSortStr() {
 		if (SORT_STR_TITLE_ARTIST == null) {
-			SORT_STR_TITLE_ARTIST = getTitle() + " :: " + getArtist();
+			SORT_STR_TITLE_ARTIST = getLowTitle() + " - " + getLowArtist();
 		}
 		return SORT_STR_TITLE_ARTIST;
 	}

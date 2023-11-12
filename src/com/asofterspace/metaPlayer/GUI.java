@@ -42,6 +42,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -478,13 +480,23 @@ public class GUI extends MainWindow {
 		});
 		artists.add(songsWithSameName);
 
-		JMenu artistsByName = createJMenu("Artists by Name...");
+		JMenu artistsByName = createJMenu("Artists by Name... (Sorted by Song Amount)");
 		artists.add(artistsByName);
+		boolean orderAlphabetically = false;
 
 		for (char c = 'A'; c <= 'Z'; c++) {
-			addArtistsByNameSubMenu(artistsByName, c);
+			addArtistsByNameSubMenu(artistsByName, c, orderAlphabetically);
 		}
-		addArtistsByNameSubMenu(artistsByName, '*');
+		addArtistsByNameSubMenu(artistsByName, '*', orderAlphabetically);
+
+		JMenu artistsByNameAlpha = createJMenu("Artists by Name... (Sorted Alphabetically)");
+		artists.add(artistsByNameAlpha);
+		orderAlphabetically = true;
+
+		for (char c = 'A'; c <= 'Z'; c++) {
+			addArtistsByNameSubMenu(artistsByNameAlpha, c, orderAlphabetically);
+		}
+		addArtistsByNameSubMenu(artistsByNameAlpha, '*', orderAlphabetically);
 
 		artists.add(createSeparator());
 
@@ -1524,7 +1536,7 @@ public class GUI extends MainWindow {
 		return false;
 	}
 
-	private void addArtistsByNameSubMenu(JMenu artistsByName, char bucketChar) {
+	private void addArtistsByNameSubMenu(JMenu artistsByName, char bucketChar, boolean orderAlphabetically) {
 
 		String itemTitle = bucketChar + "...";
 		if (bucketChar == '*') {
@@ -1535,6 +1547,14 @@ public class GUI extends MainWindow {
 
 		// add the top 32 artists for each bucket
 		List<Artist> artistNames = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET, bucketChar);
+
+		if (orderAlphabetically) {
+			Collections.sort(artistNames, new Comparator<Artist>() {
+				public int compare(Artist a, Artist b) {
+					return a.getLowName().compareTo(b.getLowName());
+				}
+			});
+		}
 
 		for (final Artist artist : artistNames) {
 			JMenuItem artistItem = createJMenuItem(artist.getName() + " (" + artist.getSongAmount() + " songs)");
