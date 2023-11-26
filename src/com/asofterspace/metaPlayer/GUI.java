@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.BarListener;
 import com.asofterspace.toolbox.gui.BarMenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.ColorMenuBar;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.gui.OpenFileDialog;
@@ -27,7 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -550,6 +550,20 @@ public class GUI extends MainWindow {
 		});
 		playlists.add(songsOfAllPlaylistsWithCurSong);
 
+		JMenuItem exportPlaylistList = createJMenuItem("Export List of Playlists to Clipboard");
+		exportPlaylistList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StringBuilder result = new StringBuilder();
+				List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
+				for (Record plRec : playlistRecords) {
+					appendPlaylistNameToBuilder(plRec, result, "");
+				}
+				GuiUtils.copyToClipboard(result.toString());
+			}
+		});
+		playlists.add(exportPlaylistList);
+
 		playlists.add(createSeparator());
 
 		List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
@@ -869,10 +883,7 @@ public class GUI extends MainWindow {
 					}
 				} else {
 					if (currentlyPlayedSong != null) {
-						StringSelection selection = new StringSelection(
-							currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
-						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-						clipboard.setContents(selection, selection);
+						GuiUtils.copyToClipboard(currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
 					}
 				}
 			}
@@ -1651,6 +1662,17 @@ public class GUI extends MainWindow {
 			}
 		} else {
 			starModeItem.setText(" " + STAR_OFF + " ");
+		}
+	}
+
+	private void appendPlaylistNameToBuilder(Record plRec, StringBuilder result, String indentation) {
+		result.append(indentation);
+		result.append(plRec.getString(SongCtrl.PLAYLIST_NAME_KEY));
+		result.append("\n");
+
+		List<Record> sublistRecords = plRec.getArray(SongCtrl.PLAYLIST_SUBLISTS_KEY);
+		for (Record slRec : sublistRecords) {
+			appendPlaylistNameToBuilder(slRec, result, indentation + "\t");
 		}
 	}
 
