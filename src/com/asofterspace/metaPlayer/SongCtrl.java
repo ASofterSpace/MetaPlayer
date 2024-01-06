@@ -6,7 +6,9 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.utils.MathUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
@@ -47,6 +49,10 @@ public class SongCtrl {
 		if (songConfig.getAllContents().isEmpty()) {
 			songConfig.setAllContents(Record.emptyArray());
 		}
+
+		JsonFile backupSongConf = new JsonFile(songConfig.getParentDirectory(),
+			"songs_backup_" + MathUtils.randomInteger(10) + ".cnf");
+		backupSongConf.save(songConfig.getAllContents());
 
 		JSON songRecordContainer = songConfig.getAllContents();
 
@@ -112,8 +118,10 @@ public class SongCtrl {
 		currentSongs = new ArrayList<>();
 		currentSongs.add(currentlyPlayedSong);
 
+		boolean orderMatters = false;
+
 		List<Record> playlistsContainingSong = getPlaylistsContainingSong(
-			currentlyPlayedSong, allPlaylists);
+			currentlyPlayedSong, allPlaylists, orderMatters);
 
 		List<Song> songs = new ArrayList<>();
 
@@ -186,7 +194,7 @@ public class SongCtrl {
 		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists, allSongs);
 	}
 
-	public List<Record> getPlaylistsContainingSong(Song song, List<Record> allPlaylists) {
+	public List<Record> getPlaylistsContainingSong(Song song, List<Record> allPlaylists, boolean orderMatters) {
 		// we are only interested in whether this one song is in there or not
 		List<Song> allConsideredSongs = new ArrayList<>();
 		allConsideredSongs.add(song);
@@ -198,6 +206,23 @@ public class SongCtrl {
 				result.add(playlistRecord);
 			}
 		}
+
+		// keep mostly the order as it comes from the playlist record,
+		// but do make some changes
+		if (orderMatters) {
+			List<Record> resultBegin = new ArrayList<>();
+			List<Record> resultEnd = new ArrayList<>();
+			for (Record playlistRec : result) {
+				if (playlistRec.getString(PLAYLIST_NAME_KEY).contains("Karaoke")) {
+					resultEnd.add(playlistRec);
+				} else {
+					resultBegin.add(playlistRec);
+				}
+			}
+			result = resultBegin;
+			result.addAll(resultEnd);
+		}
+
 		return result;
 	}
 

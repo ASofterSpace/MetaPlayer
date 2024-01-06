@@ -27,6 +27,7 @@ public class Song {
 	private String ARTIST_LOW = null;
 	private String SORT_STR_ARTIST_TITLE = null;
 	private String SORT_STR_TITLE_ARTIST = null;
+	private String CAPTION_STRING = null;
 	private Map<String, Boolean> HAS_ARTIST_MAP = new HashMap<>();
 
 	private String artist;
@@ -133,6 +134,7 @@ public class Song {
 		ARTIST_LOW = null;
 		SORT_STR_ARTIST_TITLE = null;
 		SORT_STR_TITLE_ARTIST = null;
+		CAPTION_STRING = null;
 		HAS_ARTIST_MAP = new HashMap<>();
 	}
 
@@ -364,7 +366,9 @@ public class Song {
 		result.append("\n");
 		result.append("Included in:");
 
-		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
+		// the order matters, as we want to display it
+		boolean orderMatters = true;
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
 		if (playlistsWithThisSong.size() < 1) {
 			result.append("\n(not included in any playlists)");
 		}
@@ -388,7 +392,10 @@ public class Song {
 
 	public String getPlaylistText(SongCtrl songCtrl, List<Record> allPlaylists) {
 		StringBuilder result = new StringBuilder();
-		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
+
+		// the order matters, as we want to display it
+		boolean orderMatters = true;
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
 		if (playlistsWithThisSong.size() < 1) {
 			result.append("(not included in any playlists)");
 		}
@@ -502,14 +509,21 @@ public class Song {
 
 	public String getCaptionString(SongCtrl songCtrl, List<Record> allPlaylists) {
 
-		String result = toString();
+		if (CAPTION_STRING == null) {
 
-		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists);
-		if (playlistsWithThisSong.size() < 1) {
-			return result + "   (not included in any playlists)";
+			// the order does not matter, as we just want to get the amount anyway
+			boolean orderMatters = false;
+			List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
+
+			if (playlistsWithThisSong.size() < 1) {
+				CAPTION_STRING = toString() + "   (not included in any playlists)";
+			} else {
+				CAPTION_STRING = toString() + "   (included in " + playlistsWithThisSong.size() + " playlist" +
+					((playlistsWithThisSong.size() == 1) ? "" : "s") + ")";
+			}
 		}
-		return result + "   (included in " + playlistsWithThisSong.size() + " playlist" +
-			((playlistsWithThisSong.size() == 1) ? "" : "s") + ")";
+
+		return CAPTION_STRING;
 	}
 
 	/**

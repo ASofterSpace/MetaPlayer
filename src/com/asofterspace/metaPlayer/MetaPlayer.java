@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.MathUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
@@ -21,8 +22,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.2.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 15. October 2023";
+	public final static String VERSION_NUMBER = "0.0.2.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 6. January 2024";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;
@@ -121,6 +122,11 @@ public class MetaPlayer {
 					"{\"" + GUI.CONFIG_KEY_PLAYLISTS + "\":[]}"
 				));
 			}
+
+			JsonFile backupPlaylistConf = new JsonFile(playlistConfig.getParentDirectory(),
+				"playlists_backup_" + MathUtils.randomInteger(10) + ".cnf");
+			backupPlaylistConf.save(playlistConfig.getAllContents());
+
 		} catch (JsonParseException e) {
 			System.err.println("Loading the playlists failed:");
 			System.err.println(e);
