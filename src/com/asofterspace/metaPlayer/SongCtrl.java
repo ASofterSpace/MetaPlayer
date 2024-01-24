@@ -226,6 +226,10 @@ public class SongCtrl {
 		return result;
 	}
 
+	// in here, allPlaylists is a flattened list of all playlists - also sublists have been recursively added to it
+	// so one playlist can extend from another one's sublist easy peasy
+	// buuut if you are missing a song in a playlist that extends another, check that the song's rating is above the minimum
+	// that is selected for the extension ;)
 	private List<Song> getSongsForPlaylist(Record playlist, List<Record> allPlaylists, List<Song> allConsideredSongs) {
 
 		List<Song> result = new ArrayList<>();
