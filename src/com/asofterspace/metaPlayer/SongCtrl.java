@@ -230,6 +230,7 @@ public class SongCtrl {
 	// so one playlist can extend from another one's sublist easy peasy
 	// buuut if you are missing a song in a playlist that extends another, check that the song's rating is above the minimum
 	// that is selected for the extension ;)
+	// also, we still have to explicitly go over the sublists in case we extend from a parent, and the song is in a sublist!
 	private List<Song> getSongsForPlaylist(Record playlist, List<Record> allPlaylists, List<Song> allConsideredSongs) {
 
 		List<Song> result = new ArrayList<>();
@@ -255,6 +256,14 @@ public class SongCtrl {
 					if (!result.contains(song)) {
 						result.add(song);
 					}
+				}
+			}
+		}
+
+		for (Record sublistRec : playlist.getArray(PLAYLIST_SUBLISTS_KEY)) {
+			for (Song song : getSongsForPlaylist(sublistRec, allPlaylists, allConsideredSongs)) {
+				if (!result.contains(song)) {
+					result.add(song);
 				}
 			}
 		}

@@ -903,6 +903,20 @@ public class GUI extends MainWindow {
 
 		for (final Record playlistRecord : playlistRecords) {
 
+			// sort and remove duplicates
+			List<String> songList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_SONGS_KEY);
+			songList = StrUtils.sortAndRemoveDuplicates(songList);
+			playlistRecord.set(SongCtrl.PLAYLIST_SONGS_KEY, songList);
+
+			List<String> artistList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_ARTISTS_KEY);
+			artistList = StrUtils.sortAndRemoveDuplicates(artistList);
+			playlistRecord.set(SongCtrl.PLAYLIST_ARTISTS_KEY, artistList);
+
+			allPlaylistRecords.add(playlistRecord);
+
+			String playlistName = playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY);
+			allPlaylistsByName.put(playlistName, playlistRecord);
+
 			List<Record> sublists = playlistRecord.getValues(SongCtrl.PLAYLIST_SUBLISTS_KEY);
 
 			if ((sublists != null) && (sublists.size() > 0)) {
@@ -915,21 +929,8 @@ public class GUI extends MainWindow {
 
 			} else {
 
-				// sort and remove duplicates
-				List<String> songList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_SONGS_KEY);
-				songList = StrUtils.sortAndRemoveDuplicates(songList);
-				playlistRecord.set(SongCtrl.PLAYLIST_SONGS_KEY, songList);
-
-				List<String> artistList = playlistRecord.getArrayAsStringList(SongCtrl.PLAYLIST_ARTISTS_KEY);
-				artistList = StrUtils.sortAndRemoveDuplicates(artistList);
-				playlistRecord.set(SongCtrl.PLAYLIST_ARTISTS_KEY, artistList);
-
-				allPlaylistRecords.add(playlistRecord);
-
-				String playlistName = playlistRecord.getString(SongCtrl.PLAYLIST_NAME_KEY);
-				allPlaylistsByName.put(playlistName, playlistRecord);
-
 				JMenuItem playlistItem = createJMenuItem(playlistName);
+
 				playlistItem.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -938,6 +939,7 @@ public class GUI extends MainWindow {
 						regenerateSongList();
 					}
 				});
+
 				parentElement.add(playlistItem);
 			}
 		}
