@@ -119,9 +119,10 @@ public class SongCtrl {
 		currentSongs.add(currentlyPlayedSong);
 
 		boolean orderMatters = false;
+		boolean includeParentLists = true;
 
 		List<Record> playlistsContainingSong = getPlaylistsContainingSong(
-			currentlyPlayedSong, allPlaylists, orderMatters);
+			currentlyPlayedSong, allPlaylists, orderMatters, includeParentLists);
 
 		List<Song> songs = new ArrayList<>();
 
@@ -194,7 +195,9 @@ public class SongCtrl {
 		currentSongs = getSongsForPlaylist(playlistToSelect, allPlaylists, allSongs);
 	}
 
-	public List<Record> getPlaylistsContainingSong(Song song, List<Record> allPlaylists, boolean orderMatters) {
+	public List<Record> getPlaylistsContainingSong(Song song, List<Record> allPlaylists, boolean orderMatters,
+		boolean includeParentLists) {
+
 		// we are only interested in whether this one song is in there or not
 		List<Song> allConsideredSongs = new ArrayList<>();
 		allConsideredSongs.add(song);
@@ -221,6 +224,18 @@ public class SongCtrl {
 			}
 			result = resultBegin;
 			result.addAll(resultEnd);
+		}
+
+		// if parent lists are not wanted, filter them out!
+		if (!includeParentLists) {
+			List<Record> newResult = new ArrayList<>();
+			for (Record curPlaylist : result) {
+				List<Record> sublists = curPlaylist.getArray(PLAYLIST_SUBLISTS_KEY);
+				if (sublists.size() < 1) {
+					newResult.add(curPlaylist);
+				}
+			}
+			result = newResult;
 		}
 
 		return result;

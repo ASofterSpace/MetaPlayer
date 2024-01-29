@@ -368,7 +368,8 @@ public class Song {
 
 		// the order matters, as we want to display it
 		boolean orderMatters = true;
-		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
+		boolean showParentLists = false;
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters, showParentLists);
 		if (playlistsWithThisSong.size() < 1) {
 			result.append("\n(not included in any playlists)");
 		}
@@ -395,7 +396,8 @@ public class Song {
 
 		// the order matters, as we want to display it
 		boolean orderMatters = true;
-		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
+		boolean showParentLists = false;
+		List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters, showParentLists);
 		if (playlistsWithThisSong.size() < 1) {
 			result.append("(not included in any playlists)");
 		}
@@ -513,7 +515,8 @@ public class Song {
 
 			// the order does not matter, as we just want to get the amount anyway
 			boolean orderMatters = false;
-			List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters);
+			boolean showParentLists = false;
+			List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters, showParentLists);
 
 			if (playlistsWithThisSong.size() < 1) {
 				CAPTION_STRING = toString() + "   (not included in any playlists)";
