@@ -35,6 +35,7 @@ public class Song {
 	private String path;
 	private Integer length;
 	private Integer rating;
+	private boolean usedAsHeraMorningSong;
 	private Integer playAmount;
 	private boolean fileExists;
 	private String clipboardText = null;
@@ -101,6 +102,7 @@ public class Song {
 		this.path = record.getString("path");
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
+		this.usedAsHeraMorningSong = record.getBoolean("usedAsHeraMorningSong", false);
 		this.playAmount = record.getInteger("playAmount");
 		this.fileExists = (new File(path)).exists();
 	}
@@ -117,6 +119,9 @@ public class Song {
 		result.set("rating", rating);
 		if ((playAmount != null) && (playAmount > 0)) {
 			result.set("playAmount", playAmount);
+		}
+		if (usedAsHeraMorningSong) {
+			result.set("usedAsHeraMorningSong", usedAsHeraMorningSong);
 		}
 		result.set("fileExists", fileExists);
 		return result;
@@ -517,11 +522,15 @@ public class Song {
 			boolean orderMatters = false;
 			boolean showParentLists = false;
 			List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters, showParentLists);
+			String heraStr = "";
+			if (usedAsHeraMorningSong) {
+				heraStr = "(H) ";
+			}
 
 			if (playlistsWithThisSong.size() < 1) {
-				CAPTION_STRING = toString() + "   (not included in any playlists)";
+				CAPTION_STRING = heraStr + toString() + "   (not included in any playlists)";
 			} else {
-				CAPTION_STRING = toString() + "   (included in " + playlistsWithThisSong.size() + " playlist" +
+				CAPTION_STRING = heraStr + toString() + "   (included in " + playlistsWithThisSong.size() + " playlist" +
 					((playlistsWithThisSong.size() == 1) ? "" : "s") + ")";
 			}
 		}

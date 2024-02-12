@@ -22,8 +22,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.3.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 25. January 2024";
+	public final static String VERSION_NUMBER = "0.0.3.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 12. February 2024";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;
@@ -102,8 +102,7 @@ public class MetaPlayer {
 			// create a default config file, if necessary
 			if (config.getAllContents().isEmpty()) {
 				config.setAllContents(new JSON(
-					"{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[]," +
-					"\"" + GUI.CONFIG_KEY_MAIN_ARTISTS + "\":[]}"
+					"{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[]}"
 				));
 			}
 		} catch (JsonParseException e) {

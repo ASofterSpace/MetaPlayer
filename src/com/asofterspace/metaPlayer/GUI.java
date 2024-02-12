@@ -77,7 +77,6 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 	private final static String CONFIG_KEY_STAR_PLAYLIST_NAME = "starPlaylist";
-	public final static String CONFIG_KEY_MAIN_ARTISTS = "mainArtists";
 	public final static String CONFIG_KEY_PLAYLISTS = "playlists";
 	public final static String STAR_ON = "★";
 	public final static String STAR_OFF = "✰";
@@ -489,41 +488,14 @@ public class GUI extends MainWindow {
 		}
 		addArtistsByNameSubMenu(artistsByName, '*', orderAlphabetically);
 
-		JMenu artistsByNameAlpha = createJMenu("Artists by Name... (Sorted Alphabetically)");
-		artists.add(artistsByNameAlpha);
+		artists.add(createSeparator());
+
 		orderAlphabetically = true;
 
 		for (char c = 'A'; c <= 'Z'; c++) {
-			addArtistsByNameSubMenu(artistsByNameAlpha, c, orderAlphabetically);
+			addArtistsByNameSubMenu(artists, c, orderAlphabetically);
 		}
-		addArtistsByNameSubMenu(artistsByNameAlpha, '*', orderAlphabetically);
-
-		artists.add(createSeparator());
-
-		// actually, the artists that we have a lot of songs of are not necessarily the ones that
-		// we want to see in the list, so load this from config by default:
-		List<String> artistNames = config.getList(CONFIG_KEY_MAIN_ARTISTS);
-		// and only get the top artists if there is no such config:
-		if ((artistNames == null) || (artistNames.size() == 0)) {
-			artistNames = new ArrayList<>();
-			List<Artist> topArtists = songCtrl.getTopArtists(MAX_ARTISTS_PER_BUCKET);
-			for (Artist artist : topArtists) {
-				artistNames.add(artist.getName());
-			}
-		}
-
-		for (final String artistName : artistNames) {
-			JMenuItem artistItem = createJMenuItem(artistName);
-			artistItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					songCtrl.selectSongsOfArtist(artistName);
-					songCtrl.randomize();
-					regenerateSongList();
-				}
-			});
-			artists.add(artistItem);
-		}
+		addArtistsByNameSubMenu(artists, '*', orderAlphabetically);
 
 		JMenu playlists = createJMenu("Playlists");
 		menu.add(playlists);
