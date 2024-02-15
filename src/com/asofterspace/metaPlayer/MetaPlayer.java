@@ -5,6 +5,7 @@
 package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
@@ -22,8 +23,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.3.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 12. February 2024";
+	public final static String VERSION_NUMBER = "0.0.3.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 15. February 2024";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;
@@ -106,9 +107,7 @@ public class MetaPlayer {
 				));
 			}
 		} catch (JsonParseException e) {
-			System.err.println("Loading the settings failed:");
-			System.err.println(e);
-			System.exit(1);
+			complainThenExit("settings", e);
 		}
 
 		try {
@@ -127,9 +126,7 @@ public class MetaPlayer {
 			backupPlaylistConf.save(playlistConfig.getAllContents());
 
 		} catch (JsonParseException e) {
-			System.err.println("Loading the playlists failed:");
-			System.err.println(e);
-			System.exit(1);
+			complainThenExit("playlists", e);
 		}
 
 		// create timer
@@ -142,9 +139,7 @@ public class MetaPlayer {
 			// load songs
 			songCtrl = new SongCtrl();
 		} catch (JsonParseException e) {
-			System.err.println("Loading the songs failed:");
-			System.err.println(e);
-			System.exit(1);
+			complainThenExit("songs", e);
 		}
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
@@ -193,4 +188,11 @@ public class MetaPlayer {
 		return afterStartupPlayPlaylist;
 	}
 
+	private static void complainThenExit(String whichFile, Exception e) {
+		String complainStr = "Loading the " + whichFile + " failed:";
+		System.err.println(complainStr);
+		System.err.println(e);
+		GuiUtils.complain(complainStr + "\n" + e);
+		System.exit(1);
+	}
 }
