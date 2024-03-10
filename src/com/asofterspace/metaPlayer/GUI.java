@@ -1287,7 +1287,8 @@ public class GUI extends MainWindow {
 			  lowFilename.endsWith(".txt") ||
 			  lowFilename.endsWith(".ini") ||
 			  lowFilename.endsWith(".lnk") ||
-			  lowFilename.endsWith(".srt"))) {
+			  lowFilename.endsWith(".srt") ||
+			  lowFilename.endsWith(".orig"))) {
 			songCtrl.addUnlessAlreadyPresent(new Song(file));
 		}
 	}
