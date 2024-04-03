@@ -128,6 +128,7 @@ public class GUI extends MainWindow {
 	private JCheckBoxMenuItem skipBelow50;
 	private JCheckBoxMenuItem skipBelow45;
 	private JCheckBoxMenuItem skipWithoutRating;
+	private JCheckBoxMenuItem skipHeraMorningSongs;
 
 	private MouseAdapter mouseListenerToNormalize = new MouseAdapter() {
 		@Override
@@ -378,6 +379,34 @@ public class GUI extends MainWindow {
 
 		songs.add(createSeparator());
 
+		JMenuItem unsetHeraMorningSong = createJMenuItem("Unset / not used as Hera morning song");
+		unsetHeraMorningSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentlyPlayedSong != null) {
+					currentlyPlayedSong.setUsedAsHeraMorningSong(false);
+					songCtrl.save();
+					songItem.setText(currentlyPlayedSong.getCaptionString(songCtrl, allPlaylistRecords));
+				}
+			}
+		});
+		songs.add(unsetHeraMorningSong);
+
+		JMenuItem setHeraMorningSong = createJMenuItem("Set to used as Hera morning song");
+		setHeraMorningSong.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentlyPlayedSong != null) {
+					currentlyPlayedSong.setUsedAsHeraMorningSong(true);
+					songCtrl.save();
+					songItem.setText(currentlyPlayedSong.getCaptionString(songCtrl, allPlaylistRecords));
+				}
+			}
+		});
+		songs.add(setHeraMorningSong);
+
+		songs.add(createSeparator());
+
 		JMenuItem save = createJMenuItem("Save");
 		save.addActionListener(new ActionListener() {
 			@Override
@@ -616,6 +645,11 @@ public class GUI extends MainWindow {
 		skipWithoutRating.addActionListener(skipClickListener);
 		skip.add(skipWithoutRating);
 
+		skipHeraMorningSongs = createJCheckBoxMenuItem("Skip Songs Already Used as Hera Morning Song");
+		skipHeraMorningSongs.setSelected(config.getBoolean("skipHeraMorningSongs", false));
+		skipHeraMorningSongs.addActionListener(skipClickListener);
+		skip.add(skipHeraMorningSongs);
+
 		skip.add(createSeparator());
 
 		JMenuItem skipNone = createJMenuItem("Play All");
@@ -634,6 +668,7 @@ public class GUI extends MainWindow {
 				skipBelow50.setSelected(false);
 				skipBelow45.setSelected(false);
 				skipWithoutRating.setSelected(false);
+				skipHeraMorningSongs.setSelected(false);
 				saveSkipState();
 			}
 		});
@@ -655,6 +690,7 @@ public class GUI extends MainWindow {
 				skipBelow50.setSelected(false);
 				skipBelow45.setSelected(false);
 				skipWithoutRating.setSelected(false);
+				skipHeraMorningSongs.setSelected(false);
 				saveSkipState();
 			}
 		});
@@ -665,9 +701,21 @@ public class GUI extends MainWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setSkipStateToPlayFavorites();
+				saveSkipState();
 			}
 		});
 		skip.add(playFavoriteSongs);
+
+		JMenuItem playNewMorningSongs = createJMenuItem("Play New Morning Songs");
+		playNewMorningSongs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setSkipStateToPlayFavorites();
+				skipHeraMorningSongs.setSelected(true);
+				saveSkipState();
+			}
+		});
+		skip.add(playNewMorningSongs);
 
 		JMenuItem defaultSkipping = createJMenuItem("Default Skipping");
 		defaultSkipping.addActionListener(new ActionListener() {
@@ -685,6 +733,7 @@ public class GUI extends MainWindow {
 				skipBelow50.setSelected(false);
 				skipBelow45.setSelected(true);
 				skipWithoutRating.setSelected(false);
+				skipHeraMorningSongs.setSelected(false);
 				saveSkipState();
 			}
 		});
@@ -931,6 +980,7 @@ public class GUI extends MainWindow {
 		configContent.set("skipSongsBelow50", skipBelow50.isSelected());
 		configContent.set("skipSongsBelow45", skipBelow45.isSelected());
 		configContent.set("skipSongsWithoutRating", skipWithoutRating.isSelected());
+		configContent.set("skipHeraMorningSongs", skipHeraMorningSongs.isSelected());
 		config.setAllContents(configContent);
 	}
 
@@ -1519,6 +1569,10 @@ public class GUI extends MainWindow {
 			return true;
 		}
 
+		if (skipHeraMorningSongs.isSelected() && song.getUsedAsHeraMorningSong()) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -1615,7 +1669,7 @@ public class GUI extends MainWindow {
 		skipBelow50.setSelected(false);
 		skipBelow45.setSelected(false);
 		skipWithoutRating.setSelected(true);
-		saveSkipState();
+		skipHeraMorningSongs.setSelected(false);
 	}
 
 	private void toggleStarMode() {
@@ -1624,6 +1678,7 @@ public class GUI extends MainWindow {
 			starModeItem.setText(" " + STAR_ON + " ");
 
 			setSkipStateToPlayFavorites();
+			saveSkipState();
 
 			String starPlaylistName = config.getValue(CONFIG_KEY_STAR_PLAYLIST_NAME);
 			if (starPlaylistName != null) {

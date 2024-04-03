@@ -23,8 +23,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.3.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 10. March 2024";
+	public final static String VERSION_NUMBER = "0.0.3.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 3. April 2024";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;

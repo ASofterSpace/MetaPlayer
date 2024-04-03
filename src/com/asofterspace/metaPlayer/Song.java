@@ -538,6 +538,15 @@ public class Song {
 		return CAPTION_STRING;
 	}
 
+	public boolean getUsedAsHeraMorningSong() {
+		return usedAsHeraMorningSong;
+	}
+
+	public void setUsedAsHeraMorningSong(boolean usedAsHeraMorningSong) {
+		this.usedAsHeraMorningSong = usedAsHeraMorningSong;
+		resetPreComputations();
+	}
+
 	/**
 	 * Compares if the two things point to the same path and are therefore the same
 	 */
