@@ -6,6 +6,8 @@ package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.utils.DateHolder;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class Song {
 	private Integer length;
 	private Integer rating;
 	private boolean usedAsHeraMorningSong;
+	private DateHolder usedAsMorningSongDate;
 	private Integer playAmount;
 	private boolean fileExists;
 	private String clipboardText = null;
@@ -103,6 +106,7 @@ public class Song {
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
 		this.usedAsHeraMorningSong = record.getBoolean("usedAsHeraMorningSong", false);
+		this.usedAsMorningSongDate = record.getDateHolder("usedAsMorningSongDate");
 		this.playAmount = record.getInteger("playAmount");
 		this.fileExists = (new File(path)).exists();
 	}
@@ -122,6 +126,11 @@ public class Song {
 		}
 		if (usedAsHeraMorningSong) {
 			result.set("usedAsHeraMorningSong", usedAsHeraMorningSong);
+		}
+		if (usedAsMorningSongDate != null) {
+			if (!usedAsMorningSongDate.getIsNull()) {
+				result.set("usedAsMorningSongDate", usedAsMorningSongDate);
+			}
 		}
 		result.set("fileExists", fileExists);
 		return result;
@@ -543,6 +552,11 @@ public class Song {
 	}
 
 	public void setUsedAsHeraMorningSong(boolean usedAsHeraMorningSong) {
+		if (usedAsHeraMorningSong) {
+			if ((usedAsMorningSongDate == null) || usedAsMorningSongDate.getIsNull()) {
+				usedAsMorningSongDate = DateUtils.nowHolder();
+			}
+		}
 		this.usedAsHeraMorningSong = usedAsHeraMorningSong;
 		resetPreComputations();
 	}
