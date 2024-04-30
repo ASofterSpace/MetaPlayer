@@ -37,7 +37,7 @@ public class Song {
 	private String path;
 	private Integer length;
 	private Integer rating;
-	private boolean usedAsHeraMorningSong;
+	private boolean usedAsMorningSong;
 	private DateHolder usedAsMorningSongDate;
 	private Integer playAmount;
 	private boolean fileExists;
@@ -105,7 +105,7 @@ public class Song {
 		this.path = record.getString("path");
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
-		this.usedAsHeraMorningSong = record.getBoolean("usedAsHeraMorningSong", false);
+		this.usedAsMorningSong = record.getBoolean("usedAsMorningSong", false);
 		this.usedAsMorningSongDate = record.getDateHolder("usedAsMorningSongDate");
 		this.playAmount = record.getInteger("playAmount");
 		this.fileExists = (new File(path)).exists();
@@ -124,8 +124,8 @@ public class Song {
 		if ((playAmount != null) && (playAmount > 0)) {
 			result.set("playAmount", playAmount);
 		}
-		if (usedAsHeraMorningSong) {
-			result.set("usedAsHeraMorningSong", usedAsHeraMorningSong);
+		if (usedAsMorningSong) {
+			result.set("usedAsMorningSong", usedAsMorningSong);
 		}
 		if (usedAsMorningSongDate != null) {
 			if (!usedAsMorningSongDate.getIsNull()) {
@@ -532,8 +532,8 @@ public class Song {
 			boolean showParentLists = false;
 			List<Record> playlistsWithThisSong = songCtrl.getPlaylistsContainingSong(this, allPlaylists, orderMatters, showParentLists);
 			String heraStr = "";
-			if (usedAsHeraMorningSong) {
-				heraStr = "(H) ";
+			if (usedAsMorningSong) {
+				heraStr = "(M) ";
 			}
 
 			if (playlistsWithThisSong.size() < 1) {
@@ -548,16 +548,16 @@ public class Song {
 	}
 
 	public boolean getUsedAsHeraMorningSong() {
-		return usedAsHeraMorningSong;
+		return usedAsMorningSong;
 	}
 
-	public void setUsedAsHeraMorningSong(boolean usedAsHeraMorningSong) {
-		if (usedAsHeraMorningSong) {
+	public void setUsedAsHeraMorningSong(boolean usedAsMorningSong) {
+		if (usedAsMorningSong) {
 			if ((usedAsMorningSongDate == null) || usedAsMorningSongDate.getIsNull()) {
 				usedAsMorningSongDate = DateUtils.nowHolder();
 			}
 		}
-		this.usedAsHeraMorningSong = usedAsHeraMorningSong;
+		this.usedAsMorningSong = usedAsMorningSong;
 		resetPreComputations();
 	}
 
