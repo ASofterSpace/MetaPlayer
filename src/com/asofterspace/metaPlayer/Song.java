@@ -547,11 +547,11 @@ public class Song {
 		return CAPTION_STRING;
 	}
 
-	public boolean getUsedAsHeraMorningSong() {
+	public boolean getUsedAsMorningSong() {
 		return usedAsMorningSong;
 	}
 
-	public void setUsedAsHeraMorningSong(boolean usedAsMorningSong) {
+	public void setUsedAsMorningSong(boolean usedAsMorningSong) {
 		if (usedAsMorningSong) {
 			if ((usedAsMorningSongDate == null) || usedAsMorningSongDate.getIsNull()) {
 				usedAsMorningSongDate = DateUtils.nowHolder();
