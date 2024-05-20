@@ -348,6 +348,34 @@ public class GUI extends MainWindow {
 
 		songs.add(createSeparator());
 
+		JMenuItem exportPlaylistList2 = createJMenuItem("Export List of Playlists to Clipboard");
+		exportPlaylistList2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportPlaylistListToClipboard();
+			}
+		});
+		songs.add(exportPlaylistList2);
+
+		JMenuItem exportSongs = createJMenuItem("Export Currently Loaded Songs to Clipboard");
+		exportSongs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StringBuilder result = new StringBuilder();
+				List<Song> songs = songCtrl.getSongs();
+				String sep = "";
+				for (Song song : songs) {
+					result.append(sep);
+					sep = "\n";
+					result.append(song.toString());
+				}
+				GuiUtils.copyToClipboard(result.toString());
+			}
+		});
+		songs.add(exportSongs);
+
+		songs.add(createSeparator());
+
 		JMenuItem importSongs = createJMenuItem("Import Songs");
 		importSongs.addActionListener(new ActionListener() {
 			@Override
@@ -555,12 +583,7 @@ public class GUI extends MainWindow {
 		exportPlaylistList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StringBuilder result = new StringBuilder();
-				List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
-				for (Record plRec : playlistRecords) {
-					appendPlaylistNameToBuilder(plRec, result, "");
-				}
-				GuiUtils.copyToClipboard(result.toString());
+				exportPlaylistListToClipboard();
 			}
 		});
 		playlists.add(exportPlaylistList);
@@ -1706,4 +1729,12 @@ public class GUI extends MainWindow {
 		}
 	}
 
+	private void exportPlaylistListToClipboard() {
+		StringBuilder result = new StringBuilder();
+		List<Record> playlistRecords = playlistConfig.getAllContents().getArray(CONFIG_KEY_PLAYLISTS);
+		for (Record plRec : playlistRecords) {
+			appendPlaylistNameToBuilder(plRec, result, "");
+		}
+		GuiUtils.copyToClipboard(result.toString());
+	}
 }
