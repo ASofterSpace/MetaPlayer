@@ -152,6 +152,11 @@ public class GUI extends MainWindow {
 		this.config = config;
 
 		this.playlistConfig = playlistConfig;
+
+		// enable anti-aliasing for swing
+		System.setProperty("swing.aatext", "true");
+		// enable anti-aliasing for awt
+		System.setProperty("awt.useSystemAAFontSettings", "on");
 	}
 
 	@Override
@@ -1128,21 +1133,23 @@ public class GUI extends MainWindow {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 		int width = (int) screenSize.getWidth();
-		int height = (int) screenSize.getHeight() - 22;
+		int screenHeight = (int) screenSize.getHeight();
+		int height = screenHeight - 22;
+
+		if (offset < 0) {
+			offset += screenHeight;
+			height = screenHeight - offset;
+		}
 
 		mainFrame.setSize(width, height);
 
 		mainFrame.setPreferredSize(new Dimension(width, height));
 
-		if (offset < 0) {
-			offset += (int) screenSize.getHeight();
-		}
-
 		mainFrame.setLocation(new Point(0, offset));
 	}
 
 	private void minimize() {
-		adjustSizeAndMoveToOffset(-1);
+		adjustSizeAndMoveToOffset(-4);
 	}
 
 	private void normalize() {
