@@ -29,7 +29,10 @@ public class SongEndTask {
 
 	public void stopPlayer() {
 		try {
-			process.destroy();
+			if (process != null) {
+				process.destroy();
+			}
+			process = null;
 		} catch (Throwable t) {
 			// catching throwables is bad? well... oopsie!
 		}
