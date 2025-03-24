@@ -398,7 +398,7 @@ public class Song {
 		Directory hereDir = new Directory(System.getProperty("java.class.path") + "/..");
 		result.append(hereDir.getCanonicalDirname());
 		result.append("\n");
-		result.append("run.bat --song \"" + toString() + "\"");
+		result.append("./run.sh --song \"" + toString() + "\"");
 
 		clipboardText = result.toString();
 
