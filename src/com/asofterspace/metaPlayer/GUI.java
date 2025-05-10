@@ -1286,7 +1286,11 @@ public class GUI extends MainWindow {
 		timingCtrl.stopPlaying();
 
 		try {
-			Process process = IoUtils.executeAsync(player, song.getPath());
+			List<String> playerStrList = StrUtils.split(player, " ");
+			String playerStrFirst = playerStrList.get(0);
+			playerStrList.remove(0);
+			playerStrList.add(song.getPath());
+			Process process = IoUtils.executeAsync(playerStrFirst, playerStrList);
 
 			pauseItem.setText("Pause");
 
