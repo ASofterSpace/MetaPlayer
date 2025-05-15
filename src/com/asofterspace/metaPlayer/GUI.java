@@ -1173,11 +1173,6 @@ public class GUI extends MainWindow {
 	 */
 	public void regenerateSongList() {
 
-		// in star mode, *always* enforce sort by rating, no matter what
-		if (starMode) {
-			songCtrl.sort(SortCriterion.RATING);
-		}
-
 		/*
 		// if there is no last shown tab...
 		if (currentlyPlayedSong == null) {
@@ -1719,8 +1714,7 @@ public class GUI extends MainWindow {
 				Record playlistRecord = allPlaylistsByName.get(starPlaylistName);
 				if (playlistRecord != null) {
 					songCtrl.selectPlaylist(playlistRecord, allPlaylistRecords);
-					// bit pointless here as we override in starMode anyway, but let's call it for consistency
-					songCtrl.randomize();
+					songCtrl.sort(SortCriterion.RATING);
 					regenerateSongList();
 				}
 			}
