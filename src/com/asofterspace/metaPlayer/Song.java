@@ -9,7 +9,12 @@ import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.DateHolder;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +63,14 @@ public class Song {
 
 	public Song(String path, String artistAndTitle) {
 
+		path = renameFile(path);
+
 		this.setPath(path);
+
+		initFromPathArtistTitle(path, artistAndTitle);
+	}
+
+	private void initFromPathArtistTitle(String path, String artistAndTitle) {
 
 		if ((artistAndTitle == null) || !artistAndTitle.contains(" - ")) {
 			String altSongName = path;
@@ -103,12 +115,32 @@ public class Song {
 		this.artist = record.getString("artist");
 		this.title = record.getString("title");
 		this.path = record.getString("path");
+
+		if (this.path.contains("–")) {
+			this.path = renameFile(this.path);
+			initFromPathArtistTitle(this.path, "");
+		}
+
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
 		this.usedAsMorningSong = record.getBoolean("usedAsMorningSong", false);
 		this.usedAsMorningSongDate = record.getDateHolder("usedAsMorningSongDate");
 		this.playAmount = record.getInteger("playAmount");
-		this.fileExists = (new File(path)).exists();
+		this.fileExists = (new File(this.path)).exists();
+	}
+
+	private String renameFile(String path) {
+		if (path.contains("–")) {
+			String newpath = StrUtils.replaceAll(path, "–", "-");
+			try {
+				System.out.println("Moving " + path + " to " + newpath + "...");
+				Files.move(Paths.get(path), Paths.get(newpath));
+			} catch (IOException e) {
+				System.out.println("Oops - could not move " + path + " to " + newpath + "!");
+			}
+			path = newpath;
+		}
+		return path;
 	}
 
 	public Record toRecord() {
