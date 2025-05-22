@@ -23,6 +23,11 @@ import java.util.Map;
 
 public class Song {
 
+	public final static String DASH = "-";
+	public final static String SPACED_DASH = " " + DASH + " ";
+	public final static String WONKY_DASH_1 = "–";
+	public final static String WONKY_DASH_2 = "—";
+
 	private Integer HASH_CODE = null;
 	private String STRING_REPRESENTATION = null;
 	private String STRING_REPRESENTATION_LOW = null;
@@ -63,16 +68,15 @@ public class Song {
 
 	public Song(String path, String artistAndTitle) {
 
-		path = renameFile(path);
-
-		this.setPath(path);
-
+		this.path = path;
 		initFromPathArtistTitle(path, artistAndTitle);
+
+		renameFileIfNecessary();
 	}
 
 	private void initFromPathArtistTitle(String path, String artistAndTitle) {
 
-		if ((artistAndTitle == null) || !artistAndTitle.contains(" - ")) {
+		if ((artistAndTitle == null) || !artistAndTitle.contains(SPACED_DASH)) {
 			String altSongName = path;
 			if (altSongName.contains("\\")) {
 				altSongName = altSongName.substring(altSongName.lastIndexOf("\\") + 1);
@@ -80,16 +84,16 @@ public class Song {
 			if (altSongName.contains("/")) {
 				altSongName = altSongName.substring(altSongName.lastIndexOf("/") + 1);
 			}
-			if ((artistAndTitle == null) || altSongName.contains(" - ")) {
+			if ((artistAndTitle == null) || altSongName.contains(SPACED_DASH)) {
 				artistAndTitle = altSongName;
 			}
 		}
-		String[] songNames = artistAndTitle.split(" - ");
+		String[] songNames = artistAndTitle.split(SPACED_DASH);
 		title = null;
 		if (songNames.length > 1) {
 			artist = songNames[0];
 			if (songNames.length > 2) {
-				title = songNames[1] + " - " + songNames[2];
+				title = songNames[1] + SPACED_DASH + songNames[2];
 			} else {
 				title = songNames[1];
 			}
@@ -116,10 +120,7 @@ public class Song {
 		this.title = record.getString("title");
 		this.path = record.getString("path");
 
-		if (this.path.contains("–")) {
-			this.path = renameFile(this.path);
-			initFromPathArtistTitle(this.path, "");
-		}
+		renameFileIfNecessary();
 
 		this.length = record.getInteger("length");
 		this.rating = record.getInteger("rating");
@@ -129,18 +130,20 @@ public class Song {
 		this.fileExists = (new File(this.path)).exists();
 	}
 
-	private String renameFile(String path) {
-		if (path.contains("–")) {
-			String newpath = StrUtils.replaceAll(path, "–", "-");
+	private void renameFileIfNecessary() {
+		if (path.contains(WONKY_DASH_1) || path.contains(WONKY_DASH_2)) {
+			String newpath = path;
+			newpath = StrUtils.replaceAll(newpath, WONKY_DASH_1, DASH);
+			newpath = StrUtils.replaceAll(newpath, WONKY_DASH_2, DASH);
 			try {
 				System.out.println("Moving " + path + " to " + newpath + "...");
 				Files.move(Paths.get(path), Paths.get(newpath));
 			} catch (IOException e) {
 				System.out.println("Oops - could not move " + path + " to " + newpath + "!");
 			}
-			path = newpath;
+			setPath(newpath);
 		}
-		return path;
+		initFromPathArtistTitle(this.path, null);
 	}
 
 	public Record toRecord() {
@@ -389,14 +392,14 @@ public class Song {
 
 	public String getArtistTitleSortStr() {
 		if (SORT_STR_ARTIST_TITLE == null) {
-			SORT_STR_ARTIST_TITLE = getLowArtist() + " - " + getLowTitle();
+			SORT_STR_ARTIST_TITLE = getLowArtist() + SPACED_DASH + getLowTitle();
 		}
 		return SORT_STR_ARTIST_TITLE;
 	}
 
 	public String getTitleArtistSortStr() {
 		if (SORT_STR_TITLE_ARTIST == null) {
-			SORT_STR_TITLE_ARTIST = getLowTitle() + " - " + getLowArtist();
+			SORT_STR_TITLE_ARTIST = getLowTitle() + SPACED_DASH + getLowArtist();
 		}
 		return SORT_STR_TITLE_ARTIST;
 	}
@@ -533,7 +536,7 @@ public class Song {
 	public String toString() {
 		if (STRING_REPRESENTATION == null) {
 			if (hasArtist()) {
-				STRING_REPRESENTATION = getArtist() + " - " + getTitle();
+				STRING_REPRESENTATION = getArtist() + SPACED_DASH + getTitle();
 			} else {
 				STRING_REPRESENTATION = getTitle();
 			}

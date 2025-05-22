@@ -114,11 +114,20 @@ public class MetaPlayer {
 			// load playlists
 			playlistConfig = new ConfigFile("playlists", true);
 
+			JSON playlistRoot = playlistConfig.getAllContents();
+
 			// create a default config file, if necessary
-			if (playlistConfig.getAllContents().isEmpty()) {
+			if (playlistRoot.isEmpty()) {
 				playlistConfig.setAllContents(new JSON(
 					"{\"" + GUI.CONFIG_KEY_PLAYLISTS + "\":[]}"
 				));
+			}
+
+			String playlistStr = playlistRoot.toString();
+			if (playlistStr.contains(Song.WONKY_DASH_1) || playlistStr.contains(Song.WONKY_DASH_2)) {
+				playlistStr = StrUtils.replaceAll(playlistStr, Song.WONKY_DASH_1, Song.DASH);
+				playlistStr = StrUtils.replaceAll(playlistStr, Song.WONKY_DASH_2, Song.DASH);
+				playlistConfig.setAllContents(new JSON(playlistStr));
 			}
 
 			JsonFile backupPlaylistConf = new JsonFile(playlistConfig.getParentDirectory(),
