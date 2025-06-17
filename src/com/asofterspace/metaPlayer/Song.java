@@ -390,6 +390,19 @@ public class Song {
 		return PATH_LOW;
 	}
 
+	public String getSubtitlePath() {
+		String result = path;
+		if ((result == null) || (!result.contains("."))) {
+			return null;
+		}
+		result = result.substring(0, result.lastIndexOf(".")) + ".srt";
+		File testFile = new File(result);
+		if (testFile.exists()) {
+			return result;
+		}
+		return null;
+	}
+
 	public String getArtistTitleSortStr() {
 		if (SORT_STR_ARTIST_TITLE == null) {
 			SORT_STR_ARTIST_TITLE = getLowArtist() + SPACED_DASH + getLowTitle();

@@ -1284,6 +1284,10 @@ public class GUI extends MainWindow {
 			List<String> playerStrList = StrUtils.split(player, " ");
 			String playerStrFirst = playerStrList.get(0);
 			playerStrList.remove(0);
+			String subFile = song.getSubtitlePath();
+			if (subFile != null) {
+				playerStrList.add("--sub-files=\"" + subFile + "\"");
+			}
 			playerStrList.add(song.getPath());
 			Process process = IoUtils.executeAsync(playerStrFirst, playerStrList);
 
