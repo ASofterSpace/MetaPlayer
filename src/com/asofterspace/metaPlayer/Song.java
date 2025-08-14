@@ -142,8 +142,8 @@ public class Song {
 				System.out.println("Oops - could not move " + path + " to " + newpath + "!");
 			}
 			setPath(newpath);
+			initFromPathArtistTitle(this.path, null);
 		}
-		initFromPathArtistTitle(this.path, null);
 	}
 
 	public Record toRecord() {
@@ -331,6 +331,7 @@ public class Song {
 
 	public void setArtist(String artist) {
 		this.artist = artist;
+
 		resetPreComputations();
 	}
 
