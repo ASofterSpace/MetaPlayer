@@ -433,6 +433,8 @@ public class GUI extends MainWindow {
 					currentlyPlayedSong.setUsedAsMorningSong(true);
 					songCtrl.save();
 					songItem.setText(currentlyPlayedSong.getCaptionString(songCtrl, allPlaylistRecords));
+					boolean forMorningSong = true;
+					GuiUtils.copyToClipboard(currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords, forMorningSong));
 				}
 			}
 		});
@@ -932,7 +934,8 @@ public class GUI extends MainWindow {
 					}
 				} else {
 					if (currentlyPlayedSong != null) {
-						GuiUtils.copyToClipboard(currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords));
+						boolean forMorningSong = false;
+						GuiUtils.copyToClipboard(currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords, forMorningSong));
 					}
 				}
 			}

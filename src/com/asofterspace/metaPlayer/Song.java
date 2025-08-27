@@ -418,13 +418,17 @@ public class Song {
 		return SORT_STR_TITLE_ARTIST;
 	}
 
-	public String getClipboardText(SongCtrl songCtrl, List<Record> allPlaylists) {
-		if (clipboardText != null) {
+	public String getClipboardText(SongCtrl songCtrl, List<Record> allPlaylists, boolean forMorningSong) {
+
+		if ((!forMorningSong) && (clipboardText != null)) {
 			return clipboardText;
 		}
 
 		StringBuilder result = new StringBuilder();
-		result.append(toString() + " (" + getPath() + ")");
+		result.append(toString());
+		if (!forMorningSong) {
+			result.append(" (" + getPath() + ")");
+		}
 		result.append("\n");
 		result.append("\n");
 		result.append("Included in:");
@@ -443,15 +447,21 @@ public class Song {
 
 		result.append("\n");
 		result.append("\n");
-		result.append("cd ");
-		Directory hereDir = new Directory(System.getProperty("java.class.path") + "/..");
-		result.append(hereDir.getCanonicalDirname());
-		result.append("\n");
-		result.append("./run.sh --song \"" + toString() + "\"");
+		if (forMorningSong) {
+			result.append("youtube " + toString());
+		} else {
+			result.append("cd ");
+			Directory hereDir = new Directory(System.getProperty("java.class.path") + "/..");
+			result.append(hereDir.getCanonicalDirname());
+			result.append("\n");
+			result.append("./run.sh --song \"" + toString() + "\"");
+		}
 
-		clipboardText = result.toString();
-
-		return clipboardText;
+		if (!forMorningSong) {
+			clipboardText = result.toString();
+			return clipboardText;
+		}
+		return result.toString();
 	}
 
 	public String getPlaylistText(SongCtrl songCtrl, List<Record> allPlaylists) {
