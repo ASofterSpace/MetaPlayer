@@ -18,6 +18,7 @@ import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.CallbackWithStatus;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
@@ -434,7 +435,10 @@ public class GUI extends MainWindow {
 					songCtrl.save();
 					songItem.setText(currentlyPlayedSong.getCaptionString(songCtrl, allPlaylistRecords));
 					boolean forMorningSong = true;
-					GuiUtils.copyToClipboard(currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords, forMorningSong));
+					String morningSongClipboardText = currentlyPlayedSong.getClipboardText(songCtrl, allPlaylistRecords, forMorningSong);
+					GuiUtils.copyToClipboard(morningSongClipboardText);
+					TextFile morningSongClpStorageFile = new TextFile(System.getProperty("java.class.path") + "/../morningSong.txt");
+					morningSongClpStorageFile.saveContent(morningSongClipboardText);
 				}
 			}
 		});
