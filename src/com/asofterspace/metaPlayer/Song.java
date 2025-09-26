@@ -109,8 +109,12 @@ public class Song {
 				title.endsWith(".flv") ||
 				title.endsWith(".wmv") ||
 				title.endsWith(".wma") ||
-				title.endsWith(".webm")) {
+				title.endsWith(".wav")) {
 				title = title.substring(0, title.length() - 4);
+			} else {
+				if (title.endsWith(".webm")) {
+					title = title.substring(0, title.length() - 5);
+				}
 			}
 		}
 	}
