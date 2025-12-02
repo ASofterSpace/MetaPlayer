@@ -306,76 +306,24 @@ public class Song {
 			matchOnlyThatArtistExactly = true;
 		}
 
-		String loArtist = getLowArtist();
 		String loPotentialArtist = potentialArtist.toLowerCase();
-
-		// matches Foo - Bar for argument "foo"
-		if (loArtist.equals(loPotentialArtist)) {
-			return true;
-		}
 
 		// if we are only interested in that artist exactly and no cooperations,
 		// then return false if we did not match so far
 		if (matchOnlyThatArtistExactly) {
-			return false;
-		}
 
-		loArtist += " ";
+			String loArtist = getLowArtist();
+			// matches Foo - Bar for argument "foo"
+			if (loArtist.equals(loPotentialArtist)) {
+				return true;
+			}
 
-		// matches Foo Bar - Bar for argument "foo",
-		// but does not match FooBar - Barbara
-		if (loArtist.startsWith(loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Foo, Bar - Bar for argument "foo",
-		if (loArtist.startsWith(loPotentialArtist + ",")) {
-			return true;
-		}
-
-		// matches Bar, Foo - Bar for argument "foo"
-		if (loArtist.contains(", " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar, Foo, Barbara - Bar for argument "foo"
-		if (loArtist.contains(", " + loPotentialArtist + ",")) {
-			return true;
-		}
-
-		// matches Bar und Foo - Bar for argument "foo"
-		if (loArtist.contains(" und " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar and Foo - Bar for argument "foo"
-		if (loArtist.contains(" and " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar feat Foo - Bar for argument "foo"
-		if (loArtist.contains(" ft. " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar feat Foo - Bar for argument "foo"
-		if (loArtist.contains(" feat " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar feat Foo - Bar for argument "foo"
-		if (loArtist.contains(" feat. " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar feat Foo - Bar for argument "foo"
-		if (loArtist.contains(" featuring " + loPotentialArtist + " ")) {
-			return true;
-		}
-
-		// matches Bar & Foo - Bar for argument "foo"
-		if (loArtist.contains(" & " + loPotentialArtist + " ")) {
-			return true;
+		} else {
+			for (String curLowArtist : getLowArtists()) {
+				if (curLowArtist.equals(loPotentialArtist)) {
+					return true;
+				}
+			}
 		}
 
 		return false;
