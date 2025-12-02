@@ -169,6 +169,34 @@ public class SongCtrl {
 		}
 	}
 
+	public void selectSongsOfArtistNameStartingWith(char startWithLetter) {
+
+		currentSongs = new ArrayList<>();
+
+		if (startWithLetter == '*') {
+
+			for (Song song : allSongs) {
+				if (song.hasArtistNameStartingWithNonLetter()) {
+					if (!currentSongs.contains(song)) {
+						currentSongs.add(song);
+					}
+				}
+			}
+
+		} else {
+
+			startWithLetter = Character.toLowerCase(startWithLetter);
+
+			for (Song song : allSongs) {
+				if (song.hasArtistNameStartingWithLowLetter(startWithLetter)) {
+					if (!currentSongs.contains(song)) {
+						currentSongs.add(song);
+					}
+				}
+			}
+		}
+	}
+
 	public void selectSongsByName(String title) {
 
 		currentSongs = new ArrayList<>();

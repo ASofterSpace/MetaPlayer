@@ -1648,6 +1648,17 @@ public class GUI extends MainWindow {
 			});
 			bucketMenu.add(artistItem);
 		}
+
+		JMenuItem startWithLetterItem = createJMenuItem("All Artist Names Starting With " + itemTitle);
+		startWithLetterItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.selectSongsOfArtistNameStartingWith(bucketChar);
+				songCtrl.randomize();
+				regenerateSongList();
+			}
+		});
+		bucketMenu.add(startWithLetterItem);
 	}
 
 	private JMenu createJMenu(String text) {

@@ -41,6 +41,8 @@ public class Song {
 	private String SORT_STR_TITLE_ARTIST = null;
 	private String CAPTION_STRING = null;
 	private Map<String, Boolean> HAS_ARTIST_MAP = new HashMap<>();
+	private List<String> ARTIST_LIST = null;
+	private List<String> ARTIST_LIST_LOW = null;
 
 	private String artist;
 	private String title;
@@ -189,6 +191,8 @@ public class Song {
 		SORT_STR_TITLE_ARTIST = null;
 		CAPTION_STRING = null;
 		HAS_ARTIST_MAP = new HashMap<>();
+		ARTIST_LIST = null;
+		ARTIST_LIST_LOW = null;
 	}
 
 	public String getArtist() {
@@ -207,10 +211,14 @@ public class Song {
 
 	public List<String> getArtists() {
 
-		List<String> result = new ArrayList<>();
+		if (ARTIST_LIST != null) {
+			return ARTIST_LIST;
+		}
+
+		List<String> ARTIST_LIST = new ArrayList<>();
 
 		if (artist == null) {
-			return result;
+			return ARTIST_LIST;
 		}
 
 		String artistsStr = artist.replaceAll(" und ", ", ");
@@ -224,10 +232,26 @@ public class Song {
 		String[] artists = artistsStr.split(",");
 
 		for (String cur : artists) {
-			result.add(cur.trim());
+			ARTIST_LIST.add(cur.trim());
 		}
 
-		return result;
+		return ARTIST_LIST;
+	}
+
+	public List<String> getLowArtists() {
+
+		if (ARTIST_LIST_LOW != null) {
+			return ARTIST_LIST_LOW;
+		}
+
+		List<String> ARTIST_LIST_LOW = new ArrayList<>();
+
+		for (String curArtist : getArtists()) {
+			if (curArtist != null) {
+				ARTIST_LIST_LOW.add(curArtist.toLowerCase());
+			}
+		}
+		return ARTIST_LIST_LOW;
 	}
 
 	public boolean hasArtist() {
@@ -248,6 +272,30 @@ public class Song {
 		boolean result = hasArtistInternal(potentialArtist);
 		HAS_ARTIST_MAP.put(potentialArtist, result);
 		return result;
+	}
+
+	public boolean hasArtistNameStartingWithLowLetter(char startWithLetter) {
+
+		for (String curLowArtist : getLowArtists()) {
+			if ((curLowArtist != null) && (curLowArtist.length() > 0)) {
+				if (curLowArtist.charAt(0) == startWithLetter) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean hasArtistNameStartingWithNonLetter() {
+		for (String curLowArtist : getLowArtists()) {
+			if ((curLowArtist != null) && (curLowArtist.length() > 0)) {
+				char firstChar = curLowArtist.charAt(0);
+				if ((firstChar < 'a') || (firstChar > 'z')) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean hasArtistInternal(String potentialArtist) {
