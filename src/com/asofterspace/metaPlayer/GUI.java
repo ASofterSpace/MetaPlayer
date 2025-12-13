@@ -190,7 +190,20 @@ public class GUI extends MainWindow {
 				// Actually display the whole jazz
 				mainFrame.setVisible(true);
 
+				// normalize size
 				normalize();
+
+				// and a bit later, again ^^'
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// no worries, then just carry on now ^^'
+						}
+						normalize();
+					}
+				});
 			}
 		});
 
