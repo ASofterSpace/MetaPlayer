@@ -196,12 +196,14 @@ public class GUI extends MainWindow {
 				// and a bit later, again ^^'
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							// no worries, then just carry on now ^^'
+						for (int i = 0; i < 3; i++) {
+							try {
+								Thread.sleep(1000);
+							} catch (InterruptedException e) {
+								// no worries, then just carry on now ^^'
+							}
+							normalize();
 						}
-						normalize();
 					}
 				});
 			}
