@@ -70,10 +70,12 @@ import javax.swing.SwingUtilities;
 public class GUI extends MainWindow {
 
 	private static final String NORM = "Norm";
-
 	private static final String MAX = "Max";
-
 	private static final String MIN = "Min";
+
+	private static final int NORM_OFFSET = -21;
+	private static final int MAXI_OFFSET = 22;
+	private static final int MINI_OFFSET = -4;
 
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
@@ -196,9 +198,15 @@ public class GUI extends MainWindow {
 				// and a bit later, again ^^'
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						for (int i = 0; i < 3; i++) {
+						for (int i = 0; i < 2; i++) {
 							try {
 								Thread.sleep(1000);
+							} catch (InterruptedException e) {
+								// no worries, then just carry on now ^^'
+							}
+							adjustSizeAndMoveToOffset(NORM_OFFSET + 1);
+							try {
+								Thread.sleep(250);
 							} catch (InterruptedException e) {
 								// no worries, then just carry on now ^^'
 							}
@@ -1156,7 +1164,7 @@ public class GUI extends MainWindow {
 
 		int width = (int) screenSize.getWidth();
 		int screenHeight = (int) screenSize.getHeight();
-		int height = screenHeight - 22;
+		int height = screenHeight - MAXI_OFFSET;
 
 		if (offset < 0) {
 			offset += screenHeight;
@@ -1171,11 +1179,11 @@ public class GUI extends MainWindow {
 	}
 
 	private void minimize() {
-		adjustSizeAndMoveToOffset(-4);
+		adjustSizeAndMoveToOffset(MINI_OFFSET);
 	}
 
 	private void normalize() {
-		adjustSizeAndMoveToOffset(-21);
+		adjustSizeAndMoveToOffset(NORM_OFFSET);
 		if (maxiItem != null) {
 			maxiItem.setText(MAX);
 		}
@@ -1185,7 +1193,7 @@ public class GUI extends MainWindow {
 	}
 
 	private void maximize() {
-		adjustSizeAndMoveToOffset(22);
+		adjustSizeAndMoveToOffset(MAXI_OFFSET);
 	}
 
 	/**
