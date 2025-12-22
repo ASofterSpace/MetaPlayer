@@ -57,7 +57,6 @@ public class TimingCtrl {
 					ffmpegPath, songFile.getParentDirectory(), "-i", songFile.getLocalFilename());
 				if (outputLines != null) {
 					for (String line : outputLines) {
-						System.out.println("DEBUG: " + line);
 						String trimLine = line.trim();
 						if (trimLine.startsWith("Duration: ")) {
 							trimLine = trimLine.substring(10, 21);
@@ -65,7 +64,6 @@ public class TimingCtrl {
 							Integer minutes = StrUtils.strToInt(trimLine.substring(3, 5));
 							Integer seconds = StrUtils.strToInt(trimLine.substring(6, 8));
 							Integer afterDot = StrUtils.strToInt(trimLine.substring(9, 11));
-							System.out.println("DEBUG 2: " + hours + " " + minutes + " " + seconds + " " + afterDot);
 							if ((hours != null) && (minutes != null) && (seconds != null) && (afterDot != null)) {
 								// make a tiny bit longer than the second actually is
 								seconds += 3;
