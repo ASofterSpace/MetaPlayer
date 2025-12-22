@@ -4,6 +4,14 @@
  */
 package com.asofterspace.metaPlayer;
 
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.IoUtils;
+import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
+
+import java.util.List;
+
 
 public class TimingCtrl {
 
@@ -20,19 +28,62 @@ public class TimingCtrl {
 
 	private GUI gui;
 
+	private SongCtrl songCtrl;
 
-	public TimingCtrl() {
-		timerRunning = false;
+	private String ffmpegPath = null;
+
+
+	public TimingCtrl(Record config, SongCtrl songCtrl) {
+		this.timerRunning = false;
+		this.songCtrl = songCtrl;
+		this.ffmpegPath = config.getString("ffmpegPath");
 	}
 
 	public void close() {
 		timerRunning = false;
 	}
 
-	public void startPlaying(SongEndTask songEndTask, Integer songLengthInMilliseconds) {
+	public void startPlaying(SongEndTask songEndTask, Song song) {
 
 		this.lastSongStart = System.currentTimeMillis();
 
+		Integer songLengthInMilliseconds = song.getLength();
+
+		// if no length is given, first try to automagically get the length
+		if ((songLengthInMilliseconds == null) || (songLengthInMilliseconds < 1)) {
+			if (ffmpegPath != null) {
+				File songFile = song.getFile();
+				List<String> outputLines = IoUtils.execute(
+					ffmpegPath, songFile.getParentDirectory(), "-i", songFile.getLocalFilename());
+				if (outputLines != null) {
+					for (String line : outputLines) {
+						System.out.println("DEBUG: " + line);
+						String trimLine = line.trim();
+						if (trimLine.startsWith("Duration: ")) {
+							trimLine = trimLine.substring(10, 21);
+							Integer hours = StrUtils.strToInt(trimLine.substring(0, 2));
+							Integer minutes = StrUtils.strToInt(trimLine.substring(3, 5));
+							Integer seconds = StrUtils.strToInt(trimLine.substring(6, 8));
+							Integer afterDot = StrUtils.strToInt(trimLine.substring(9, 11));
+							System.out.println("DEBUG 2: " + hours + " " + minutes + " " + seconds + " " + afterDot);
+							if ((hours != null) && (minutes != null) && (seconds != null) && (afterDot != null)) {
+								// make a tiny bit longer than the second actually is
+								seconds += 3;
+								songLengthInMilliseconds =
+									(60*60*1000*hours)+(60*1000*minutes)+(1000*seconds)+(10*afterDot);
+								song.setLength(songLengthInMilliseconds);
+								if (songCtrl != null) {
+									songCtrl.save();
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// if still no length has been found, then just accept that ^^
 		if ((songLengthInMilliseconds == null) || (songLengthInMilliseconds < 1)) {
 			this.executeSongEndAt = null;
 		} else {

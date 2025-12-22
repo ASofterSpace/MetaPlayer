@@ -4,7 +4,6 @@
  */
 package com.asofterspace.metaPlayer;
 
-import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.HashMap;
@@ -15,15 +14,25 @@ import java.util.Map;
 public class PlayerCtrl {
 
 	public final static String EXT_PLAYER_ASSOC_KEY = "externalPlayerAssociations";
+	public final static String EXT_PLAYER_ASSOC_DEFAULT = "%DEFAULT%";
 
 	private Map<String, String> assocs = new HashMap<>();
 
+	private String defaultPlayer = null;
 
-	public PlayerCtrl(JSON config) {
+
+	public PlayerCtrl(Record config) {
 		List<Record> extPlayerAssocs = config.getArray(EXT_PLAYER_ASSOC_KEY);
 		assocs = new HashMap<>();
 		for (Record assoc : extPlayerAssocs) {
-			assocs.put(assoc.getString("ext").toLowerCase(), assoc.getString("play"));
+			String key = assoc.getString("ext");
+			String value = assoc.getString("play");
+			if (EXT_PLAYER_ASSOC_DEFAULT.equals(key)) {
+				this.defaultPlayer = value;
+			} else {
+				key = key.toLowerCase();
+				assocs.put(key, value);
+			}
 		}
 	}
 
@@ -41,7 +50,11 @@ public class PlayerCtrl {
 			}
 		}
 
-		System.out.println("No player associated with the file " + filename + " found!");
+		if (defaultPlayer != null) {
+			return defaultPlayer;
+		}
+
+		System.out.println("No player associated with the file " + filename + " found, and no default specified!");
 
 		return "";
 	}

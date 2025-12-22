@@ -1324,7 +1324,7 @@ public class GUI extends MainWindow {
 			pauseItem.setText("Pause");
 
 			SongEndTask songEndTask = new SongEndTask(this, process);
-			timingCtrl.startPlaying(songEndTask, song.getLength());
+			timingCtrl.startPlaying(songEndTask, song);
 
 			regenerateSongList();
 

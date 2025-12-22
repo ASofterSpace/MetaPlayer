@@ -23,8 +23,8 @@ import javax.swing.SwingUtilities;
 public class MetaPlayer {
 
 	public final static String PROGRAM_TITLE = "MetaPlayer";
-	public final static String VERSION_NUMBER = "0.0.4.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "25. September 2019 - 13. December 2025";
+	public final static String VERSION_NUMBER = "0.0.4.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "25. September 2019 - 22. December 2025";
 
 	private static ConfigFile config;
 	private static ConfigFile playlistConfig;
@@ -138,11 +138,7 @@ public class MetaPlayer {
 			complainThenExit("playlists", e);
 		}
 
-		// create timer
-		timingCtrl = new TimingCtrl();
-
-		// load player associations
-		playerCtrl = new PlayerCtrl(config.getAllContents());
+		JSON configJSON = config.getAllContents();
 
 		try {
 			// load songs
@@ -150,6 +146,12 @@ public class MetaPlayer {
 		} catch (JsonParseException e) {
 			complainThenExit("songs", e);
 		}
+
+		// create timer
+		timingCtrl = new TimingCtrl(configJSON, songCtrl);
+
+		// load player associations
+		playerCtrl = new PlayerCtrl(configJSON);
 
 		System.out.println("All songs have been loaded; MetaPlayer ready!");
 

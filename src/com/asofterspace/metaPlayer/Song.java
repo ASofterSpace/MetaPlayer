@@ -384,6 +384,10 @@ public class Song {
 		return path;
 	}
 
+	public File getFile() {
+		return new File(path);
+	}
+
 	public String getLowPath() {
 		if (PATH_LOW == null) {
 			PATH_LOW = getPath().toLowerCase();
@@ -502,7 +506,7 @@ public class Song {
 	public void setLength(Integer length) {
 		this.length = length;
 		if (!(this.length == null)) {
-			// 9 seconds minimum length
+			// 9 seconds minimum length to be able to unset length in case this was a mistake
 			int minLength = 9*1000;
 			if (this.length < minLength) {
 				this.length = minLength;
