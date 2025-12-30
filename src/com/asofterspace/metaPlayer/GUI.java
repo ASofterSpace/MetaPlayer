@@ -73,14 +73,15 @@ public class GUI extends MainWindow {
 	private static final String MAX = "Max";
 	private static final String MIN = "Min";
 
-	private static final int NORM_OFFSET = -21;
-	private static final int MAXI_OFFSET = 22;
-	private static final int MINI_OFFSET = -4;
+	private static final String CONFIG_KEY_NORM_OFFSET = "offsetNorm";
+	private static final String CONFIG_KEY_MAXI_OFFSET = "offsetMaxi";
+	private static final String CONFIG_KEY_MINI_OFFSET = "offsetMini";
 
 	private final static String CONFIG_KEY_LAST_SONG_DIRECTORY = "songDir";
 	private final static String CONFIG_KEY_LAST_LEGACY_DIRECTORY = "legacyDir";
 	private final static String CONFIG_KEY_STAR_PLAYLIST_NAME = "starPlaylist";
 	public final static String CONFIG_KEY_PLAYLISTS = "playlists";
+
 	public final static String STAR_ON = "★";
 	public final static String STAR_OFF = "✰";
 
@@ -204,7 +205,7 @@ public class GUI extends MainWindow {
 							} catch (InterruptedException e) {
 								// no worries, then just carry on now ^^'
 							}
-							adjustSizeAndMoveToOffset(NORM_OFFSET + 1);
+							adjustSizeAndMoveToOffset(config.getInteger(CONFIG_KEY_NORM_OFFSET) + 1);
 							try {
 								Thread.sleep(250);
 							} catch (InterruptedException e) {
@@ -1164,7 +1165,7 @@ public class GUI extends MainWindow {
 
 		int width = (int) screenSize.getWidth();
 		int screenHeight = (int) screenSize.getHeight();
-		int height = screenHeight - MAXI_OFFSET;
+		int height = screenHeight - config.getInteger(CONFIG_KEY_MAXI_OFFSET);
 
 		if (offset < 0) {
 			offset += screenHeight;
@@ -1179,11 +1180,11 @@ public class GUI extends MainWindow {
 	}
 
 	private void minimize() {
-		adjustSizeAndMoveToOffset(MINI_OFFSET);
+		adjustSizeAndMoveToOffset(config.getInteger(CONFIG_KEY_MINI_OFFSET));
 	}
 
 	private void normalize() {
-		adjustSizeAndMoveToOffset(NORM_OFFSET);
+		adjustSizeAndMoveToOffset(config.getInteger(CONFIG_KEY_NORM_OFFSET));
 		if (maxiItem != null) {
 			maxiItem.setText(MAX);
 		}
@@ -1193,7 +1194,7 @@ public class GUI extends MainWindow {
 	}
 
 	private void maximize() {
-		adjustSizeAndMoveToOffset(MAXI_OFFSET);
+		adjustSizeAndMoveToOffset(config.getInteger(CONFIG_KEY_MAXI_OFFSET));
 	}
 
 	/**
