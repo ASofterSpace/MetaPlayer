@@ -281,25 +281,37 @@ public class SongCtrl {
 		List<String> songList = playlist.getArrayAsStringList(PLAYLIST_SONGS_KEY);
 
 		for (String curSongStr : songList) {
+			boolean foundOne = false;
 			String curSongLoStr = curSongStr.toLowerCase();
 			for (Song song : allConsideredSongs) {
 				if (song.toLowString().equals(curSongLoStr)) {
+					foundOne = true;
 					if (!result.contains(song)) {
 						result.add(song);
 					}
 				}
+			}
+			if (!foundOne) {
+				System.out.println("Playlist '" + playlist.getString(PLAYLIST_NAME_KEY) + "' contains song '" +
+					curSongStr + "' - but this song does not exist!");
 			}
 		}
 
 		List<String> artistList = playlist.getArrayAsStringList(PLAYLIST_ARTISTS_KEY);
 
 		for (String curArtistStr : artistList) {
+			boolean foundOne = false;
 			for (Song song : allConsideredSongs) {
 				if (song.hasArtist(curArtistStr)) {
+					foundOne = true;
 					if (!result.contains(song)) {
 						result.add(song);
 					}
 				}
+			}
+			if (!foundOne) {
+				System.out.println("Playlist '" + playlist.getString(PLAYLIST_NAME_KEY) + "' contains songs " +
+					"from artist '" + curArtistStr + "' - but this artist does not exist!");
 			}
 		}
 
