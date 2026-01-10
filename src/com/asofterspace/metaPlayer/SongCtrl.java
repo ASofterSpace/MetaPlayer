@@ -291,7 +291,8 @@ public class SongCtrl {
 					}
 				}
 			}
-			if (!foundOne) {
+			// sometimes we only give a single song as input instead of all songs - do not complain then!
+			if ((!foundOne) && (allConsideredSongs.size() > 1)) {
 				System.out.println("Playlist '" + playlist.getString(PLAYLIST_NAME_KEY) + "' contains song '" +
 					curSongStr + "' - but this song does not exist!");
 			}
@@ -309,7 +310,8 @@ public class SongCtrl {
 					}
 				}
 			}
-			if (!foundOne) {
+			// sometimes we only give a single song as input instead of all songs - do not complain then!
+			if ((!foundOne) && (allConsideredSongs.size() > 1)) {
 				System.out.println("Playlist '" + playlist.getString(PLAYLIST_NAME_KEY) + "' contains songs " +
 					"from artist '" + curArtistStr + "' - but this artist does not exist!");
 			}
