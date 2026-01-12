@@ -5,6 +5,7 @@
 package com.asofterspace.metaPlayer;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
@@ -377,6 +378,25 @@ public class SongCtrl {
 
 	public void invertOrder() {
 		Collections.reverse(currentSongs);
+	}
+
+	public void purgeNonExisting() {
+
+		boolean foundOne = false;
+		StringBuilder purgeList = new StringBuilder();
+		for (int j = allSongs.size() - 1; j >= 0; j--) {
+			if (!allSongs.get(j).getFileExists()) {
+				purgeList.append(allSongs.get(j).toString());
+				purgeList.append("\n");
+				allSongs.remove(j);
+				foundOne = true;
+			}
+		}
+		if (foundOne) {
+			GuiUtils.notify("Purged:\n" + purgeList.toString());
+		} else {
+			GuiUtils.notify("Nothing to purge, all good!");
+		}
 	}
 
 	/**

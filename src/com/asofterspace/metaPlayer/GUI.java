@@ -424,16 +424,25 @@ public class GUI extends MainWindow {
 		});
 		songs.add(importLegacyPlaylist);
 
-		JMenuItem cullMultiples = createJMenuItem("Cull Multiples");
-		cullMultiples.addActionListener(new ActionListener() {
+		JMenuItem curItem = createJMenuItem("Cull Multiples (without Save)");
+		curItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				songCtrl.cullMultiples();
-				songCtrl.save();
 				regenerateSongList();
 			}
 		});
-		songs.add(cullMultiples);
+		songs.add(curItem);
+
+		curItem = createJMenuItem("Purge Non-Existing Songs (without Save)");
+		curItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.purgeNonExisting();
+				regenerateSongList();
+			}
+		});
+		songs.add(curItem);
 
 		songs.add(createSeparator());
 

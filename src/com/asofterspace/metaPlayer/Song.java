@@ -683,4 +683,8 @@ public class Song {
 		return HASH_CODE;
 	}
 
+	public boolean getFileExists() {
+		return fileExists;
+	}
+
 }
