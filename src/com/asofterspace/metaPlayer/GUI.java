@@ -121,6 +121,7 @@ public class GUI extends MainWindow {
 	private boolean starMode = false;
 
 	private JCheckBoxMenuItem audioOnlySetting;
+	private JCheckBoxMenuItem managePauseContinueSetting;
 	private JCheckBoxMenuItem skipWithDuration;
 	private JCheckBoxMenuItem skipWithoutDuration;
 	private JCheckBoxMenuItem skipWithRating;
@@ -461,6 +462,18 @@ public class GUI extends MainWindow {
 			}
 		});
 		songs.add(audioOnlySetting);
+
+		managePauseContinueSetting = createJCheckBoxMenuItem("Manage Pause / Continue");
+		managePauseContinueSetting.setSelected(config.getBoolean("managePauseContinue", true));
+		managePauseContinueSetting.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Record configContent = config.getAllContents();
+				configContent.set("managePauseContinue", managePauseContinueSetting.isSelected());
+				config.setAllContents(configContent);
+			}
+		});
+		songs.add(managePauseContinueSetting);
 
 		songs.add(createSeparator());
 
@@ -1333,7 +1346,7 @@ public class GUI extends MainWindow {
 
 		// explicitly continue a paused song (if there is any), such that it can be stopped
 		// in the next line
-		timingCtrl.continueSong();
+		timingCtrl.continueSong(managePauseContinueSetting.isSelected());
 
 		// stop playing the current song as we do not want to play two at the same time
 		timingCtrl.stopPlaying();
@@ -1352,7 +1365,7 @@ public class GUI extends MainWindow {
 			pauseItem.setText("Pause");
 
 			SongEndTask songEndTask = new SongEndTask(this, process);
-			timingCtrl.startPlaying(songEndTask, song);
+			timingCtrl.startPlaying(songEndTask, song, playerStrFirst, playerStrList);
 
 			regenerateSongList();
 
@@ -1527,11 +1540,11 @@ public class GUI extends MainWindow {
 	}
 
 	private void pauseCurSong() {
-		timingCtrl.pauseSong();
+		timingCtrl.pauseSong(managePauseContinueSetting.isSelected());
 	}
 
 	private void continueCurSong() {
-		timingCtrl.continueSong();
+		timingCtrl.continueSong(managePauseContinueSetting.isSelected());
 	}
 
 	public void currentSongPlayedAllTheWayThrough() {

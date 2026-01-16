@@ -10,6 +10,8 @@ import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,7 +24,10 @@ public class TimingCtrl {
 	private SongEndTask pausedEndTask;
 	private Long pausedTimeLeft;
 
-	private Long lastSongStart;
+	private Long lastSongStartMillis;
+	private String lastPlayerStrFirst;
+	private List<String> lastPlayerStrList;
+	private Long pausedSongAtMillis;
 
 	private boolean timerRunning;
 
@@ -41,11 +46,14 @@ public class TimingCtrl {
 
 	public void close() {
 		timerRunning = false;
+		stopPlaying();
 	}
 
-	public void startPlaying(SongEndTask songEndTask, Song song) {
+	public void startPlaying(SongEndTask songEndTask, Song song, String playerStrFirst, List<String> playerStrList) {
 
-		this.lastSongStart = System.currentTimeMillis();
+		this.lastSongStartMillis = System.currentTimeMillis();
+		this.lastPlayerStrFirst = playerStrFirst;
+		this.lastPlayerStrList = playerStrList;
 
 		Integer songLengthInMilliseconds = song.getLength();
 
@@ -85,7 +93,7 @@ public class TimingCtrl {
 		if ((songLengthInMilliseconds == null) || (songLengthInMilliseconds < 1)) {
 			this.executeSongEndAt = null;
 		} else {
-			this.executeSongEndAt = lastSongStart + songLengthInMilliseconds;
+			this.executeSongEndAt = lastSongStartMillis + songLengthInMilliseconds;
 		}
 
 		this.currentEndTask = songEndTask;
@@ -93,7 +101,7 @@ public class TimingCtrl {
 
 	public Long getElapsedTimeSinceLastSongStart() {
 
-		return System.currentTimeMillis() - this.lastSongStart;
+		return System.currentTimeMillis() - this.lastSongStartMillis;
 	}
 
 	public void stopPlaying() {
@@ -104,8 +112,11 @@ public class TimingCtrl {
 			currentEndTask = null;
 		}
 	}
+	public void pauseSong(boolean managePauseContinue) {
+		if (lastSongStartMillis != null) {
+			pausedSongAtMillis = System.currentTimeMillis() - lastSongStartMillis;
+		}
 
-	public void pauseSong() {
 		if (currentEndTask != null) {
 			pausedEndTask = currentEndTask;
 			currentEndTask = null;
@@ -114,11 +125,44 @@ public class TimingCtrl {
 			} else {
 				pausedTimeLeft = executeSongEndAt - System.currentTimeMillis();
 			}
+			if (managePauseContinue) {
+				pausedEndTask.stopPlayer();
+			}
 		}
 	}
 
-	public void continueSong() {
+	public void continueSong(boolean managePauseContinue) {
+		// if anything was paused at all...
 		if (pausedEndTask != null) {
+			long restartAtSeconds = 0;
+			if (pausedSongAtMillis != null) {
+				restartAtSeconds = pausedSongAtMillis / 1000;
+				lastSongStartMillis = System.currentTimeMillis() - pausedSongAtMillis;
+			}
+
+			// ... actually resume playing from where we left off if we want to manage the player...
+			if (managePauseContinue) {
+				try {
+					List<String> curPlayerStrList = new ArrayList<>();
+					for (String s : lastPlayerStrList) {
+						curPlayerStrList.add(s);
+					}
+					// in mpv: --start=SECONDS
+					// in vlc: --start-time=SECONDS
+					if (lastPlayerStrFirst.contains("mpv")) {
+						curPlayerStrList.add("--start=" + restartAtSeconds);
+					} else if (lastPlayerStrFirst.contains("vlc")) {
+						curPlayerStrList.add("--start-time=" + restartAtSeconds);
+					}
+					Process process = IoUtils.executeAsync(lastPlayerStrFirst, curPlayerStrList);
+					pausedEndTask = new SongEndTask(gui, process);
+
+				} catch (IOException ex) {
+					System.err.println("Could not continuge playing with player " + lastPlayerStrFirst + " due to: " + ex);
+				}
+			}
+
+			// ... and in either case, update the timestamps ^^
 			if (pausedTimeLeft == null) {
 				executeSongEndAt = null;
 			} else {
