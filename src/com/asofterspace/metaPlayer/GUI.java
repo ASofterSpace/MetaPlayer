@@ -120,6 +120,7 @@ public class GUI extends MainWindow {
 	private Map<String, Record> allPlaylistsByName = new HashMap<>();
 	private boolean starMode = false;
 
+	private JCheckBoxMenuItem audioOnlySetting;
 	private JCheckBoxMenuItem skipWithDuration;
 	private JCheckBoxMenuItem skipWithoutDuration;
 	private JCheckBoxMenuItem skipWithRating;
@@ -415,6 +416,8 @@ public class GUI extends MainWindow {
 		});
 		songs.add(importSongs);
 
+		/*
+		// REMOVED AS THIS IS NO LONGER IN USE
 		JMenuItem importLegacyPlaylist = createJMenuItem("Import Songs from Legacy Playlist");
 		importLegacyPlaylist.addActionListener(new ActionListener() {
 			@Override
@@ -423,6 +426,7 @@ public class GUI extends MainWindow {
 			}
 		});
 		songs.add(importLegacyPlaylist);
+		*/
 
 		JMenuItem curItem = createJMenuItem("Cull Multiples (without Save)");
 		curItem.addActionListener(new ActionListener() {
@@ -443,6 +447,20 @@ public class GUI extends MainWindow {
 			}
 		});
 		songs.add(curItem);
+
+		songs.add(createSeparator());
+
+		audioOnlySetting = createJCheckBoxMenuItem("Audio Only Playing (Do Not Show Video)");
+		audioOnlySetting.setSelected(config.getBoolean("playAudioOnly", false));
+		audioOnlySetting.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Record configContent = config.getAllContents();
+				configContent.set("playAudioOnly", audioOnlySetting.isSelected());
+				config.setAllContents(configContent);
+			}
+		});
+		songs.add(audioOnlySetting);
 
 		songs.add(createSeparator());
 
@@ -1301,7 +1319,7 @@ public class GUI extends MainWindow {
 			return;
 		}
 
-		String player = playerCtrl.getPlayerForSong(song);
+		String player = playerCtrl.getPlayerForSong(song, audioOnlySetting.isSelected());
 
 		if (player == null) {
 			return;
