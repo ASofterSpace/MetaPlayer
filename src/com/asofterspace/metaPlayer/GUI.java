@@ -120,6 +120,7 @@ public class GUI extends MainWindow {
 	private Map<String, Record> allPlaylistsByName = new HashMap<>();
 	private boolean starMode = false;
 
+	private JCheckBoxMenuItem randomizePlaylistAutomatically;
 	private JCheckBoxMenuItem audioOnlySetting;
 	private JCheckBoxMenuItem managePauseContinueSetting;
 	private JCheckBoxMenuItem skipWithDuration;
@@ -451,7 +452,19 @@ public class GUI extends MainWindow {
 
 		songs.add(createSeparator());
 
-		audioOnlySetting = createJCheckBoxMenuItem("Audio Only Playing (Do Not Show Video)");
+		randomizePlaylistAutomatically = createJCheckBoxMenuItem("Randomize Playlist Automatically Immediately After Selecting It");
+		randomizePlaylistAutomatically.setSelected(config.getBoolean("randomizePlaylistAutomatically", false));
+		randomizePlaylistAutomatically.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Record configContent = config.getAllContents();
+				configContent.set("randomizePlaylistAutomatically", randomizePlaylistAutomatically.isSelected());
+				config.setAllContents(configContent);
+			}
+		});
+		songs.add(randomizePlaylistAutomatically);
+
+		audioOnlySetting = createJCheckBoxMenuItem("Audio Only Background Playing (Do Not Show Video)");
 		audioOnlySetting.setSelected(config.getBoolean("playAudioOnly", false));
 		audioOnlySetting.addActionListener(new ActionListener() {
 			@Override
@@ -1055,7 +1068,9 @@ public class GUI extends MainWindow {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						songCtrl.selectPlaylist(playlistRecord, allPlaylistRecords);
-						songCtrl.randomize();
+						if (randomizePlaylistAutomatically.isSelected()) {
+							songCtrl.randomize();
+						}
 						regenerateSongList();
 					}
 				});
