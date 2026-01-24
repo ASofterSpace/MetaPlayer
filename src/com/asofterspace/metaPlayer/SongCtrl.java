@@ -361,6 +361,19 @@ public class SongCtrl {
 		Collections.shuffle(currentSongs, randomizer);
 	}
 
+	public void uniquify() {
+		List<Song> newSongs = new ArrayList<>();
+		List<String> encounteredSongs = new ArrayList<>();
+		for (Song song : currentSongs) {
+			String songStr = song.toLowTrimString();
+			if (!encounteredSongs.contains(songStr)) {
+				encounteredSongs.add(songStr);
+				newSongs.add(song);
+			}
+		}
+		currentSongs = newSongs;
+	}
+
 	public void sort(final SortCriterion criterion) {
 		Collections.sort(currentSongs, new Comparator<Song>() {
 			public int compare(Song a, Song b) {

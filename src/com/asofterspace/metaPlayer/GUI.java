@@ -121,10 +121,11 @@ public class GUI extends MainWindow {
 	private boolean starMode = false;
 
 	private JCheckBoxMenuItem randomizePlaylistAutomatically;
+	private JCheckBoxMenuItem uniquifyPlaylistAutomatically;
 	private JCheckBoxMenuItem audioOnlySetting;
 	private JCheckBoxMenuItem managePauseContinueSetting;
-	private JCheckBoxMenuItem skipWithDuration;
-	private JCheckBoxMenuItem skipWithoutDuration;
+	// private JCheckBoxMenuItem skipWithDuration;
+	// private JCheckBoxMenuItem skipWithoutDuration;
 	private JCheckBoxMenuItem skipWithRating;
 	private JCheckBoxMenuItem skipBelowPlAvg;
 	private JCheckBoxMenuItem skipBelow95;
@@ -339,6 +340,16 @@ public class GUI extends MainWindow {
 		});
 		songs.add(randomize);
 
+		JMenuItem uniquify = createJMenuItem("Uniquify");
+		uniquify.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.uniquify();
+				regenerateSongList();
+			}
+		});
+		songs.add(uniquify);
+
 		JMenuItem sortArtist = createJMenuItem("Sort by Artist");
 		sortArtist.addActionListener(new ActionListener() {
 			@Override
@@ -463,6 +474,18 @@ public class GUI extends MainWindow {
 			}
 		});
 		songs.add(randomizePlaylistAutomatically);
+
+		uniquifyPlaylistAutomatically = createJCheckBoxMenuItem("Uniquify Playlist Automatically Immediately After Selecting It");
+		uniquifyPlaylistAutomatically.setSelected(config.getBoolean("uniquifyPlaylistAutomatically", false));
+		uniquifyPlaylistAutomatically.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Record configContent = config.getAllContents();
+				configContent.set("uniquifyPlaylistAutomatically", uniquifyPlaylistAutomatically.isSelected());
+				config.setAllContents(configContent);
+			}
+		});
+		songs.add(uniquifyPlaylistAutomatically);
 
 		audioOnlySetting = createJCheckBoxMenuItem("Audio Only Background Playing (Do Not Show Video)");
 		audioOnlySetting.setSelected(config.getBoolean("playAudioOnly", false));
@@ -694,6 +717,7 @@ public class GUI extends MainWindow {
 			}
 		};
 
+		/*
 		skipWithDuration = createJCheckBoxMenuItem("Skip Songs With Duration");
 		skipWithDuration.setSelected(config.getBoolean("skipSongsWithDuration", false));
 		skipWithDuration.addActionListener(skipClickListener);
@@ -705,6 +729,7 @@ public class GUI extends MainWindow {
 		skip.add(skipWithoutDuration);
 
 		skip.add(createSeparator());
+		*/
 
 		skipWithRating = createJCheckBoxMenuItem("Skip Songs With Rating");
 		skipWithRating.setSelected(config.getBoolean("skipSongsWithRating", false));
@@ -767,8 +792,8 @@ public class GUI extends MainWindow {
 		skipNone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				skipWithDuration.setSelected(false);
-				skipWithoutDuration.setSelected(false);
+				// skipWithDuration.setSelected(false);
+				// skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(false);
 				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
@@ -789,8 +814,8 @@ public class GUI extends MainWindow {
 		discoverNew.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				skipWithDuration.setSelected(true);
-				skipWithoutDuration.setSelected(false);
+				// skipWithDuration.setSelected(true);
+				// skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(true);
 				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
@@ -832,8 +857,8 @@ public class GUI extends MainWindow {
 		defaultSkipping.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				skipWithDuration.setSelected(false);
-				skipWithoutDuration.setSelected(false);
+				// skipWithDuration.setSelected(false);
+				// skipWithoutDuration.setSelected(false);
 				skipWithRating.setSelected(false);
 				skipBelowPlAvg.setSelected(false);
 				skipBelow95.setSelected(false);
@@ -1068,6 +1093,9 @@ public class GUI extends MainWindow {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						songCtrl.selectPlaylist(playlistRecord, allPlaylistRecords);
+						if (uniquifyPlaylistAutomatically.isSelected()) {
+							songCtrl.uniquify();
+						}
 						if (randomizePlaylistAutomatically.isSelected()) {
 							songCtrl.randomize();
 						}
@@ -1082,8 +1110,8 @@ public class GUI extends MainWindow {
 
 	private void saveSkipState() {
 		Record configContent = config.getAllContents();
-		configContent.set("skipSongsWithDuration", skipWithDuration.isSelected());
-		configContent.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
+		// configContent.set("skipSongsWithDuration", skipWithDuration.isSelected());
+		// configContent.set("skipSongsWithoutDuration", skipWithoutDuration.isSelected());
 		configContent.set("skipSongsWithRating", skipWithRating.isSelected());
 		configContent.set("skipSongsBelowPlaylistAvg", skipBelowPlAvg.isSelected());
 		configContent.set("skipSongsBelow95", skipBelow95.isSelected());
@@ -1644,6 +1672,7 @@ public class GUI extends MainWindow {
 	 */
 	public boolean skippingSong(Song song, int averageRatingOfPlaylist) {
 
+		/*
 		if (skipWithDuration.isSelected() && song.hasLength()) {
 			return true;
 		}
@@ -1651,6 +1680,7 @@ public class GUI extends MainWindow {
 		if (skipWithoutDuration.isSelected() && !song.hasLength()) {
 			return true;
 		}
+		*/
 
 		if (skipWithRating.isSelected() && song.hasRating()) {
 			return true;
@@ -1787,8 +1817,8 @@ public class GUI extends MainWindow {
 	}
 
 	private void setSkipStateToPlayFavorites() {
-		skipWithDuration.setSelected(false);
-		skipWithoutDuration.setSelected(true);
+		// skipWithDuration.setSelected(false);
+		// skipWithoutDuration.setSelected(true);
 		skipWithRating.setSelected(false);
 		skipBelowPlAvg.setSelected(true);
 		skipBelow95.setSelected(false);
