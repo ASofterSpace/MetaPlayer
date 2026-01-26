@@ -461,6 +461,16 @@ public class GUI extends MainWindow {
 		});
 		songs.add(curItem);
 
+		curItem = createJMenuItem("Purge Files That Are Not Actaully Songs (without Save)");
+		curItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songCtrl.purgeNotActuallySongs();
+				regenerateSongList();
+			}
+		});
+		songs.add(curItem);
+
 		songs.add(createSeparator());
 
 		randomizePlaylistAutomatically = createJCheckBoxMenuItem("Randomize Playlist Automatically Immediately After Selecting It");
@@ -1474,18 +1484,7 @@ public class GUI extends MainWindow {
 	}
 
 	private void importSong(File file) {
-		String lowFilename = file.getFilename().toLowerCase();
-		if (!(lowFilename.endsWith(".jpg") ||
-			  lowFilename.endsWith(".jpeg") ||
-			  lowFilename.endsWith(".png") ||
-			  lowFilename.endsWith(".gif") ||
-			  lowFilename.endsWith(".bmp") ||
-			  lowFilename.endsWith(".webp") ||
-			  lowFilename.endsWith(".txt") ||
-			  lowFilename.endsWith(".ini") ||
-			  lowFilename.endsWith(".lnk") ||
-			  lowFilename.endsWith(".srt") ||
-			  lowFilename.endsWith(".orig"))) {
+		if (SongCtrl.fileIsASong(file.getFilename())) {
 			songCtrl.addUnlessAlreadyPresent(new Song(file));
 		}
 	}

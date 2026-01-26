@@ -412,6 +412,25 @@ public class SongCtrl {
 		}
 	}
 
+	public void purgeNotActuallySongs() {
+
+		boolean foundOne = false;
+		StringBuilder purgeList = new StringBuilder();
+		for (int j = allSongs.size() - 1; j >= 0; j--) {
+			if (!fileIsASong(allSongs.get(j).getLowPath())) {
+				purgeList.append(allSongs.get(j).toString());
+				purgeList.append("\n");
+				allSongs.remove(j);
+				foundOne = true;
+			}
+		}
+		if (foundOne) {
+			GuiUtils.notify("Purged:\n" + purgeList.toString());
+		} else {
+			GuiUtils.notify("Nothing to purge, all good!");
+		}
+	}
+
 	/**
 	 * Ensure that every song is only present once;
 	 * if a song is present several times, take the longest length
@@ -752,4 +771,21 @@ public class SongCtrl {
 	public void save() {
 		songConfig.setAllContents(getSongData());
 	}
+
+	public static boolean fileIsASong(String filename) {
+		filename = filename.toLowerCase();
+		return !(filename.endsWith(".jpg") ||
+				 filename.endsWith(".jpeg") ||
+				 filename.endsWith(".png") ||
+				 filename.endsWith(".gif") ||
+				 filename.endsWith(".bmp") ||
+				 filename.endsWith(".webp") ||
+				 filename.endsWith(".txt") ||
+				 filename.endsWith(".ini") ||
+				 filename.endsWith(".lnk") ||
+				 filename.endsWith(".srt") ||
+				 filename.endsWith(".pdf") ||
+				 filename.endsWith(".orig"));
+	}
+
 }
