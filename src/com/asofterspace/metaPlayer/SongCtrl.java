@@ -785,6 +785,7 @@ public class SongCtrl {
 				 filename.endsWith(".lnk") ||
 				 filename.endsWith(".srt") ||
 				 filename.endsWith(".pdf") ||
+				 filename.endsWith(".wpl") ||
 				 filename.endsWith(".orig"));
 	}
 

@@ -461,7 +461,7 @@ public class GUI extends MainWindow {
 		});
 		songs.add(curItem);
 
-		curItem = createJMenuItem("Purge Files That Are Not Actaully Songs (without Save)");
+		curItem = createJMenuItem("Purge Files That Are Not Actually Songs (without Save)");
 		curItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
