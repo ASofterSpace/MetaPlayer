@@ -1484,7 +1484,7 @@ public class GUI extends MainWindow {
 	}
 
 	private void importSong(File file) {
-		if (SongCtrl.fileIsASong(file.getFilename())) {
+		if (SongCtrl.fileNameLowIsASong(file.getFilename().toLowerCase())) {
 			songCtrl.addUnlessAlreadyPresent(new Song(file));
 		}
 	}

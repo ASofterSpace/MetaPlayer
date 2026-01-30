@@ -417,7 +417,7 @@ public class SongCtrl {
 		boolean foundOne = false;
 		StringBuilder purgeList = new StringBuilder();
 		for (int j = allSongs.size() - 1; j >= 0; j--) {
-			if (!fileIsASong(allSongs.get(j).getLowPath())) {
+			if (!fileNameLowIsASong(allSongs.get(j).getLowPath())) {
 				purgeList.append(allSongs.get(j).toString());
 				purgeList.append("\n");
 				allSongs.remove(j);
@@ -772,21 +772,25 @@ public class SongCtrl {
 		songConfig.setAllContents(getSongData());
 	}
 
-	public static boolean fileIsASong(String filename) {
-		filename = filename.toLowerCase();
-		return !(filename.endsWith(".jpg") ||
-				 filename.endsWith(".jpeg") ||
-				 filename.endsWith(".png") ||
-				 filename.endsWith(".gif") ||
-				 filename.endsWith(".bmp") ||
-				 filename.endsWith(".webp") ||
-				 filename.endsWith(".txt") ||
-				 filename.endsWith(".ini") ||
-				 filename.endsWith(".lnk") ||
-				 filename.endsWith(".srt") ||
-				 filename.endsWith(".pdf") ||
-				 filename.endsWith(".wpl") ||
-				 filename.endsWith(".orig"));
+	public static boolean fileNameLowIsASong(String filename) {
+		return filename.endsWith(".mp3") ||
+			   filename.endsWith(".mp4") ||
+			   filename.endsWith(".mkv") ||
+			   filename.endsWith(".avi") ||
+			   filename.endsWith(".mpg") ||
+			   filename.endsWith(".mpeg") ||
+			   filename.endsWith(".wav") ||
+			   filename.endsWith(".wma") ||
+			   filename.endsWith(".wmv") ||
+			   filename.endsWith(".mid") ||
+			   filename.endsWith(".midi") ||
+			   filename.endsWith(".ogg") ||
+			   filename.endsWith(".aac") ||
+			   filename.endsWith(".ts") ||
+			   filename.endsWith(".m4a") ||
+			   filename.endsWith(".mov") ||
+			   filename.endsWith(".weba") ||
+			   filename.endsWith(".webm");
 	}
 
 }
