@@ -441,12 +441,28 @@ public class GUI extends MainWindow {
 		songs.add(importLegacyPlaylist);
 		*/
 
-		JMenuItem curItem = createJMenuItem("Cull Multiples (without Save)");
+		JMenuItem curItem = createJMenuItem("Cull Multiple Songs (without Save)");
 		curItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				songCtrl.cullMultiples();
 				regenerateSongList();
+			}
+		});
+		songs.add(curItem);
+
+		curItem = createJMenuItem("Sanitize Song Titles (without Save)");
+		curItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String res = songCtrl.sanitizeSongTitles();
+				regenerateSongList();
+
+				if ((res != null) && (!"".equals(res))) {
+					GuiUtils.notify("Sanitized:\n" + res);
+				} else {
+					GuiUtils.notify("Nothing to sanitize, all good!");
+				}
 			}
 		});
 		songs.add(curItem);

@@ -360,6 +360,23 @@ public class Song {
 		return cur;
 	}
 
+	// sanitizes the title and returns the old one if a change was made
+	public String sanitizeTitle() {
+		String loT = getLowTitle();
+		if ((loT != null) && (this.title != null)) {
+			if (SongCtrl.fileNameLowIsASong(loT)) {
+				int pos = title.lastIndexOf(".");
+				if (pos >= 0) {
+					String oldTitle = title;
+					this.title = title.substring(0, pos);
+					resetPreComputations();
+					return oldTitle;
+				}
+			}
+		}
+		return null;
+	}
+
 	public boolean hasTitle() {
 		return title != null;
 	}

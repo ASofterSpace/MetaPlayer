@@ -431,6 +431,20 @@ public class SongCtrl {
 		}
 	}
 
+	public String sanitizeSongTitles() {
+		StringBuilder result = new StringBuilder();
+		String sep = "";
+		for (Song song : allSongs) {
+			String res = song.sanitizeTitle();
+			if (res != null) {
+				result.append(sep);
+				sep = "\n";
+				result.append(song.getArtist() + " - " + res + " -> " + song.getTitle());
+			}
+		}
+		return result.toString();
+	}
+
 	/**
 	 * Ensure that every song is only present once;
 	 * if a song is present several times, take the longest length
