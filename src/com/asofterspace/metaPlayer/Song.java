@@ -103,20 +103,9 @@ public class Song {
 			title = songNames[0];
 		}
 		if (title != null) {
-			if (title.endsWith(".mp4") ||
-				title.endsWith(".mp3") ||
-				title.endsWith(".mkv") ||
-				title.endsWith(".mpg") ||
-				title.endsWith(".avi") ||
-				title.endsWith(".flv") ||
-				title.endsWith(".wmv") ||
-				title.endsWith(".wma") ||
-				title.endsWith(".wav")) {
-				title = title.substring(0, title.length() - 4);
-			} else {
-				if (title.endsWith(".webm")) {
-					title = title.substring(0, title.length() - 5);
-				}
+			String lowTitle = title.toLowerCase();
+			if (SongCtrl.fileNameLowIsASong(lowTitle)) {
+				title = title.substring(0, title.lastIndexOf("."));
 			}
 		}
 	}

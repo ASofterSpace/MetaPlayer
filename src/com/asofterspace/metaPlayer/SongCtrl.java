@@ -779,6 +779,7 @@ public class SongCtrl {
 			   filename.endsWith(".avi") ||
 			   filename.endsWith(".mpg") ||
 			   filename.endsWith(".mpeg") ||
+			   filename.endsWith(".flv") ||
 			   filename.endsWith(".wav") ||
 			   filename.endsWith(".wma") ||
 			   filename.endsWith(".wmv") ||
